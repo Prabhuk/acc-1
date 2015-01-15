@@ -6,12 +6,13 @@ import com.acc.data.Result;
 
 /**
  * Created by prabhuk on 1/14/2015.
+ * The auxilary methods to cre
  */
-public class AuxilaryFunctions {
+public class AuxiliaryFunctions {
 
     private Code code;
 
-    public AuxilaryFunctions(Code code) {
+    public AuxiliaryFunctions(Code code) {
         this.code = code;
     }
 
@@ -59,9 +60,8 @@ public class AuxilaryFunctions {
 
     public static void main(String[] args) {
         final Code code = new Code();
-        AuxilaryFunctions auxf = new AuxilaryFunctions(code);
+        AuxiliaryFunctions auxf = new AuxiliaryFunctions(code);
         auxf.putF1(Opcodes.ADD, "R1", "R2", "#5");
-
         System.out.println(code.toString());
     }
 }
