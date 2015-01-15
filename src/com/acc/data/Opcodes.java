@@ -1,10 +1,11 @@
-package com.acc.util;
+package com.acc.data;
 
 /**
  * Created by prabhuk on 1/14/2015.
  */
 public enum Opcodes {
-    ADD(0)
+    ADD(0),
+    BEQ(0)
     ;
     int opcode;
 

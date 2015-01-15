@@ -1,4 +1,4 @@
-package com.acc.util;
+package com.acc.data;
 
 import java.util.Iterator;
 import java.util.LinkedList;
