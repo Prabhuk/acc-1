@@ -5,8 +5,8 @@ package com.acc.data;
  */
 public enum Opcodes {
     ADD(0),
-    BEQ(0)
-    ;
+    BEQ(0);
+
     int opcode;
 
     Opcodes(int opcode) {

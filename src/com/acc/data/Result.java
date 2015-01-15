@@ -4,14 +4,14 @@ package com.acc.data;
  * Created by Rumpy on 14-01-2015.
  */
 public class Result {
-    private int kind;
+    private Kind kind;
     private int regno;
     private int value;   //if constant
     private int address; //if variable
-    private int cond;    //Conditions: ET, LT, LE, GE, NE, EQ
+    private Condition cond;   //Conditions: ET, LT, LE, GE, NE, EQ
     private int fixuploc;  //Contains information on where I branch off from. ie: pcBranch
 
-    public Result(int kind, int regno, int value, int address, int cond, int fixuploc) {
+    public Result(Kind kind, int regno, int value, int address, Condition cond, int fixuploc) {
         this.kind = kind;
         this.regno = regno;
         this.value = value;
@@ -20,11 +20,11 @@ public class Result {
         this.fixuploc = fixuploc;
     }
 
-    public int getKind() {
+    public Kind getKind() {
         return kind;
     }
 
-    public void setKind(int kind) {
+    public void setKind(Kind kind) {
         this.kind = kind;
     }
 
@@ -52,11 +52,11 @@ public class Result {
         this.address = address;
     }
 
-    public int getCond() {
+    public Condition getCond() {
         return cond;
     }
 
-    public void setCond(int cond) {
+    public void setCond(Condition cond) {
         this.cond = cond;
     }
 
@@ -67,4 +67,5 @@ public class Result {
     public void setFixuploc(int fixuploc) {
         this.fixuploc = fixuploc;
     }
+
 }
