@@ -20,7 +20,6 @@ public class Code {
     }
 
     /**
-     *
      * @param code - Takes a line of code and appends to the output assembly/intermediate code
      * @return Returns the current program counter value
      */

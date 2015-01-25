@@ -12,6 +12,6 @@ public class Identifier implements Token {
 
     @Override
     public TokenType getTokenType() {
-        return TokenType.Identifier;
+        return TokenType.IDENTIFIER;
     }
 }

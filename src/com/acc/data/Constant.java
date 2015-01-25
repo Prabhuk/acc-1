@@ -5,13 +5,13 @@ package com.acc.data;
  */
 public class Constant implements Token {
     private String token;
-    Constant(String token)
-    {
-        this.token=token;
+
+    Constant(String token) {
+        this.token = token;
     }
 
     @Override
     public TokenType getTokenType() {
-        return TokenType.Constant;
+        return TokenType.CONSTANT;
     }
 }
