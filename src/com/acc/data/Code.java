@@ -1,5 +1,7 @@
 package com.acc.data;
 
+import com.acc.structure.BasicBlock;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,32 +12,49 @@ import java.util.List;
  */
 public class Code {
 
-    private final List<String> code = new LinkedList<String>();
+    /*
+     * List of instructions for the input program
+     */
+    private final List<Integer> instructions = new LinkedList<Integer>();
+    private final List<BasicBlock> basicBlocks = new LinkedList<BasicBlock>();
+    private BasicBlock currentBlock;
+
+    public Code() {
+        currentBlock = new BasicBlock();
+        basicBlocks.add(currentBlock);
+    }
 
     /**
      * @return Returns the current program counter value
      */
     public int getPc() {
-        return code.size();
+        return instructions.size();
     }
 
     /**
-     * @param code - Takes a line of code and appends to the output assembly/intermediate code
+     * @param instruction - Takes an instruction and appends to the output code
      * @return Returns the current program counter value
      */
-    public int addCode(String code) {
-        this.code.add(code);
-        return this.code.size();
+    public int addCode(int instruction) {
+        instructions.add(instruction);
+        currentBlock.addToBlock(instruction);
+        return instructions.size();
     }
 
-    @Override
-    public String toString() {
-        final Iterator<String> iterator = code.iterator();
-        StringBuilder finalStringBuilder = new StringBuilder();
-        while (iterator.hasNext()) {
-            finalStringBuilder.append(iterator.next()).append("\n");
-        }
-        return finalStringBuilder.toString();
+    /*
+     * Creates a new Basic Block to which instructions will be added in the future
+     */
+
+    public void addBasicBlock() {
+        currentBlock = new BasicBlock();
+        basicBlocks.add(currentBlock);
+    }
+
+    /*
+     * @return Returns the current Basic Block
+     */
+    public BasicBlock getCurrentBlock() {
+        return currentBlock;
     }
 
 }

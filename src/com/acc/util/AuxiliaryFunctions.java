@@ -17,40 +17,40 @@ public class AuxiliaryFunctions {
     }
 
     public void putF1(Opcodes op, String a, String b, String c) {
-        StringBuilder codeBuilder = new StringBuilder();
-        codeBuilder.append(op.name());
-        boolean addComma = false;
-        if (a != null) {
-            codeBuilder.append(" ")
-                    .append(a);
-            addComma = true;
-        }
-        if (b != null) {
-            if (addComma) {
-                codeBuilder.append(", ");
-            }
-            codeBuilder.append(" ")
-                    .append(b);
-            addComma = true;
-        }
-        if (c != null) {
-            if (addComma) {
-                codeBuilder.append(", ");
-            }
-            codeBuilder.append(" ")
-                    .append(c);
-
-        }
-        code.addCode(codeBuilder.toString());
+//        StringBuilder codeBuilder = new StringBuilder();
+//        codeBuilder.append(op.name());
+//        boolean addComma = false;
+//        if (a != null) {
+//            codeBuilder.append(" ")
+//                    .append(a);
+//            addComma = true;
+//        }
+//        if (b != null) {
+//            if (addComma) {
+//                codeBuilder.append(", ");
+//            }
+//            codeBuilder.append(" ")
+//                    .append(b);
+//            addComma = true;
+//        }
+//        if (c != null) {
+//            if (addComma) {
+//                codeBuilder.append(", ");
+//            }
+//            codeBuilder.append(" ")
+//                    .append(c);
+//
+//        }
+//        code.addCode(codeBuilder.toString());
     }
 
     public void BJ(int loc) {
-        putF1(Opcodes.BEQ, "0", null, String.valueOf(loc - code.getPc()));
+//        putF1(Opcodes.BEQ, "0", null, String.valueOf(loc - code.getPc()));
     }
 
     public void FJLink(Result x) {
-        putF1(Opcodes.BEQ, "0", null, String.valueOf(x.getFixuploc()));
-        x.setFixuploc(code.getPc() - 1);
+//        putF1(Opcodes.BEQ, "0", null, String.valueOf(x.getFixuploc()));
+//        x.setFixuploc(code.getPc() - 1);
     }
 
 //    public void CJF(Result x) {
@@ -60,8 +60,8 @@ public class AuxiliaryFunctions {
 
     public static void main(String[] args) {
         final Code code = new Code();
-        AuxiliaryFunctions auxf = new AuxiliaryFunctions(code);
-        auxf.putF1(Opcodes.ADD, "R1", "R2", "#5");
-        System.out.println(code.toString());
+//        AuxiliaryFunctions auxf = new AuxiliaryFunctions(code);
+//        auxf.putF1(Opcodes.ADD, "R1", "R2", "#5");
+//        Printer.print(code.toString());
     }
 }
