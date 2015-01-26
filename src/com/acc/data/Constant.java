@@ -15,4 +15,8 @@ public class Constant extends Token {
     public int value() {
         return value;
     }
+
+    public void value(int value) {
+        this.value = value;
+    }
 }
