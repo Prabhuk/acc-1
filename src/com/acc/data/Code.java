@@ -2,7 +2,6 @@ package com.acc.data;
 
 import com.acc.structure.BasicBlock;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 

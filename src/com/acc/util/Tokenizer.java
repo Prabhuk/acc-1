@@ -34,27 +34,26 @@ public class Tokenizer {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if(reader != null) {
+            if (reader != null) {
                 reader.close();
             }
         }
-        tokenSet=new HashSet<Token>();
-        input=input.replaceAll("\n"," ");
-        input=input.replaceAll("\t"," ");
-        input=input.replaceAll("<-","`");
-        st = new StringTokenizer(input,", <>={}()`;",true);
+        tokenSet = new HashSet<Token>();
+        input = input.replaceAll("\n", " ");
+        input = input.replaceAll("\t", " ");
+        input = input.replaceAll("<-", "`");
+        st = new StringTokenizer(input, ", <>={}()`;", true);
     }
 
 
     public Token next() {
         String e = st.nextToken();
         //$TODO$ figure out what kind of token it is before initializing it as Operator
-        Operator o=new Operator(e);
+        Operator o = new Operator(e);
         return o;
     }
 
-    public boolean hasNext()
-    {
+    public boolean hasNext() {
         return true;
     }
 

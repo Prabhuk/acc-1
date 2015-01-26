@@ -1,6 +1,9 @@
 package com.acc.parser;
 
-import com.acc.data.*;
+import com.acc.data.Code;
+import com.acc.data.Operator;
+import com.acc.data.Token;
+import com.acc.data.TokenType;
 import com.acc.util.Tokenizer;
 
 /**
@@ -23,10 +26,10 @@ public class Expression {
             Operator nextOperator;
             while (next.getTokenType() == TokenType.OPERATOR) {
                 nextOperator = (Operator) next;
-                if(nextOperator.value().isPlus()) {
+                if (nextOperator.value().isPlus()) {
 
 //                    result = result + term.parse();
-                } else if(nextOperator.value().isMinus()) {
+                } else if (nextOperator.value().isMinus()) {
 //                    result = result - term.parse();
                 } else {
                     break;

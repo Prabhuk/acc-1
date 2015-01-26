@@ -1,7 +1,7 @@
 package com.acc.util;
 
 import com.acc.data.Code;
-import com.acc.data.Opcodes;
+import com.acc.data.OperationCode;
 import com.acc.data.Result;
 
 /**
@@ -16,41 +16,28 @@ public class AuxiliaryFunctions {
         this.code = code;
     }
 
-    public void putF1(Opcodes op, String a, String b, String c) {
-//        StringBuilder codeBuilder = new StringBuilder();
-//        codeBuilder.append(op.name());
-//        boolean addComma = false;
-//        if (a != null) {
-//            codeBuilder.append(" ")
-//                    .append(a);
-//            addComma = true;
-//        }
-//        if (b != null) {
-//            if (addComma) {
-//                codeBuilder.append(", ");
-//            }
-//            codeBuilder.append(" ")
-//                    .append(b);
-//            addComma = true;
-//        }
-//        if (c != null) {
-//            if (addComma) {
-//                codeBuilder.append(", ");
-//            }
-//            codeBuilder.append(" ")
-//                    .append(c);
-//
-//        }
-//        code.addCode(codeBuilder.toString());
+    public void putF1(int instructionCode, int a, int b, int c) {
+        if (c < 0) c ^= 0xFFFF0000;
+        code.addCode(instructionCode << 26 | a << 21 | b << 16 | c);
+    }
+
+    public void putF2(int instructionCode, int a, int b, int c) {
+
+        code.addCode(instructionCode << 26 | a << 21 | b << 16 | c);
+
+    }
+
+    public void putF3(int instructionCode, int c) {
+        code.addCode(instructionCode << 26 | c);
     }
 
     public void BJ(int loc) {
-//        putF1(Opcodes.BEQ, "0", null, String.valueOf(loc - code.getPc()));
+        putF1(OperationCode.BEQ, 0, 0, loc - code.getPc());
     }
 
     public void FJLink(Result x) {
-//        putF1(Opcodes.BEQ, "0", null, String.valueOf(x.getFixuploc()));
-//        x.setFixuploc(code.getPc() - 1);
+        putF1(OperationCode.BEQ, 0, 0, x.getFixuploc());
+        x.setFixuploc(code.getPc() - 1);
     }
 
 //    public void CJF(Result x) {
@@ -60,8 +47,8 @@ public class AuxiliaryFunctions {
 
     public static void main(String[] args) {
         final Code code = new Code();
-//        AuxiliaryFunctions auxf = new AuxiliaryFunctions(code);
-//        auxf.putF1(Opcodes.ADD, "R1", "R2", "#5");
+        AuxiliaryFunctions auxf = new AuxiliaryFunctions(code);
+        auxf.putF1(OperationCode.ADD, 1, 2, 5);
 //        Printer.print(code.toString());
     }
 }

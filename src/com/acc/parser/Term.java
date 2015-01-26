@@ -1,6 +1,7 @@
 package com.acc.parser;
 
-import com.acc.data.*;
+import com.acc.data.Code;
+import com.acc.data.Token;
 import com.acc.util.Tokenizer;
 
 /**
@@ -16,9 +17,9 @@ public class Term {
     }
 
     public void parse() {
-       while (tokenizer.hasNext()) {
-           final Token next = tokenizer.next();
+        while (tokenizer.hasNext()) {
+            final Token next = tokenizer.next();
 
-       }
+        }
     }
 }

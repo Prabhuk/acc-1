@@ -20,7 +20,7 @@ public class CompileInputFile {
         try {
             tokenizer = new Tokenizer(filePath);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Input file ["+ filePath +"] not found");
+            logger.log(Level.SEVERE, "Input file [" + filePath + "] not found");
             e.printStackTrace();
         }
         processFile();

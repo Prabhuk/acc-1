@@ -5,19 +5,21 @@ package com.acc.vm;
 // The DLX Virtual Machine
 // chs / mf 2001-08-07
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 // All variables and methods are realized as class variables/methods which
 // means that just one processor can be emulated at a time.
 
 public class DLX {
     // processor state variables
-    static int R[] = new int [32];
+    static int R[] = new int[32];
     static int PC, op, a, b, c, format;
 
     // emulated memory
     static final int MemSize = 10000; // bytes in memory (divisible by 4)
-    static int M[] = new int [MemSize/4];
+    static int M[] = new int[MemSize / 4];
 
 
     public static void main(String argv[]) {
@@ -34,8 +36,12 @@ public class DLX {
 
     public static void execute() throws IOException {
         int origc = 0; // used for F2 instruction RET
-        for (int i = 0; i < 32; i++) { R[i] = 0; };
-        PC = 0; R[30] = MemSize - 1;
+        for (int i = 0; i < 32; i++) {
+            R[i] = 0;
+        }
+        ;
+        PC = 0;
+        R[30] = MemSize - 1;
 
         try {
 
@@ -45,7 +51,7 @@ public class DLX {
                 disassem(M[PC]); // initializes op, a, b, c
 
                 int nextPC = PC + 1;
-                if (format==2) {
+                if (format == 2) {
                     origc = c; // used for RET
                     c = R[c];  // dirty trick
                 }
@@ -97,43 +103,43 @@ public class DLX {
                     //         - if c > 31 or c < -31 an error is generated
                     case LSH:
                     case LSHI:
-                        if ((c < -31) || (c >31)) {
+                        if ((c < -31) || (c > 31)) {
                             System.out.println("Illegal value " + c +
                                     " of operand c or register c!");
                             bug(1);
                         }
-                        if (c < 0)  R[a] = R[b] >>> -c;
-                        else        R[a] = R[b] << c;
+                        if (c < 0) R[a] = R[b] >>> -c;
+                        else R[a] = R[b] << c;
                         break;
                     case ASH:
                     case ASHI:
-                        if ((c < -31) || (c >31)) {
+                        if ((c < -31) || (c > 31)) {
                             System.out.println("DLX.execute: Illegal value " + c +
                                     " of operand c or register c!");
                             bug(1);
                         }
-                        if (c < 0)  R[a] = R[b] >> -c;
-                        else        R[a] = R[b] << c;
+                        if (c < 0) R[a] = R[b] >> -c;
+                        else R[a] = R[b] << c;
                         break;
                     case CHKI:
                     case CHK:
                         if (R[a] < 0) {
-                            System.out.println("DLX.execute: " + PC*4 + ": R[" + a + "] == " +
+                            System.out.println("DLX.execute: " + PC * 4 + ": R[" + a + "] == " +
                                     R[a] + " < 0");
                             bug(14);
                         } else if (R[a] >= c) {
-                            System.out.println("DLX.execute: " + PC*4 + ": R[" + a + "] == " +
+                            System.out.println("DLX.execute: " + PC * 4 + ": R[" + a + "] == " +
                                     R[a] + " >= " + c);
                             bug(14);
                         }
                         break;
                     case LDW:
                     case LDX: // remember: c == R[origc] because of F2 format
-                        R[a] = M[(R[b]+c) / 4];
+                        R[a] = M[(R[b] + c) / 4];
                         break;
                     case STW:
                     case STX: // remember: c == R[origc] because of F2 format
-                        M[(R[b]+c) / 4] = R[a];
+                        M[(R[b] + c) / 4] = R[a];
                         break;
                     case POP:
                         R[a] = M[R[b] / 4];
@@ -145,58 +151,58 @@ public class DLX {
                         break;
                     case BEQ:
                         if (R[a] == 0) nextPC = PC + c;
-                        if ((nextPC < 0) || (nextPC > MemSize/4)) {
-                            System.out.println(4*nextPC + " is no address in memory (0.."
+                        if ((nextPC < 0) || (nextPC > MemSize / 4)) {
+                            System.out.println(4 * nextPC + " is no address in memory (0.."
                                     + MemSize + ").");
                             bug(40);
                         }
                         break;
                     case BNE:
                         if (R[a] != 0) nextPC = PC + c;
-                        if ((nextPC < 0) || (nextPC > MemSize/4)) {
-                            System.out.println(4*nextPC + " is no address in memory (0.."
+                        if ((nextPC < 0) || (nextPC > MemSize / 4)) {
+                            System.out.println(4 * nextPC + " is no address in memory (0.."
                                     + MemSize + ").");
                             bug(41);
                         }
                         break;
                     case BLT:
                         if (R[a] < 0) nextPC = PC + c;
-                        if ((nextPC < 0) || (nextPC > MemSize/4)) {
-                            System.out.println(4*nextPC + " is no address in memory (0.."
+                        if ((nextPC < 0) || (nextPC > MemSize / 4)) {
+                            System.out.println(4 * nextPC + " is no address in memory (0.."
                                     + MemSize + ").");
                             bug(42);
                         }
                         break;
                     case BGE:
                         if (R[a] >= 0) nextPC = PC + c;
-                        if ((nextPC < 0) || (nextPC > MemSize/4)) {
-                            System.out.println(4*nextPC + " is no address in memory (0.."
+                        if ((nextPC < 0) || (nextPC > MemSize / 4)) {
+                            System.out.println(4 * nextPC + " is no address in memory (0.."
                                     + MemSize + ").");
                             bug(43);
                         }
                         break;
                     case BLE:
                         if (R[a] <= 0) nextPC = PC + c;
-                        if ((nextPC < 0) || (nextPC > MemSize/4)) {
-                            System.out.println(4*nextPC + " is no address in memory (0.."
+                        if ((nextPC < 0) || (nextPC > MemSize / 4)) {
+                            System.out.println(4 * nextPC + " is no address in memory (0.."
                                     + MemSize + ").");
                             bug(44);
                         }
                         break;
                     case BGT:
                         if (R[a] > 0) nextPC = PC + c;
-                        if ((nextPC < 0) || (nextPC > MemSize/4)) {
-                            System.out.println(4*nextPC + " is no address in memory (0.."
+                        if ((nextPC < 0) || (nextPC > MemSize / 4)) {
+                            System.out.println(4 * nextPC + " is no address in memory (0.."
                                     + MemSize + ").");
                             bug(45);
                         }
                         break;
                     case BSR:
-                        R[31] = (PC+1) * 4;
+                        R[31] = (PC + 1) * 4;
                         nextPC = PC + c;
                         break;
                     case JSR:
-                        R[31] = (PC+1) * 4;
+                        R[31] = (PC + 1) * 4;
                         nextPC = c / 4;
                         break;
                     case RET:
@@ -233,27 +239,26 @@ public class DLX {
                 PC = nextPC;
             }
 
-        }
-        catch (java.lang.ArrayIndexOutOfBoundsException e ) {
-            System.out.println( "failed at " + PC*4 + ",   "  + disassemble( M[PC] ) );
+        } catch (java.lang.ArrayIndexOutOfBoundsException e) {
+            System.out.println("failed at " + PC * 4 + ",   " + disassemble(M[PC]));
         }
 
     }
 
     // Mnemonic-to-Opcode mapping
     static final String mnemo[] = {
-            "ADD","SUB","MUL","DIV","MOD","CMP","ERR","ERR","OR","AND","BIC","XOR","LSH","ASH","CHK","ERR",
-            "ADDI","SUBI","MULI","DIVI","MODI","CMPI","ERRI","ERRI","ORI","ANDI","BICI","XORI","LSHI","ASHI","CHKI","ERR",
-            "LDW","LDX","POP","ERR","STW","STX","PSH","ERR","BEQ","BNE","BLT","BGE","BLE","BGT","BSR","ERR",
-            "JSR","RET","RDI","WRD","WRH","WRL","ERR","ERR","ERR","ERR","ERR","ERR","ERR","ERR","ERR","ERR",
-            "ERR","ERR","ERR","ERR","ERR","ERR","ERR","ERR","ERR","ERR","ERR","ERR","ERR","ERR","ERR","ERR"};
+            "ADD", "SUB", "MUL", "DIV", "MOD", "CMP", "ERR", "ERR", "OR", "AND", "BIC", "XOR", "LSH", "ASH", "CHK", "ERR",
+            "ADDI", "SUBI", "MULI", "DIVI", "MODI", "CMPI", "ERRI", "ERRI", "ORI", "ANDI", "BICI", "XORI", "LSHI", "ASHI", "CHKI", "ERR",
+            "LDW", "LDX", "POP", "ERR", "STW", "STX", "PSH", "ERR", "BEQ", "BNE", "BLT", "BGE", "BLE", "BGT", "BSR", "ERR",
+            "JSR", "RET", "RDI", "WRD", "WRH", "WRL", "ERR", "ERR", "ERR", "ERR", "ERR", "ERR", "ERR", "ERR", "ERR", "ERR",
+            "ERR", "ERR", "ERR", "ERR", "ERR", "ERR", "ERR", "ERR", "ERR", "ERR", "ERR", "ERR", "ERR", "ERR", "ERR", "ERR"};
     static final int ADD = 0;
     static final int SUB = 1;
     static final int MUL = 2;
     static final int DIV = 3;
     static final int MOD = 4;
     static final int CMP = 5;
-    static final int OR  = 8;
+    static final int OR = 8;
     static final int AND = 9;
     static final int BIC = 10;
     static final int XOR = 11;
@@ -267,7 +272,7 @@ public class DLX {
     static final int DIVI = 19;
     static final int MODI = 20;
     static final int CMPI = 21;
-    static final int ORI  = 24;
+    static final int ORI = 24;
     static final int ANDI = 25;
     static final int BICI = 26;
     static final int XORI = 27;
@@ -372,7 +377,7 @@ public class DLX {
 
             // unknown instruction code
             default:
-                System.out.println( "Illegal instruction! (" + PC + ")" );
+                System.out.println("Illegal instruction! (" + PC + ")");
         }
     }
 
@@ -444,7 +449,7 @@ public class DLX {
             System.out.println("DLX.assemble: the only instruction without arguments is WRL!");
             bug(1);
         }
-        return F1(op,0,0,0);
+        return F1(op, 0, 0, 0);
     }
 
     static int assemble(int op, int arg1) {
@@ -452,20 +457,20 @@ public class DLX {
 
             // F1 Format
             case BSR:
-                return F1(op,0,0,arg1);
+                return F1(op, 0, 0, arg1);
             case RDI:
-                return F1(op,arg1,0,0);
+                return F1(op, arg1, 0, 0);
             case WRD:
             case WRH:
-                return F1(op,0,arg1,0);
+                return F1(op, 0, arg1, 0);
 
             // F2 Format
             case RET:
-                return F2(op,0,0,arg1);
+                return F2(op, 0, 0, arg1);
 
             // F3 Format
             case JSR:
-                return F3(op,arg1);
+                return F3(op, arg1);
             default:
                 System.out.println("DLX.assemble: wrong opcode for one arg instruction!");
                 bug(1);
@@ -485,11 +490,11 @@ public class DLX {
             case BGE:
             case BLE:
             case BGT:
-                return F1(op,arg1,0,arg2);
+                return F1(op, arg1, 0, arg2);
 
             // F2 Format
             case CHK:
-                return F2(op,arg1,0,arg2);
+                return F2(op, arg1, 0, arg2);
 
             default:
                 System.out.println("DLX.assemble: wrong opcode for two arg instruction!");
@@ -518,7 +523,7 @@ public class DLX {
             case POP:
             case STW:
             case PSH:
-                return F1(op,arg1,arg2,arg3);
+                return F1(op, arg1, arg2, arg3);
 
             // F2 Format
             case ADD:
@@ -535,7 +540,7 @@ public class DLX {
             case ASH:
             case LDX:
             case STX:
-                return F2(op,arg1,arg2,arg3);
+                return F2(op, arg1, arg2, arg3);
 
             default:
                 System.out.println("DLX.assemble: wrong opcode for three arg instruction!");
@@ -572,7 +577,11 @@ public class DLX {
 
     static void bug(int n) {
         System.out.println("bug number: " + n);
-        try{ System.in.read(); } catch (Exception ee) {;}
+        try {
+            System.in.read();
+        } catch (Exception ee) {
+            ;
+        }
         System.exit(n);
     }
 

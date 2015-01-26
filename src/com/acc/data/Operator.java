@@ -15,13 +15,13 @@ public class Operator implements Token {
     }
 
     private void assignValue() {
-        if(token.equals("+")) {
+        if (token.equals("+")) {
             value = Operators.PLUS;
-        } else if(token.equals("-")) {
+        } else if (token.equals("-")) {
             value = Operators.MINUS;
-        } else if(token.equals("/")) {
+        } else if (token.equals("/")) {
             value = Operators.DIVISION;
-        } else if(token.equals("*")) {
+        } else if (token.equals("*")) {
             value = Operators.PRODUCT;
         }
         throw new UnknownOperatorException(token);
