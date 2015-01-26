@@ -26,7 +26,7 @@ public class Factor {
                 Constant nextConstant = (Constant) next;
                 x = new Result(Kind.CONST, nextConstant.value(), null, null, Condition.NONE, null);
             } else if(next.tokenType() == TokenType.IDENTIFIER) {
-                //$TODO$ implement lookup and set the address
+                //$TODO$ implement lookup and set the address instead of 0
                 x = new Result(Kind.VAR, null, null, 0, Condition.NONE, null);
             } else {
                 break;

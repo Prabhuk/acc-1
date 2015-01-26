@@ -58,11 +58,11 @@ public class AuxiliaryFunctions {
             }
             x.kind(Kind.CONST);
         } else {
-            load(x);
+            load(code, x);
             if(y.kind().isConst()) {
                 putF1(code, op + 16, x.regNo(), x.regNo(), y.value());
             } else {
-                load(y);
+                load(code, y);
                 putF1(code, op, x.regNo(), x.regNo(), y.regNo());
                 deallocate(y.regNo());
             }
@@ -73,8 +73,31 @@ public class AuxiliaryFunctions {
         //$TODO$ needs implementation
     }
 
-    private static void load(Result x) {
-        //$TODO$ needs implementation
+    /*
+     * @params - x is a subtree (result object)
+     * Puts the subtree's value in register and updated x will be a register Kind
+     */
+    private static void load(Code code, Result x) {
+        if(x.kind().isRegister()) {
+            return;
+        }
+        int regNo = allocateReg();
+        if(x.kind().isConst()) {
+            putF1(code, OperationCode.ADDI, regNo, 0, x.value());
+            x.kind(Kind.REG);
+            x.regNo(regNo);
+        } else if(x.kind().isVariable()) {
+            //$TODO$ Frame pointer doesn't make any sense to our design as of now or doesn't make any sense to me :P
+            putF1(code, OperationCode.LDW, regNo, 0, x.address());
+            x.kind(Kind.REG);
+            x.regNo(regNo);
+        }
+    }
+
+
+    private static int allocateReg() {
+        //$TODO$ pending implementation
+        return 0;
     }
 
     public static void main(String[] args) {
