@@ -31,13 +31,13 @@ public class AuxiliaryFunctions {
     }
 
     public static void FJLink(Code code, Result x) {
-        putF1(code, OperationCode.BEQ, 0, 0, x.getFixuploc());
-        x.setFixuploc(code.getPc() - 1);
+        putF1(code, OperationCode.BEQ, 0, 0, x.fixupLoc());
+        x.fixupLoc(code.getPc() - 1);
     }
 
 //    public void CJF(Result x) {
-//        putF1(Opcodes.BEQ + negated[x.getCond()], x.getRegno(), 0, offset);
-//        x.setFixuploc(pc - 1);
+//        putF1(Opcodes.BEQ + negated[x.condition()], x.regNo(), 0, offset);
+//        x.fixupLoc(pc - 1);
 //    }
 
     /*
@@ -53,16 +53,18 @@ public class AuxiliaryFunctions {
                 x.value(x.value() * y.value());
             } else if(op == OperationCode.DIV) {
                 x.value(x.value() / y.value());
+            } else {
+                throw new UnsupportedOperationException("Combine cannot process Operation code ["+op+"]");
             }
             x.kind(Kind.CONST);
         } else {
             load(x);
             if(y.kind().isConst()) {
-                putF1(code, op + 16, x.getRegno(), x.getRegno(), y.value());
+                putF1(code, op + 16, x.regNo(), x.regNo(), y.value());
             } else {
                 load(y);
-                putF1(code, op, x.getRegno(), x.getRegno(), y.getRegno());
-                deallocate(y.getRegno());
+                putF1(code, op, x.regNo(), x.regNo(), y.regNo());
+                deallocate(y.regNo());
             }
         }
     }

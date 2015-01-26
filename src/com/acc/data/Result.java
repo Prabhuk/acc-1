@@ -9,15 +9,15 @@ public class Result {
     private int value;   //if constant
     private int address; //if variable
     private Condition cond;   //Conditions: ET, LT, LE, GE, NE, EQ
-    private int fixuploc;  //Contains information on where I branch off from. ie: pcBranch
+    private int fixupLoc;  //Contains information on where I branch off from. ie: pcBranch
 
-    public Result(Kind kind, int regno, int value, int address, Condition cond, int fixuploc) {
+    public Result(Kind kind, int regno, int value, int address, Condition cond, int fixupLoc) {
         this.kind = kind;
         this.regno = regno;
         this.value = value;
         this.address = address;
         this.cond = cond;
-        this.fixuploc = fixuploc;
+        this.fixupLoc = fixupLoc;
     }
 
     public Kind kind() {
@@ -28,11 +28,11 @@ public class Result {
         this.kind = kind;
     }
 
-    public int getRegno() {
+    public int regNo() {
         return regno;
     }
 
-    public void setRegno(int regno) {
+    public void regNo(int regno) {
         this.regno = regno;
     }
 
@@ -44,28 +44,28 @@ public class Result {
         this.value = value;
     }
 
-    public int getAddress() {
+    public int address() {
         return address;
     }
 
-    public void setAddress(int address) {
+    public void address(int address) {
         this.address = address;
     }
 
-    public Condition getCond() {
+    public Condition condition() {
         return cond;
     }
 
-    public void setCond(Condition cond) {
+    public void condition(Condition cond) {
         this.cond = cond;
     }
 
-    public int getFixuploc() {
-        return fixuploc;
+    public int fixupLoc() {
+        return fixupLoc;
     }
 
-    public void setFixuploc(int fixuploc) {
-        this.fixuploc = fixuploc;
+    public void fixupLoc(int fixuploc) {
+        this.fixupLoc = fixuploc;
     }
 
 }
