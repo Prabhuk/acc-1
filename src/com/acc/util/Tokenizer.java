@@ -89,16 +89,27 @@ public class Tokenizer {
             currentPointer++;
             currentChar = input.charAt(currentPointer);
             if (isComment(currentChar, temp)) {
-                while (currentChar != '\n') {
-                    currentPointer++;
-                    currentChar = input.charAt(currentPointer);
-                }
+                eatCommentText(currentChar);
                 return next();
             }
             return new Operator(token.toString());
-        } else {
+        } else if(isCommentCharacter(currentChar)){
+            eatCommentText(currentChar);
+            return next();
+        }else {
             currentPointer++;
             throw new RuntimeException("Unrecognized character ["+ currentChar +"]");
+        }
+    }
+
+    private boolean isCommentCharacter(char currentChar) {
+        return currentChar=='#';
+    }
+
+    private void eatCommentText(char currentChar) {
+        while (currentChar != '\n') {
+            currentPointer++;
+            currentChar = input.charAt(currentPointer);
         }
     }
 
@@ -168,7 +179,7 @@ public class Tokenizer {
     }
 
     public static void main(String[] args) throws IOException {
-        Tokenizer t = new Tokenizer("p1.txt");
+        Tokenizer t = new Tokenizer("test/test011.txt");
         Token token;
         while (t.hasNext()) {
             token = t.next();
