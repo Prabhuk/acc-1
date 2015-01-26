@@ -1,6 +1,7 @@
 package com.acc.parser;
 
 import com.acc.data.Code;
+import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.util.Tokenizer;
 
@@ -16,10 +17,13 @@ public class Term {
         this.code = code;
     }
 
-    public void parse() {
+    public Result parse() {
+        //$TODO$ Pending implementation
+        Result x = null;
         while (tokenizer.hasNext()) {
             final Token next = tokenizer.next();
 
         }
+        return x;
     }
 }

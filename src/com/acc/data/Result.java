@@ -20,11 +20,11 @@ public class Result {
         this.fixuploc = fixuploc;
     }
 
-    public Kind getKind() {
+    public Kind kind() {
         return kind;
     }
 
-    public void setKind(Kind kind) {
+    public void kind(Kind kind) {
         this.kind = kind;
     }
 
@@ -36,11 +36,11 @@ public class Result {
         this.regno = regno;
     }
 
-    public int getValue() {
+    public int value() {
         return value;
     }
 
-    public void setValue(int value) {
+    public void value(int value) {
         this.value = value;
     }
 

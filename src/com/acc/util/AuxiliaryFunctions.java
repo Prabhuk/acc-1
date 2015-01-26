@@ -1,6 +1,7 @@
 package com.acc.util;
 
 import com.acc.data.Code;
+import com.acc.data.Kind;
 import com.acc.data.OperationCode;
 import com.acc.data.Result;
 
@@ -10,33 +11,27 @@ import com.acc.data.Result;
  */
 public class AuxiliaryFunctions {
 
-    private Code code;
-
-    public AuxiliaryFunctions(Code code) {
-        this.code = code;
-    }
-
-    public void putF1(int instructionCode, int a, int b, int c) {
+    public static void putF1(Code code, int instructionCode, int a, int b, int c) {
         if (c < 0) c ^= 0xFFFF0000;
         code.addCode(instructionCode << 26 | a << 21 | b << 16 | c);
     }
 
-    public void putF2(int instructionCode, int a, int b, int c) {
+    public static void putF2(Code code, int instructionCode, int a, int b, int c) {
 
         code.addCode(instructionCode << 26 | a << 21 | b << 16 | c);
 
     }
 
-    public void putF3(int instructionCode, int c) {
+    public static void putF3(Code code, int instructionCode, int c) {
         code.addCode(instructionCode << 26 | c);
     }
 
-    public void BJ(int loc) {
-        putF1(OperationCode.BEQ, 0, 0, loc - code.getPc());
+    public static void BJ(Code code, int loc) {
+        putF1(code, OperationCode.BEQ, 0, 0, loc - code.getPc());
     }
 
-    public void FJLink(Result x) {
-        putF1(OperationCode.BEQ, 0, 0, x.getFixuploc());
+    public static void FJLink(Code code, Result x) {
+        putF1(code, OperationCode.BEQ, 0, 0, x.getFixuploc());
         x.setFixuploc(code.getPc() - 1);
     }
 
@@ -45,10 +40,44 @@ public class AuxiliaryFunctions {
 //        x.setFixuploc(pc - 1);
 //    }
 
+    /*
+     * Combines x & y and resultant result obj is maintained in x.
+     */
+    public static void combine(Code code, int op, Result x, Result y) {
+        if(x.kind().isConst() && y.kind().isConst()) {
+            if(op == OperationCode.ADD) {
+                x.value(x.value() + y.value());
+            } else if(op == OperationCode.SUB) {
+                x.value(x.value() - y.value());
+            } else if(op == OperationCode.MUL) {
+                x.value(x.value() * y.value());
+            } else if(op == OperationCode.DIV) {
+                x.value(x.value() / y.value());
+            }
+            x.kind(Kind.CONST);
+        } else {
+            load(x);
+            if(y.kind().isConst()) {
+                putF1(code, op + 16, x.getRegno(), x.getRegno(), y.value());
+            } else {
+                load(y);
+                putF1(code, op, x.getRegno(), x.getRegno(), y.getRegno());
+                deallocate(y.getRegno());
+            }
+        }
+    }
+
+    private static void deallocate(int regno) {
+        //$TODO$ needs implementation
+    }
+
+    private static void load(Result x) {
+        //$TODO$ needs implementation
+    }
+
     public static void main(String[] args) {
         final Code code = new Code();
-        AuxiliaryFunctions auxf = new AuxiliaryFunctions(code);
-        auxf.putF1(OperationCode.ADD, 1, 2, 5);
+        AuxiliaryFunctions.putF1(code, OperationCode.ADD, 1, 2, 5);
 //        Printer.print(code.toString());
     }
 }

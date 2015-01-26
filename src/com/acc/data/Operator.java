@@ -5,30 +5,29 @@ import com.acc.exception.UnknownOperatorException;
 /**
  * Created by Rumpy on 15-01-2015.
  */
-public class Operator implements Token {
-    private String token;
+public class Operator extends Token {
     private Operators value;
 
     public Operator(String token) {
-        this.token = token;
+        super(token);
         assignValue();
     }
 
     private void assignValue() {
-        if (token.equals("+")) {
+        if (getToken().equals("+")) {
             value = Operators.PLUS;
-        } else if (token.equals("-")) {
+        } else if (getToken().equals("-")) {
             value = Operators.MINUS;
-        } else if (token.equals("/")) {
+        } else if (getToken().equals("/")) {
             value = Operators.DIVISION;
-        } else if (token.equals("*")) {
+        } else if (getToken().equals("*")) {
             value = Operators.PRODUCT;
         }
-        throw new UnknownOperatorException(token);
+        throw new UnknownOperatorException(getToken());
     }
 
     @Override
-    public TokenType getTokenType() {
+    public TokenType tokenType() {
         return TokenType.OPERATOR;
     }
 

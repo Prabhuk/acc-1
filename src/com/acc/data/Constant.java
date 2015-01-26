@@ -3,15 +3,10 @@ package com.acc.data;
 /**
  * Created by Rumpy on 15-01-2015.
  */
-public class Constant implements Token {
-    private String token;
-
-    Constant(String token) {
-        this.token = token;
-    }
+public class Constant extends Token {
 
     @Override
-    public TokenType getTokenType() {
+    public TokenType tokenType() {
         return TokenType.CONSTANT;
     }
 }

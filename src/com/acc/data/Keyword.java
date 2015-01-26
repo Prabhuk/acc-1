@@ -3,15 +3,10 @@ package com.acc.data;
 /**
  * Created by Rumpy on 15-01-2015.
  */
-public class Keyword implements Token {
-    private String token;
-
-    public Keyword(String token) {
-        this.token = token;
-    }
+public class Keyword extends Token {
 
     @Override
-    public TokenType getTokenType() {
+    public TokenType tokenType() {
         return TokenType.KEYWORD;
     }
 }

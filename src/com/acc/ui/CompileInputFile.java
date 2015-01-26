@@ -28,7 +28,7 @@ public class CompileInputFile {
 
     private void processFile() {
         final Token next = tokenizer.next();
-        switch (next.getTokenType()) {
+        switch (next.tokenType()) {
         }
     }
 }
