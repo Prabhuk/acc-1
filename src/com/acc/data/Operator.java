@@ -22,6 +22,10 @@ public class Operator extends Token {
             value = Operators.DIVISION;
         } else if (getToken().equals("*")) {
             value = Operators.PRODUCT;
+        } else if (getToken().equals("(")) {
+            value = Operators.OPEN_BRACKET;
+        } else if (getToken().equals(")")) {
+            value = Operators.CLOSE_BRACKET;
         } else {
             throw new UnknownOperatorException(getToken());
         }

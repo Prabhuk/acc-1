@@ -8,8 +8,9 @@ public class Constant extends Token {
     //Assuming the input code does not contain floating values
     private int value;
 
-    public Constant(int value) {
-        this.value=value;
+    public Constant(String token) {
+        super(token);
+        value = Integer.parseInt(token, 10);
     }
 
     @Override

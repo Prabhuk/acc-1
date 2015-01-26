@@ -7,7 +7,7 @@ public enum Operators {
     PLUS("+"),
     MINUS("-"),
     DIVISION("/"),
-    PRODUCT("*");
+    PRODUCT("*"), OPEN_BRACKET("("), CLOSE_BRACKET(")");
 
     private final String symbol;
 
