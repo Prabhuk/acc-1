@@ -5,8 +5,14 @@ package com.acc.data;
  */
 public class Identifier extends Token {
 
+
+    public Identifier(String token) {
+        super(token);
+    }
+
     @Override
     public TokenType tokenType() {
         return TokenType.IDENTIFIER;
     }
+
 }

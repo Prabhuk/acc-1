@@ -22,8 +22,9 @@ public class Operator extends Token {
             value = Operators.DIVISION;
         } else if (getToken().equals("*")) {
             value = Operators.PRODUCT;
+        } else {
+            throw new UnknownOperatorException(getToken());
         }
-        throw new UnknownOperatorException(getToken());
     }
 
     @Override

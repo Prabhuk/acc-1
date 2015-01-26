@@ -8,5 +8,8 @@ public enum TokenType {
     KEYWORD,
     IDENTIFIER,
     CONSTANT,
+    RELATIONAL_OPERATOR,
+    ASSIGNMENT_OPERATOR,
     SEPARATOR;
+
 }

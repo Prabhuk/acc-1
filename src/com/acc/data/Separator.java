@@ -5,8 +5,13 @@ package com.acc.data;
  */
 public class Separator extends Token {
 
+    public Separator(String token) {
+        super(token);
+    }
+
     @Override
     public TokenType tokenType() {
         return TokenType.SEPARATOR;
     }
+
 }

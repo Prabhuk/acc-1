@@ -5,8 +5,14 @@ package com.acc.data;
  */
 public class Keyword extends Token {
 
+    public Keyword(String token) {
+        super(token);
+    }
+
     @Override
     public TokenType tokenType() {
         return TokenType.KEYWORD;
     }
+
+
 }
