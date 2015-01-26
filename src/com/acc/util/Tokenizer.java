@@ -56,7 +56,6 @@ public class Tokenizer {
         }
 
         StringBuilder token = new StringBuilder();
-
         char currentChar = eliminateEmptySpaces();
         if(currentChar == '.') {
             Printer.print("DEBUG: currentPointer ["+ currentPointer + "] inputLength ["+input.length()+"]" );
@@ -69,14 +68,16 @@ public class Tokenizer {
         } else if (Character.isAlphabetic(currentChar)) {
             return handleIdentifiersAndKeywords(token, currentChar);
         } else if (isSeparatorCharacter(currentChar)) {
-            return new Separator(token.append(input.charAt(currentPointer++)).toString());
-        } else if (isRelationalOperator(currentChar)) {
-            char temp = currentChar;
-            token.append(temp);
             currentPointer++;
-            currentChar = input.charAt(currentPointer++);
-            if (isAssignmentOperator(currentChar, temp)) {
-                token.append(input.charAt(currentPointer++));
+            return new Separator(token.append(currentChar).toString());
+        } else if (isRelationalOperator(currentChar)) {
+            char previous = currentChar;
+            token.append(currentChar);
+            currentPointer++;
+            currentChar = input.charAt(currentPointer);
+            if (isAssignmentOperator(currentChar, previous)) {
+                token.append(currentChar);
+                currentPointer++;
                 return new AssignmentOperator(token.toString());
             } else if (currentChar == '=') {
                 token.append(input.charAt(currentPointer++));
@@ -86,11 +87,12 @@ public class Tokenizer {
             char temp = currentChar;
             token.append(temp);
             currentPointer++;
-            currentChar = input.charAt(currentPointer++);
+            currentChar = input.charAt(currentPointer);
             if (isComment(currentChar, temp)) {
-                do {
-                    currentChar = input.charAt(currentPointer++);
-                } while (currentChar != '\n');
+                while (currentChar != '\n') {
+                    currentPointer++;
+                    currentChar = input.charAt(currentPointer);
+                }
                 return next();
             }
             return new Operator(token.toString());
@@ -125,10 +127,12 @@ public class Tokenizer {
     }
 
     private Token handleIdentifiersAndKeywords(StringBuilder token, char currentChar) {
-        do {
-            currentChar = input.charAt(currentPointer++);
+        while (Character.isJavaIdentifierPart(currentChar)) {
             token.append(currentChar);
-        } while ((currentPointer < input.length()) && Character.isJavaIdentifierPart(input.charAt(currentPointer)));
+            currentPointer++;
+            currentChar = input.charAt(currentPointer);
+        }
+
         String value = token.toString();
         //$TODO$ move these identifiers into a set
         if ("if".equals(value) || "let".equals(value) || "fi".equals(value) || "call".equals(value)
@@ -142,19 +146,18 @@ public class Tokenizer {
     }
 
     private Token handleConstants(StringBuilder token, char currentChar) {
-        int constant = 0;
-        do {
-            currentChar = input.charAt(currentPointer++);
+        while (Character.isDigit(currentChar)) {
             token.append(currentChar);
-        } while ((currentPointer < input.length()) && Character.isDigit(currentChar));
-        constant = Integer.valueOf(token.toString());
-        return new Constant(constant);
+            currentPointer++;
+            currentChar = input.charAt(currentPointer);
+        }
+        return new Constant(token.toString());
     }
 
     private char eliminateEmptySpaces() {
         char currentChar = input.charAt(currentPointer);
-        while (currentChar == ' ' || currentChar == '\t' || currentChar == '\n') {
-            currentChar = input.charAt(currentPointer++);
+        while (currentChar == ' ' || currentChar == '\t' || currentChar == '\n' || currentChar == '\r') {
+            currentChar = input.charAt(++currentPointer);
         }
         return currentChar;
     }
