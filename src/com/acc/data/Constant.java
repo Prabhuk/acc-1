@@ -5,8 +5,14 @@ package com.acc.data;
  */
 public class Constant extends Token {
 
+    //Assuming the input code does not contain decimal values
+    private int value;
     @Override
     public TokenType tokenType() {
         return TokenType.CONSTANT;
+    }
+
+    public int value() {
+        return value;
     }
 }

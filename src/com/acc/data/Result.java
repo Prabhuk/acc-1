@@ -5,13 +5,13 @@ package com.acc.data;
  */
 public class Result {
     private Kind kind;
-    private int regno;
-    private int value;   //if constant
-    private int address; //if variable
+    private Integer regno;
+    private Integer value;   //if constant
+    private Integer address; //if variable
     private Condition cond;   //Conditions: ET, LT, LE, GE, NE, EQ
-    private int fixupLoc;  //Contains information on where I branch off from. ie: pcBranch
+    private Integer fixupLoc;  //Contains information on where I branch off from. ie: pcBranch
 
-    public Result(Kind kind, int regno, int value, int address, Condition cond, int fixupLoc) {
+    public Result(Kind kind, Integer regno, Integer value, Integer address, Condition cond, Integer fixupLoc) {
         this.kind = kind;
         this.regno = regno;
         this.value = value;
@@ -28,27 +28,27 @@ public class Result {
         this.kind = kind;
     }
 
-    public int regNo() {
+    public Integer regNo() {
         return regno;
     }
 
-    public void regNo(int regno) {
+    public void regNo(Integer regno) {
         this.regno = regno;
     }
 
-    public int value() {
+    public Integer value() {
         return value;
     }
 
-    public void value(int value) {
+    public void value(Integer value) {
         this.value = value;
     }
 
-    public int address() {
+    public Integer address() {
         return address;
     }
 
-    public void address(int address) {
+    public void address(Integer address) {
         this.address = address;
     }
 
@@ -60,11 +60,11 @@ public class Result {
         this.cond = cond;
     }
 
-    public int fixupLoc() {
+    public Integer fixupLoc() {
         return fixupLoc;
     }
 
-    public void fixupLoc(int fixuploc) {
+    public void fixupLoc(Integer fixuploc) {
         this.fixupLoc = fixuploc;
     }
 

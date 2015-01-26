@@ -10,13 +10,14 @@ import com.acc.util.Tokenizer;
 public class Expression {
 
     private Code code;
+    private Tokenizer tokenizer;
 
-    public Expression(Code code) {
+    public Expression(Code code, Tokenizer tokenizer) {
         this.code = code;
+        this.tokenizer = tokenizer;
     }
 
-    //$TODO$ make this return number instead of
-    public Result parse(Tokenizer tokenizer) {
+    public Result parse() {
         Result x, y;
         final Term term = new Term(code, tokenizer);
         x = term.parse();

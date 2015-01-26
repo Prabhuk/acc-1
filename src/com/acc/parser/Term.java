@@ -1,8 +1,7 @@
 package com.acc.parser;
 
-import com.acc.data.Code;
-import com.acc.data.Result;
-import com.acc.data.Token;
+import com.acc.data.*;
+import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
 /**
@@ -18,11 +17,25 @@ public class Term {
     }
 
     public Result parse() {
-        //$TODO$ Pending implementation
-        Result x = null;
+        Result x, y;
+        final Factor factor = new Factor(code, tokenizer);
+        x = factor.parse();
         while (tokenizer.hasNext()) {
             final Token next = tokenizer.next();
-
+            Operator  nextOperator;
+            while (next.tokenType() == TokenType.OPERATOR) {
+                nextOperator = (Operator) next;
+                int instructionCode;
+                if(nextOperator.value().isMultiplication()) {
+                    instructionCode = OperationCode.MUL;
+                } else if(nextOperator.value().isDivision()) {
+                    instructionCode = OperationCode.DIV;
+                } else {
+                    break;
+                }
+                y = factor.parse();
+                AuxiliaryFunctions.combine(code, instructionCode, x, y);
+            }
         }
         return x;
     }

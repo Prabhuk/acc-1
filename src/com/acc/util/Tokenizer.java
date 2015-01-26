@@ -48,6 +48,7 @@ public class Tokenizer {
 
     public Token next() {
         String e = st.nextToken();
+        Printer.print(e);
         //$TODO$ figure out what kind of token it is before initializing it as Operator
         Operator o = new Operator(e);
         return o;

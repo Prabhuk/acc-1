@@ -4,7 +4,7 @@ package com.acc.data;
  * Created by Rumpy on 14-01-2015.
  */
 public enum Condition {
-    EQ("NE"), LT("GE"), GT("LE"), LE("GT"), GE("LT"), NE("EQ");
+    EQ("NE"), LT("GE"), GT("LE"), LE("GT"), GE("LT"), NE("EQ"), NONE("none");
     private final String value;
 
     Condition(String value) {
