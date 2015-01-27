@@ -1,4 +1,4 @@
-package com.acc.data;
+package com.acc.constants;
 
 /**
  * Created by prabhuk on 1/24/2015.

@@ -1,5 +1,8 @@
 package com.acc.data;
 
+import com.acc.constants.Condition;
+import com.acc.constants.Kind;
+
 /**
  * Created by Rumpy on 14-01-2015.
  */

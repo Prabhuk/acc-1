@@ -1,5 +1,6 @@
 package com.acc.data;
 
+import com.acc.constants.Operators;
 import com.acc.exception.UnknownOperatorException;
 
 /**
@@ -14,20 +15,20 @@ public class Operator extends Token {
     }
 
     private void assignValue() {
-        if (getToken().equals("+")) {
+        if (token.equals("+")) {
             value = Operators.PLUS;
-        } else if (getToken().equals("-")) {
+        } else if (token.equals("-")) {
             value = Operators.MINUS;
-        } else if (getToken().equals("/")) {
+        } else if (token.equals("/")) {
             value = Operators.DIVISION;
-        } else if (getToken().equals("*")) {
+        } else if (token.equals("*")) {
             value = Operators.PRODUCT;
-        } else if (getToken().equals("(")) {
+        } else if (token.equals("(")) {
             value = Operators.OPEN_BRACKET;
-        } else if (getToken().equals(")")) {
+        } else if (token.equals(")")) {
             value = Operators.CLOSE_BRACKET;
         } else {
-            throw new UnknownOperatorException(getToken());
+            throw new UnknownOperatorException(token);
         }
     }
 

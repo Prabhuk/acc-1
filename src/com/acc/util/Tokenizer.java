@@ -1,5 +1,6 @@
 package com.acc.util;
 
+import com.acc.constants.KeywordType;
 import com.acc.data.*;
 
 import java.io.BufferedReader;
@@ -23,6 +24,7 @@ public class Tokenizer {
     private Set<Token> tokenSet;
     private StringTokenizer st;
     private int currentPointer = 0;
+
 
     public Tokenizer(String filePath) throws IOException {
         sourceFile = new File(filePath);
@@ -146,11 +148,9 @@ public class Tokenizer {
 
         String value = token.toString();
         //$TODO$ move these identifiers into a set
-        if ("if".equals(value) || "let".equals(value) || "fi".equals(value) || "call".equals(value)
-                || "then".equals(value) || "else".equals(value) || "while".equals(value) ||
-                "do".equals(value) || "od".equals(value) || "return".equals(value) || "var".equals(value) ||
-                "array".equals(value) || "function".equals(value) || "procedure".equals(value) || "main".equals(value)) {
-            return new Keyword(value);
+        final KeywordType keywordType = KeywordType.isKeyword(value);
+        if (keywordType != null) {
+            return new Keyword(value, keywordType);
         } else {
             return new Identifier(value);
         }

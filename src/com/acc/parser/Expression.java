@@ -1,5 +1,6 @@
 package com.acc.parser;
 
+import com.acc.constants.OperationCode;
 import com.acc.data.*;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
@@ -7,16 +8,13 @@ import com.acc.util.Tokenizer;
 /**
  * Created by prabhuk on 1/24/2015.
  */
-public class Expression {
-
-    private Code code;
-    private Tokenizer tokenizer;
+public class Expression extends Parser{
 
     public Expression(Code code, Tokenizer tokenizer) {
-        this.code = code;
-        this.tokenizer = tokenizer;
+        super(code, tokenizer);
     }
 
+    @Override
     public Result parse() {
         Result x, y;
         final Term term = new Term(code, tokenizer);
@@ -24,7 +22,7 @@ public class Expression {
         while (tokenizer.hasNext()) {
             final Token next = tokenizer.next();
             Operator nextOperator;
-            while (next.tokenType() == TokenType.OPERATOR) {
+            while (next.tokenType().isOperator()) {
                 nextOperator = (Operator) next;
                 int instructionCode;
                 if (nextOperator.value().isPlus()) {

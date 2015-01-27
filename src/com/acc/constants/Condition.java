@@ -1,4 +1,4 @@
-package com.acc.data;
+package com.acc.constants;
 
 /**
  * Created by Rumpy on 14-01-2015.

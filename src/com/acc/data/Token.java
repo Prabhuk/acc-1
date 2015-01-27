@@ -6,7 +6,7 @@ import com.acc.exception.InvalidTokenException;
  * Created by Rumpy on 15-01-2015.
  */
 public abstract class Token {
-    private String token;
+    protected String token;
 
     public Token() {
         throw new InvalidTokenException("Token cannot be empty");
