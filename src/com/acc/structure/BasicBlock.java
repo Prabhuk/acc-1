@@ -12,7 +12,6 @@ public class BasicBlock {
      */
     private final Map<Integer, Integer> block = new LinkedHashMap<Integer, Integer>();
     private final Set<BasicBlock> dominators = new HashSet<BasicBlock>();
-
     public Set<BasicBlock> getDominators() {
         return dominators;
     }

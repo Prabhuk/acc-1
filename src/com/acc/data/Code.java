@@ -37,6 +37,10 @@ public class Code {
     public int addCode(int instruction) {
         instructions.add(instruction);
         currentBlock.addToBlock(instruction);
+        if(isBranchInstruction(instruction))
+        {
+            addBasicBlock();
+        }
         return instructions.size();
     }
 
