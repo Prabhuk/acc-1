@@ -18,7 +18,6 @@ public class Statement extends Parser {
     @Override
     public Result parse() {
         Result x = null;
-        while (tokenizer.hasNext()) {
             final Token next = tokenizer.next();
             if (next.tokenType().isKeyword()) {
                 Keyword nextKeyword = (Keyword) next;
@@ -35,7 +34,7 @@ public class Statement extends Parser {
                         x = new IfParser(code, tokenizer).parse();
                     }
                 }
-            }
+
         }
         return x;
     }

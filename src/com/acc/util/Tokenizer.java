@@ -7,9 +7,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.lang.Character;
 
 /**
@@ -21,9 +19,10 @@ import java.lang.Character;
 public class Tokenizer {
     private File sourceFile;
     private String input;
-    private Set<Token> tokenSet;
+    private Map<Integer,Token> tokenSet;
     private StringTokenizer st;
     private int currentPointer = 0;
+    private int tokenCounter =0;
 
 
     public Tokenizer(String filePath) throws IOException {
@@ -43,14 +42,21 @@ public class Tokenizer {
                 reader.close();
             }
         }
-        tokenSet = new HashSet<Token>();
+        tokenSet = new LinkedHashMap<Integer, Token>();
         //input = input.replaceAll("\n", " ");
         //input = input.replaceAll("\t", " ");
         //input = input.replaceAll("<-", "`");
         //input = input.replaceAll("//", "~");
         //st = new StringTokenizer(input, ", <>={}()`;", true);
     }
-
+    public Token current()
+    {
+        if(!tokenSet.isEmpty())
+        {
+            return tokenSet.get(tokenCounter);
+        }
+        return null;
+    }
 
     public Token next() {
         if (!hasNext()) {
@@ -62,7 +68,9 @@ public class Tokenizer {
         if(currentChar == '.') {
             Printer.print("DEBUG: currentPointer ["+ currentPointer + "] inputLength ["+input.length()+"]" );
             currentPointer++;
-            return new Separator(token.append(currentChar).toString());
+            Separator s=new Separator(token.append(currentChar).toString());
+            tokenSet.put(++tokenCounter,s);
+            return s;
         }
 
         if (Character.isDigit(currentChar)) {
@@ -71,7 +79,9 @@ public class Tokenizer {
             return handleIdentifiersAndKeywords(token, currentChar);
         } else if (isSeparatorCharacter(currentChar)) {
             currentPointer++;
-            return new Separator(token.append(currentChar).toString());
+            Separator s=new Separator(token.append(currentChar).toString());
+            tokenSet.put(++tokenCounter, s);
+            return s;
         } else if (isRelationalOperator(currentChar)) {
             char previous = currentChar;
             token.append(currentChar);
@@ -80,11 +90,15 @@ public class Tokenizer {
             if (isAssignmentOperator(currentChar, previous)) {
                 token.append(currentChar);
                 currentPointer++;
-                return new AssignmentOperator(token.toString());
+                AssignmentOperator a=new AssignmentOperator(token.toString());
+                tokenSet.put(++tokenCounter, a);
+                return a;
             } else if (currentChar == '=') {
                 token.append(input.charAt(currentPointer++));
             }
-            return new RelOp(token.toString());
+            RelOp ro = new RelOp(token.toString());
+            tokenSet.put(++tokenCounter, ro);
+            return ro;
         } else if (isOperatorCharacter(currentChar)) {
             char temp = currentChar;
             token.append(temp);
@@ -94,7 +108,9 @@ public class Tokenizer {
                 eatCommentText(currentChar);
                 return next();
             }
-            return new Operator(token.toString());
+            Operator o = new Operator(token.toString());
+            tokenSet.put(++tokenCounter, o);
+            return o;
         } else if(isCommentCharacter(currentChar)){
             eatCommentText(currentChar);
             return next();
@@ -150,9 +166,13 @@ public class Tokenizer {
         //$TODO$ move these identifiers into a set
         final KeywordType keywordType = KeywordType.isKeyword(value);
         if (keywordType != null) {
-            return new Keyword(value, keywordType);
+            Keyword k = new Keyword(value, keywordType);
+            tokenSet.put(++tokenCounter, k);
+            return k;
         } else {
-            return new Identifier(value);
+            Identifier i = new Identifier(value);
+            tokenSet.put(++tokenCounter, i);
+            return i;
         }
     }
 
@@ -162,7 +182,9 @@ public class Tokenizer {
             currentPointer++;
             currentChar = input.charAt(currentPointer);
         }
-        return new Constant(token.toString());
+        Constant c = new Constant(token.toString());
+        tokenSet.put(++tokenCounter, c);
+        return c;
     }
 
     private char eliminateEmptySpaces() {
