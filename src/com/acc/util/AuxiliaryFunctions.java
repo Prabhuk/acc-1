@@ -1,8 +1,9 @@
 package com.acc.util;
 
-import com.acc.data.Code;
+import com.acc.constants.Condition;
 import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
+import com.acc.data.Code;
 import com.acc.data.Result;
 
 /**
@@ -35,31 +36,31 @@ public class AuxiliaryFunctions {
         x.fixupLoc(code.getPc() - 1);
     }
 
-//    public void CJF(Result x) {
-//        putF1(Opcodes.BEQ + negated[x.condition()], x.regNo(), 0, offset);
-//        x.fixupLoc(pc - 1);
-//    }
+    public static void CJF(Code code, Result x) {
+        putF1(code, OperationCode.BEQ + Condition.getNegatedInstruction(x.condition()), x.regNo(), 0, 0);
+        x.fixupLoc(code.getPc() - 1);
+    }
 
     /*
      * Combines x & y and resultant result obj is maintained in x.
      */
     public static void combine(Code code, int op, Result x, Result y) {
-        if(x.kind().isConst() && y.kind().isConst()) {
-            if(op == OperationCode.ADD) {
+        if (x.kind().isConst() && y.kind().isConst()) {
+            if (op == OperationCode.ADD) {
                 x.value(x.value() + y.value());
-            } else if(op == OperationCode.SUB) {
+            } else if (op == OperationCode.SUB) {
                 x.value(x.value() - y.value());
-            } else if(op == OperationCode.MUL) {
+            } else if (op == OperationCode.MUL) {
                 x.value(x.value() * y.value());
-            } else if(op == OperationCode.DIV) {
+            } else if (op == OperationCode.DIV) {
                 x.value(x.value() / y.value());
             } else {
-                throw new UnsupportedOperationException("Combine cannot process Operation code ["+op+"]");
+                throw new UnsupportedOperationException("Combine cannot process Operation code [" + op + "]");
             }
             x.kind(Kind.CONST);
         } else {
             load(code, x);
-            if(y.kind().isConst()) {
+            if (y.kind().isConst()) {
                 putF1(code, op + 16, x.regNo(), x.regNo(), y.value());
             } else {
                 load(code, y);
@@ -78,15 +79,15 @@ public class AuxiliaryFunctions {
      * Puts the subtree's value in register and updated x will be a register Kind
      */
     private static void load(Code code, Result x) {
-        if(x.kind().isRegister()) {
+        if (x.kind().isRegister()) {
             return;
         }
         int regNo = allocateReg();
-        if(x.kind().isConst()) {
+        if (x.kind().isConst()) {
             putF1(code, OperationCode.ADDI, regNo, 0, x.value());
             x.kind(Kind.REG);
             x.regNo(regNo);
-        } else if(x.kind().isVariable()) {
+        } else if (x.kind().isVariable()) {
             //$TODO$ Frame pointer doesn't make any sense to our design as of now or doesn't make any sense to me :P
             putF1(code, OperationCode.LDW, regNo, 0, x.address());
             x.kind(Kind.REG);

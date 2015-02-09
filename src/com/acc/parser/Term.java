@@ -23,13 +23,13 @@ public class Term {
         x = factor.parse();
         while (tokenizer.hasNext()) {
             final Token next = tokenizer.next();
-            Operator  nextOperator;
+            Operator nextOperator;
             while (next.tokenType() == TokenType.OPERATOR) {
                 nextOperator = (Operator) next;
                 int instructionCode;
-                if(nextOperator.value().isMultiplication()) {
+                if (nextOperator.value().isMultiplication()) {
                     instructionCode = OperationCode.MUL;
-                } else if(nextOperator.value().isDivision()) {
+                } else if (nextOperator.value().isDivision()) {
                     instructionCode = OperationCode.DIV;
                 } else {
                     break;

@@ -2,13 +2,15 @@ package com.acc.util;
 
 import com.acc.constants.KeywordType;
 import com.acc.data.*;
+import com.acc.exception.UnknownOperatorException;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
-import java.lang.Character;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * Created by Rumpy on 15-01-2015.
@@ -17,16 +19,15 @@ import java.lang.Character;
  * The "(" and ")" bracket are always defined as operators in this class
  */
 public class Tokenizer {
-    private File sourceFile;
     private String input;
-    private Map<Integer,Token> tokenSet;
-    private StringTokenizer st;
+    private Map<Integer, Token> tokenSet;
     private int currentPointer = 0;
-    private int tokenCounter =0;
+    private int tokenCounter = 0;
+    private static boolean movedBack = false;
 
 
     public Tokenizer(String filePath) throws IOException {
-        sourceFile = new File(filePath);
+        File sourceFile = new File(filePath);
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(sourceFile));
@@ -49,27 +50,35 @@ public class Tokenizer {
         //input = input.replaceAll("//", "~");
         //st = new StringTokenizer(input, ", <>={}()`;", true);
     }
-    public Token current()
-    {
-        if(!tokenSet.isEmpty())
-        {
-            return tokenSet.get(tokenCounter);
+
+    /**
+     * For parsing that requires look ahead, we allow one token look ahead.
+     * Calling the previous multiple times without moving forward (next()) will result in an error.
+     */
+    public void previous() {
+        if (movedBack) {
+            throw new UnknownOperatorException("Cannot move back more than once at a time. ");
         }
-        return null;
+        movedBack = true;
     }
 
     public Token next() {
+        if (movedBack && !tokenSet.isEmpty()) {
+            movedBack = false;
+            return tokenSet.get(tokenCounter);
+        }
+
         if (!hasNext()) {
             throw new UnsupportedOperationException("You should call next only when hasNext is true");
         }
 
         StringBuilder token = new StringBuilder();
         char currentChar = eliminateEmptySpaces();
-        if(currentChar == '.') {
-            Printer.print("DEBUG: currentPointer ["+ currentPointer + "] inputLength ["+input.length()+"]" );
+        if (currentChar == '.') {
+            Printer.print("DEBUG: currentPointer [" + currentPointer + "] inputLength [" + input.length() + "]");
             currentPointer++;
-            Separator s=new Separator(token.append(currentChar).toString());
-            tokenSet.put(++tokenCounter,s);
+            Separator s = new Separator(token.append(currentChar).toString());
+            tokenSet.put(++tokenCounter, s);
             return s;
         }
 
@@ -79,7 +88,7 @@ public class Tokenizer {
             return handleIdentifiersAndKeywords(token, currentChar);
         } else if (isSeparatorCharacter(currentChar)) {
             currentPointer++;
-            Separator s=new Separator(token.append(currentChar).toString());
+            Separator s = new Separator(token.append(currentChar).toString());
             tokenSet.put(++tokenCounter, s);
             return s;
         } else if (isRelationalOperator(currentChar)) {
@@ -90,7 +99,7 @@ public class Tokenizer {
             if (isAssignmentOperator(currentChar, previous)) {
                 token.append(currentChar);
                 currentPointer++;
-                AssignmentOperator a=new AssignmentOperator(token.toString());
+                AssignmentOperator a = new AssignmentOperator(token.toString());
                 tokenSet.put(++tokenCounter, a);
                 return a;
             } else if (currentChar == '=') {
@@ -111,17 +120,17 @@ public class Tokenizer {
             Operator o = new Operator(token.toString());
             tokenSet.put(++tokenCounter, o);
             return o;
-        } else if(isCommentCharacter(currentChar)){
+        } else if (isCommentCharacter(currentChar)) {
             eatCommentText(currentChar);
             return next();
-        }else {
+        } else {
             currentPointer++;
-            throw new RuntimeException("Unrecognized character ["+ currentChar +"]");
+            throw new RuntimeException("Unrecognized character [" + currentChar + "]");
         }
     }
 
     private boolean isCommentCharacter(char currentChar) {
-        return currentChar=='#';
+        return currentChar == '#';
     }
 
     private void eatCommentText(char currentChar) {

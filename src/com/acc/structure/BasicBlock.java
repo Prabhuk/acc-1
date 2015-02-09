@@ -1,5 +1,7 @@
 package com.acc.structure;
 
+import com.acc.constants.OperationCode;
+
 import java.util.*;
 
 /**
@@ -11,9 +13,9 @@ public class BasicBlock {
      * Storing the instruction number along with the
      */
     private final Map<Integer, Integer> block = new LinkedHashMap<Integer, Integer>();
-    private final Set<BasicBlock> dominators = new HashSet<BasicBlock>();
-    public Set<BasicBlock> getDominators() {
-        return dominators;
+    private final Set<BasicBlock> dominatesOver = new HashSet<BasicBlock>();
+    public Set<BasicBlock> getDominatesOver() {
+        return dominatesOver;
     }
 
     public Map<Integer, Integer> getBlock() {
@@ -24,7 +26,6 @@ public class BasicBlock {
      * Adds an instruction to the basicBlock
      */
     public void addToBlock(Integer instruction) {
-
         block.put((block.keySet().size() + 1), instruction);
     }
 
@@ -40,22 +41,22 @@ public class BasicBlock {
     /*
      * returns true if the block parameter is a dominating block for the current block
      */
-    public boolean isDominatingBlock(BasicBlock block) {
-        return dominators.contains(block);
+    public boolean isDominatingOver(BasicBlock block) {
+        return dominatesOver.contains(block);
     }
 
     /*
      * The block parameter will be added as a dominating block for the current block
      */
-    public void addDominatingBlock(BasicBlock block) {
-        dominators.add(block);
+    public void addDominatedOverBlock(BasicBlock block) {
+        dominatesOver.add(block);
     }
 
     /*
      *
      */
-    public boolean removeDominatingBlock(BasicBlock block) {
-        return dominators.remove(block);
+    public boolean removeDominatingOverBlock(BasicBlock block) {
+        return dominatesOver.remove(block);
     }
 
 }

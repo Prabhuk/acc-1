@@ -7,7 +7,8 @@ public enum Kind {
     CONST,
     VAR,
     REG,
-    CONDITION;
+    CONDITION,
+    FIXUP_DUMMY;
 
     public boolean isConst() {
         return this == CONST;

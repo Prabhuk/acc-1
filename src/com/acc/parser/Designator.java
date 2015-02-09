@@ -7,7 +7,7 @@ import com.acc.util.Tokenizer;
 /**
  * Created by Rumpy on 05-02-2015.
  */
-public class Designator extends Parser{
+public class Designator extends Parser {
 
     public Designator(Code code, Tokenizer tokenizer) {
         super(code, tokenizer);
@@ -15,8 +15,8 @@ public class Designator extends Parser{
 
     @Override
     public Result parse() {
-        Result x;
-        x = new Ident(code, tokenizer).parse();
+//        Result x;
+//        x = new Ident(code, tokenizer).parse();$TODO$ Nik - forgot checking in Ident?
         return null;
     }
 }

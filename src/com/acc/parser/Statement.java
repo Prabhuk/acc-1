@@ -18,24 +18,26 @@ public class Statement extends Parser {
     @Override
     public Result parse() {
         Result x = null;
-            final Token next = tokenizer.next();
-            if (next.tokenType().isKeyword()) {
-                Keyword nextKeyword = (Keyword) next;
-                if (nextKeyword.type().isStatementBeginKeyword()) {
-                    if (nextKeyword.type().isLet()) {
-                        x = new LetParser(code, tokenizer).parse();
-                    } else if (nextKeyword.type().isCall()) {
-                        x = new CallParser(code, tokenizer).parse();
-                    } else if (nextKeyword.type().isWhile()) {
-                        x = new WhileParser(code, tokenizer).parse();
-                    } else if (nextKeyword.type().isReturn()) {
-                        x = new ReturnParser(code, tokenizer).parse();
-                    } else if (nextKeyword.type().isIf()) {
-                        x = new IfParser(code, tokenizer).parse();
-                    }
+        final Token next = tokenizer.next();
+        if (next.tokenType().isKeyword()) {
+            Keyword nextKeyword = (Keyword) next;
+            if (nextKeyword.type().isStatementBeginKeyword()) {
+                if (nextKeyword.type().isLet()) {
+                    x = new LetParser(code, tokenizer).parse();
+                } else if (nextKeyword.type().isCall()) {
+                    x = new CallParser(code, tokenizer).parse();
+                } else if (nextKeyword.type().isWhile()) {
+                    x = new WhileParser(code, tokenizer).parse();
+                } else if (nextKeyword.type().isReturn()) {
+                    x = new ReturnParser(code, tokenizer).parse();
+                } else if (nextKeyword.type().isIf()) {
+                    x = new IfParser(code, tokenizer).parse();
                 }
+            }
 
         }
+        tokenizer.previous(); // Statements breakout on semicolon or end curly brace.
+        // Rolling back to those tokens for statSequence to stay sane.
         return x;
     }
 

@@ -1,22 +1,37 @@
 package com.acc.constants;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Rumpy on 14-01-2015.
  */
-public enum Condition {
-    EQ("NE"), LT("GE"), GT("LE"), LE("GT"), GE("LT"), NE("EQ"), NONE("none");
-    private final String value;
+public class Condition {
+    private static Map<Integer, Integer> conditionsVsNegations= new HashMap<Integer, Integer>();
+    static {
+        conditionsVsNegations.put(OperationCode.BEQ, OperationCode.BNE);
+        conditionsVsNegations.put(OperationCode.BLT, OperationCode.BGE);
+        conditionsVsNegations.put(OperationCode.BGT, OperationCode.BLE);
+        conditionsVsNegations.put(OperationCode.BLE, OperationCode.BGT);
+        conditionsVsNegations.put(OperationCode.BGE, OperationCode.BLT);
+        conditionsVsNegations.put(OperationCode.BNE, OperationCode.BEQ);
+    }
+    private final Integer instruction;
 
-    Condition(String value) {
-        this.value = value;
+    Condition(int instruction) {
+        this.instruction = instruction;
     }
 
-    public String getValue() {
-        return value;
+    public Integer getInstruction() {
+        return instruction;
     }
 
-    public Condition getNegated(Condition cond) {
-        return Condition.valueOf(cond.getValue());
+    public static Condition getNegated(Condition cond) {
+        return new Condition(conditionsVsNegations.get(cond.getInstruction()));
+    }
+
+    public static Integer getNegatedInstruction(Condition cond) {
+        return new Condition(conditionsVsNegations.get(cond.getInstruction())).getInstruction();
     }
 
 }

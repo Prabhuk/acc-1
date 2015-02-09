@@ -7,7 +7,7 @@ import com.acc.util.Tokenizer;
 /**
  * Created by prabhuk on 1/26/2015.
  */
-public class CallParser extends Parser{
+public class CallParser extends Parser {
     public CallParser(Code code, Tokenizer tokenizer) {
         super(code, tokenizer);
     }
