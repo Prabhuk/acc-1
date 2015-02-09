@@ -1,7 +1,8 @@
 package com.acc.parser;
 
-import com.acc.data.Code;
-import com.acc.data.Result;
+import com.acc.data.*;
+import com.acc.exception.SyntaxErrorException;
+import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
 /**
@@ -14,7 +15,22 @@ public class LetParser extends Parser {
 
     @Override
     public Result parse() {
-        //$TODO Pending implementation
-        return null;
+        final Token varialbleName = tokenizer.next();
+        if (!varialbleName.tokenType().isDesignator()) {
+            throw new SyntaxErrorException("Designator expected. Found[" + varialbleName.getToken() + "] instead");
+        }
+        final Token assignmentOp = tokenizer.next();
+        if (!assignmentOp.tokenType().isAssignmentOperator()) {
+            throw new SyntaxErrorException("Assignment operator [<-] expected. Found[" + assignmentOp.getToken() + "] instead");
+        }
+
+        //$TODO Pending implementation. How do you generate code for assignment? How do you link it to PHI
+
+//        AuxiliaryFunctions.putF1();
+
+        Result x = new Expression(code, tokenizer).parse();
+        //$TODO x to be assigned to variableName
+
+        return x;
     }
 }

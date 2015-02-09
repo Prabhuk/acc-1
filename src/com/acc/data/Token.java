@@ -25,4 +25,9 @@ public abstract class Token {
     public boolean isSemicolon() {
         return token.equals(";");
     }
+
+    @Override
+    public String toString() {
+        return token;
+    }
 }

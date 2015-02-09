@@ -16,7 +16,7 @@ public class Designator extends Parser {
     @Override
     public Result parse() {
 //        Result x;
-//        x = new Ident(code, tokenizer).parse();$TODO$ Nik - forgot checking in Ident?
+//        x = new Ident(code, tokenizer).parse(); $TODO$ Nik - This should be handled at the Tokenizer
         return null;
     }
 }

@@ -1,10 +1,7 @@
 package com.acc.parser;
 
 import com.acc.constants.Kind;
-import com.acc.data.Code;
-import com.acc.data.Constant;
-import com.acc.data.Result;
-import com.acc.data.Token;
+import com.acc.data.*;
 import com.acc.util.Tokenizer;
 
 /**
@@ -19,20 +16,18 @@ public class Factor extends Parser {
     @Override
     public Result parse() {
         Result x = null;
-        while (tokenizer.hasNext()) {
             final Token next = tokenizer.next();
             if (next.tokenType().isOperator() && next.getToken().equals("(")) {
                 x = new Expression(code, tokenizer).parse();
             } else if (next.tokenType().isConstant()) {
                 Constant nextConstant = (Constant) next;
                 x = new Result(Kind.CONST, nextConstant.value(), null, null, null, null);
-            } else if (next.tokenType().isIdentifier()) {
+            } else if (next.tokenType().isDesignator()) {
                 //$TODO$ implement lookup and set the address instead of 0
                 x = new Result(Kind.VAR, null, null, 0, null, null);
-            } else {
-                break;
+            } else if (next.tokenType().isKeyword() && ((Keyword)next).type().isCall()) {
+                x = new FunctionCall(code, tokenizer).parse();
             }
-        }
         return x;
     }
 }

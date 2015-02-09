@@ -20,25 +20,23 @@ public class Expression extends Parser {
     @Override
     public Result parse() {
         Result x, y;
-        final Term term = new Term(code, tokenizer);
-        x = term.parse();
-        while (tokenizer.hasNext()) {
-            final Token next = tokenizer.next();
-            Operator nextOperator;
-            while (next.tokenType().isOperator()) {
-                nextOperator = (Operator) next;
-                int instructionCode;
-                if (nextOperator.value().isPlus()) {
-                    instructionCode = OperationCode.ADD;
-                } else if (nextOperator.value().isMinus()) {
-                    instructionCode = OperationCode.SUB;
-                } else {
-                    break;
-                }
-                y = term.parse();
-                AuxiliaryFunctions.combine(code, instructionCode, x, y);
+        x = new Term(code, tokenizer).parse();
+        final Token next = tokenizer.next();
+        Operator nextOperator;
+        while (next.tokenType().isOperator() && (((Operator) next).value().isPlus() || ((Operator) next).value().isMinus())) {
+            nextOperator = ((Operator) next);
+            int instructionCode;
+            if (nextOperator.value().isPlus()) {
+                instructionCode = OperationCode.ADD;
+                //$TODO$ Add code to code
+            } else { //Minus
+                instructionCode = OperationCode.SUB;
+                //$TODO$ Add code to code
             }
+            y = new Term(code, tokenizer).parse();
+            AuxiliaryFunctions.combine(code, instructionCode, x, y);
         }
+        tokenizer.previous(); //Rolling back the token which broke the while loop
         return x;
     }
 }
