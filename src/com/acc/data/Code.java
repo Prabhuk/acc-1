@@ -38,7 +38,7 @@ public class Code {
     public int addCode(int instruction) {
         instructions.add(instruction);
         currentBlock.addToBlock(instruction);
-        if(instruction >= OperationCode.BEQ && instruction <= OperationCode.RET) {
+        if (instruction >= OperationCode.BEQ && instruction <= OperationCode.RET) {
             addBasicBlock(instruction);
         }
         return instructions.size();
@@ -66,6 +66,7 @@ public class Code {
     public void Fixlink(Result follow) {
 
     }
+
     /*
      * @return Returns the current Basic Block
      */

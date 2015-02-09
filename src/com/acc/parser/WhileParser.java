@@ -1,7 +1,12 @@
 package com.acc.parser;
 
+import com.acc.constants.KeywordType;
 import com.acc.data.Code;
+import com.acc.data.Keyword;
 import com.acc.data.Result;
+import com.acc.data.Token;
+import com.acc.exception.SyntaxErrorException;
+import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
 /**
@@ -15,7 +20,19 @@ public class WhileParser extends Parser {
 
     @Override
     public Result parse() {
-        //$TODO Pending implementation
-        return null;
+        final int loop = code.getPc();
+        Result x = new Relation(code, tokenizer).parse();
+        AuxiliaryFunctions.CJF(code, x);
+        final Token next = tokenizer.next();
+        if (!next.tokenType().isKeyword() || !((Keyword) next).type().isDo()) {
+            throw new SyntaxErrorException(KeywordType.DO, next);
+        }
+        new StatSequence(code, tokenizer).parse();
+        AuxiliaryFunctions.BJ(code, loop); //Backward Jump to the loop beginning.
+        if (!next.tokenType().isKeyword() || !((Keyword) next).type().isOd()) {
+            throw new SyntaxErrorException(KeywordType.OD, next);
+        }
+
+        return x; //$TODO$ Do we need x at all?
     }
 }

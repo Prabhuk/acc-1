@@ -27,7 +27,7 @@ public enum KeywordType {
 
     public static KeywordType isKeyword(String s) {
         for (KeywordType keyword : values()) {
-            if(keyword.getValue().equals(s)){
+            if (keyword.getValue().equals(s)) {
                 return keyword;
             }
         }
@@ -97,14 +97,11 @@ public enum KeywordType {
     public boolean isMain() {
         return MAIN == this;
     }
-    
+
     public boolean isStatementBeginKeyword() {
         return this.isLet() || this.isCall()
-                || this.isIf()|| this.isWhile()|| this.isReturn();
+                || this.isIf() || this.isWhile() || this.isReturn();
     }
-
-
-
 
 
 }

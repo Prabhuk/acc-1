@@ -1,8 +1,9 @@
 package com.acc.structure;
 
-import com.acc.constants.OperationCode;
-
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by prabhuk on 1/25/2015.
@@ -14,6 +15,7 @@ public class BasicBlock {
      */
     private final Map<Integer, Integer> block = new LinkedHashMap<Integer, Integer>();
     private final Set<BasicBlock> dominatesOver = new HashSet<BasicBlock>();
+
     public Set<BasicBlock> getDominatesOver() {
         return dominatesOver;
     }

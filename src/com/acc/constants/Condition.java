@@ -7,7 +7,8 @@ import java.util.Map;
  * Created by Rumpy on 14-01-2015.
  */
 public class Condition {
-    private static Map<Integer, Integer> conditionsVsNegations= new HashMap<Integer, Integer>();
+    private static Map<Integer, Integer> conditionsVsNegations = new HashMap<Integer, Integer>();
+
     static {
         conditionsVsNegations.put(OperationCode.BEQ, OperationCode.BNE);
         conditionsVsNegations.put(OperationCode.BLT, OperationCode.BGE);
@@ -16,6 +17,7 @@ public class Condition {
         conditionsVsNegations.put(OperationCode.BGE, OperationCode.BLT);
         conditionsVsNegations.put(OperationCode.BNE, OperationCode.BEQ);
     }
+
     private final Integer instruction;
 
     Condition(int instruction) {

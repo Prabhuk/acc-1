@@ -1,11 +1,12 @@
 package com.acc.parser;
 
+import com.acc.constants.KeywordType;
 import com.acc.constants.Kind;
 import com.acc.data.Code;
 import com.acc.data.Keyword;
 import com.acc.data.Result;
 import com.acc.data.Token;
-import com.acc.exception.InvalidTokenException;
+import com.acc.exception.SyntaxErrorException;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
@@ -26,8 +27,8 @@ public class IfParser extends Parser {
         Result x = new Relation(code, tokenizer).parse();
         AuxiliaryFunctions.CJF(code, x);
         final Token next = tokenizer.next();
-        if (!next.tokenType().isKeyword() || !((Keyword) next).type().isIf()) {
-            throw new InvalidTokenException("[then] token missing. Found [" + next.getToken() + "]");
+        if (!next.tokenType().isKeyword() || !((Keyword) next).type().isThen()) {
+            throw new SyntaxErrorException(KeywordType.THEN, next);
         }
 
         new StatSequence(code, tokenizer).parse(); //Ignoring the return type. Shouldn't mean anything at this context.
@@ -58,7 +59,7 @@ public class IfParser extends Parser {
 
         final Token finalFiToken = tokenizer.next();
         if (!finalFiToken.tokenType().isKeyword() || !((Keyword) finalFiToken).type().isFi()) {
-            throw new InvalidTokenException("[If block] must end with [fi] token. Found [" + finalFiToken.getToken() + "]");
+            throw new SyntaxErrorException(KeywordType.FI, finalFiToken);
         }
         return x;
     }
