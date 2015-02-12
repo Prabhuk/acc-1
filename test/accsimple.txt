@@ -1,5 +1,6 @@
 main
-var x;
+var x, y;
 {
-    x <- 3+2
+    x <- 3+2;
+    x <- y
 }.
