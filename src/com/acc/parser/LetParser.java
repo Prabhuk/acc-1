@@ -16,11 +16,11 @@ public class LetParser extends Parser {
     @Override
     public Result parse() {
         final Token varialbleName = tokenizer.next();
-        if (!varialbleName.tokenType().isDesignator()) {
+        if (!varialbleName.isDesignator()) {
             throw new SyntaxErrorException("Designator expected. Found[" + varialbleName.getToken() + "] instead");
         }
         final Token assignmentOp = tokenizer.next();
-        if (!assignmentOp.tokenType().isAssignmentOperator()) {
+        if (!assignmentOp.isAssignmentOperator()) {
             throw new SyntaxErrorException("Assignment operator [<-] expected. Found[" + assignmentOp.getToken() + "] instead");
         }
 

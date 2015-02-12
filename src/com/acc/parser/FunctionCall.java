@@ -22,7 +22,7 @@ public class FunctionCall extends Parser {
     @Override
     public Result parse() {
         final Token procedureName = tokenizer.next();
-        if(!procedureName.tokenType().isIdentifier()) {
+        if(!procedureName.isIdentifier()) {
             throw new SyntaxErrorException(procedureName.tokenType(), TokenType.IDENTIFIER);
         }
         final Token openBracket = tokenizer.next();

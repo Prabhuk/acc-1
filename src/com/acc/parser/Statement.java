@@ -19,7 +19,7 @@ public class Statement extends Parser {
     public Result parse() {
         Result x = null;
         final Token next = tokenizer.next();
-        if (next.tokenType().isKeyword()) {
+        if (next.isKeyword()) {
             Keyword nextKeyword = (Keyword) next;
             if (nextKeyword.type().isStatementBeginKeyword()) {
                 if (nextKeyword.type().isLet()) {

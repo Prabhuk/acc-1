@@ -23,7 +23,7 @@ public class Expression extends Parser {
         x = new Term(code, tokenizer).parse();
         final Token next = tokenizer.next();
         Operator nextOperator;
-        while (next.tokenType().isOperator() && (((Operator) next).value().isPlus() || ((Operator) next).value().isMinus())) {
+        while (next.isOperator() && (((Operator) next).value().isPlus() || ((Operator) next).value().isMinus())) {
             nextOperator = ((Operator) next);
             int instructionCode;
             if (nextOperator.value().isPlus()) {

@@ -17,15 +17,15 @@ public class Factor extends Parser {
     public Result parse() {
         Result x = null;
             final Token next = tokenizer.next();
-            if (next.tokenType().isOperator() && next.getToken().equals("(")) {
+            if (next.isOperator() && next.getToken().equals("(")) {
                 x = new Expression(code, tokenizer).parse();
-            } else if (next.tokenType().isConstant()) {
+            } else if (next.isConstant()) {
                 Constant nextConstant = (Constant) next;
                 x = new Result(Kind.CONST, nextConstant.value(), null, null, null, null);
-            } else if (next.tokenType().isDesignator()) {
+            } else if (next.isDesignator()) {
                 //$TODO$ implement lookup and set the address instead of 0
                 x = new Result(Kind.VAR, null, null, 0, null, null);
-            } else if (next.tokenType().isKeyword() && ((Keyword)next).type().isCall()) {
+            } else if (next.isKeyword() && ((Keyword)next).type().isCall()) {
                 x = new FunctionCall(code, tokenizer).parse();
             }
         return x;
