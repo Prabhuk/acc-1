@@ -36,6 +36,7 @@ public class VariableDeclaration extends Parser {
         Token next = tokenizer.next();
         while (next.getToken().equals(",")) {
             declareSymbol(symbolType);
+            next = tokenizer.next();
         }
 
         if(!next.getToken().equals(";")) {

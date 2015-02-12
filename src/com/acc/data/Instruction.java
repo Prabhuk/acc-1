@@ -20,26 +20,26 @@ public class Instruction {
         this.instruction = ins;
     }
 
-    public Instruction(int _instruction, int _opcode, Integer a, Integer b, Integer c, Symbol symbol) {
+    public Instruction(int _instruction, int _opcode, Integer a, Integer b, Integer c, Symbol symbol, Result rhs) {
         this.instruction = _instruction;
         this.a = a;
         this.b = b;
         this.c = c;
         this.opcode = _opcode;
         this.symbol = symbol;
-        instructionString = getInstructionAsString(symbol, opcode, a, b, c);
+        instructionString = getInstructionAsString(symbol, opcode, a, b, c, rhs);
     }
 
     public void setC(Integer _c) {
         c = _c;
-        instructionString = getInstructionAsString(symbol, opcode, a, b, c);
+        instructionString = getInstructionAsString(symbol, opcode, a, b, c, null);
     }
 
     public void setInstruction(Integer instruction) {
         this.instruction = instruction;
     }
 
-    private String getInstructionAsString(Symbol symbol, int opcode, Integer a, Integer b, Integer c) {
+    private String getInstructionAsString(Symbol symbol, int opcode, Integer a, Integer b, Integer c, Result rhs) {
         final String operationName = OperationCode.opcodeAndNames.get(opcode);
         final StringBuilder sb = new StringBuilder(operationName).append(" ");
         boolean addComma = false;
@@ -52,7 +52,7 @@ public class Instruction {
             addComma = true;
         }
         if(opcode == 15) { //mov
-            buildMoveInstruction(b, c, sb, addComma);
+            buildMoveInstruction(b, c, sb, addComma, rhs);
         } else {
             if(b != null) {
                 if(addComma) {
@@ -70,15 +70,15 @@ public class Instruction {
         return sb.toString();
     }
 
-    private void buildMoveInstruction(Integer b, Integer c, StringBuilder sb, boolean addComma) {
+    private void buildMoveInstruction(Integer b, Integer c, StringBuilder sb, boolean addComma, Result rhs) {
         if(b==null) {
             return;
         }
         if(addComma) {
             sb.append(",");
         }
-        if(c==1) { //constant
-            sb.append("(").append(String.valueOf(b)).append(")");
+        if(c==1) { //variable
+            sb.append("(").append(rhs.getVariableName()).append(")");
         } else {
             sb.append(String.valueOf(b));
         }

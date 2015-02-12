@@ -16,38 +16,38 @@ import com.acc.structure.SymbolType;
  */
 public class AuxiliaryFunctions {
 
-    public static void putF1(Code code, int instructionCode, int a, int b, int c, Symbol symbol) {
+    public static void putF1(Code code, int instructionCode, int a, int b, int c, Symbol symbol, Result rhs) {
         if (c < 0) c ^= 0xFFFF0000;
         final int ins = instructionCode << 26 | a << 21 | b << 16 | c;
-        final Instruction instruction = new Instruction(ins, instructionCode, a, b, c, symbol);
+        final Instruction instruction = new Instruction(ins, instructionCode, a, b, c, symbol, rhs);
         code.addCode(instruction, instructionCode);
     }
 
     public static void putF2(Code code, int instructionCode, int a, int b, int c) {
 
         final int ins = instructionCode << 26 | a << 21 | b << 16 | c;
-        final Instruction instruction = new Instruction(ins, instructionCode, a, b, c, null);
+        final Instruction instruction = new Instruction(ins, instructionCode, a, b, c, null, null);
         code.addCode(instruction, instructionCode);
     }
 
     public static void putF3(Code code, int instructionCode, int c) {
         final int ins = instructionCode << 26 | c;
-        final Instruction instruction = new Instruction(ins, instructionCode, null, null, c, null);
+        final Instruction instruction = new Instruction(ins, instructionCode, null, null, c, null, null);
         code.addCode(instruction, instructionCode);
         code.addCode(instruction, instructionCode);
     }
 
     public static void BJ(Code code, int loc) {
-        putF1(code, OperationCode.BEQ, 0, 0, loc - code.getPc(), null);
+        putF1(code, OperationCode.BEQ, 0, 0, loc - code.getPc(), null, null);
     }
 
     public static void FJLink(Code code, Result x) {
-        putF1(code, OperationCode.BEQ, 0, 0, x.fixupLoc(), null);
+        putF1(code, OperationCode.BEQ, 0, 0, x.fixupLoc(), null, null);
         x.fixupLoc(code.getPc() - 1);
     }
 
     public static void CJF(Code code, Result x) {
-        putF1(code, OperationCode.BEQ + Condition.getNegatedInstruction(x.condition()), x.regNo(), 0, 0, null);
+        putF1(code, OperationCode.BEQ + Condition.getNegatedInstruction(x.condition()), x.regNo(), 0, 0, null, null);
         x.fixupLoc(code.getPc() - 1);
     }
 
@@ -71,10 +71,10 @@ public class AuxiliaryFunctions {
         } else {
             load(code, x);
             if (y.kind().isConst()) {
-                putF1(code, op + 16, x.regNo(), x.regNo(), y.value(), null);
+                putF1(code, op + 16, x.regNo(), x.regNo(), y.value(), null, null);
             } else {
                 load(code, y);
-                putF1(code, op, x.regNo(), x.regNo(), y.regNo(), null);
+                putF1(code, op, x.regNo(), x.regNo(), y.regNo(), null, null);
                 deallocate(y.regNo());
             }
         }
@@ -94,12 +94,12 @@ public class AuxiliaryFunctions {
         }
         int regNo = allocateReg();
         if (x.kind().isConst()) {
-            putF1(code, OperationCode.ADDI, regNo, 0, x.value(), null);
+            putF1(code, OperationCode.ADDI, regNo, 0, x.value(), null, null);
             x.kind(Kind.REG);
             x.regNo(regNo);
         } else if (x.kind().isVariable()) {
             //$TODO$ Frame pointer doesn't make any sense to our design as of now or doesn't make any sense to me :P
-            putF1(code, OperationCode.LDW, regNo, 0, x.address(), null);
+            putF1(code, OperationCode.LDW, regNo, 0, x.address(), null, null);
             x.kind(Kind.REG);
             x.regNo(regNo);
         }
@@ -111,14 +111,15 @@ public class AuxiliaryFunctions {
             final Symbol symbol = new Symbol(symbolName, moveInstructionNumber,
                     SymbolType.VARIABLE, false, Symbol.cloneValue(rhs.value()));
             AuxiliaryFunctions.putF1(code, OperationCode.MOV, symbolTable.getFramePointer(),
-                    rhs.value(), OperationCode.MOV_CONSTANT, symbol);
+                    rhs.value(), OperationCode.MOV_CONSTANT, symbol, rhs);
             symbolTable.addSymbol(symbol);
         } else if (rhs.kind().isVariable()) {
             //$TODO$ Expression should set address as the framepointer value of the variable in the symboltable
             final int moveInstructionNumber = code.getPc();
             final Symbol symbol = new Symbol(symbolName, moveInstructionNumber,
                     SymbolType.VARIABLE, true, Symbol.cloneValue(rhs.value()));
-            AuxiliaryFunctions.putF1(code, OperationCode.MOV, symbolTable.getFramePointer(), rhs.address(), OperationCode.MOV_VARIABLE, null);
+            AuxiliaryFunctions.putF1(code, OperationCode.MOV,
+                    symbolTable.getFramePointer(), rhs.address(), OperationCode.MOV_VARIABLE, symbol, rhs);
             symbolTable.addSymbol(symbol);
         } else {
             return false;
@@ -139,7 +140,7 @@ public class AuxiliaryFunctions {
 
     public static void main(String[] args) {
         final Code code = new Code();
-        AuxiliaryFunctions.putF1(code, OperationCode.ADD, 1, 2, 5, null);
+        AuxiliaryFunctions.putF1(code, OperationCode.ADD, 1, 2, 5, null, null);
 //        Printer.print(code.toString());
     }
 }
