@@ -21,22 +21,24 @@ public class Statement extends Parser {
         final Token next = tokenizer.next();
         if (next.isKeyword()) {
             Keyword nextKeyword = (Keyword) next;
-            if (nextKeyword.type().isStatementBeginKeyword()) {
-                if (nextKeyword.type().isLet()) {
-                    x = new LetParser(code, tokenizer).parse();
-                } else if (nextKeyword.type().isCall()) {
+            if (nextKeyword.isStatementBeginKeyword()) {
+                if (nextKeyword.isLet()) {
+                    x = new AssignmentParser(code, tokenizer).parse();
+                } else if (nextKeyword.isCall()) {
                     x = new CallParser(code, tokenizer).parse();
-                } else if (nextKeyword.type().isWhile()) {
+                } else if (nextKeyword.isWhile()) {
                     x = new WhileParser(code, tokenizer).parse();
-                } else if (nextKeyword.type().isReturn()) {
+                } else if (nextKeyword.isReturn()) {
                     x = new ReturnParser(code, tokenizer).parse();
-                } else if (nextKeyword.type().isIf()) {
+                } else if (nextKeyword.isIf()) {
                     x = new IfParser(code, tokenizer).parse();
                 }
             }
-
+            tokenizer.previous(); // Statements breakout on semicolon or end curly brace.
+        } else {
+            tokenizer.previous(); //moving back to reread the symbolName
+            x = new AssignmentParser(code, tokenizer).parse();
         }
-        tokenizer.previous(); // Statements breakout on semicolon or end curly brace.
         // Rolling back to those tokens for statSequence to stay sane.
         return x;
     }

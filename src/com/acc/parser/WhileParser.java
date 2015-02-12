@@ -24,12 +24,12 @@ public class WhileParser extends Parser {
         Result x = new Relation(code, tokenizer).parse();
         AuxiliaryFunctions.CJF(code, x);
         final Token next = tokenizer.next();
-        if (!next.isKeyword() || !((Keyword) next).type().isDo()) {
+        if (!next.isKeyword() || !((Keyword) next).isDo()) {
             throw new SyntaxErrorException(KeywordType.DO, next);
         }
         new StatSequence(code, tokenizer).parse();
         AuxiliaryFunctions.BJ(code, loop); //Backward Jump to the loop beginning.
-        if (!next.isKeyword() || !((Keyword) next).type().isOd()) {
+        if (!next.isKeyword() || !((Keyword) next).isOd()) {
             throw new SyntaxErrorException(KeywordType.OD, next);
         }
 

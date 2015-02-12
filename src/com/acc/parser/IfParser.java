@@ -27,7 +27,7 @@ public class IfParser extends Parser {
         Result x = new Relation(code, tokenizer).parse();
         AuxiliaryFunctions.CJF(code, x);
         final Token next = tokenizer.next();
-        if (!next.isKeyword() || !((Keyword) next).type().isThen()) {
+        if (!next.isKeyword() || !((Keyword) next).isThen()) {
             throw new SyntaxErrorException(KeywordType.THEN, next);
         }
 
@@ -48,7 +48,7 @@ public class IfParser extends Parser {
         }
         tokenizer.previous(); //compensating the looking ahead token
 
-        if (incoming.isKeyword() && ((Keyword) incoming).type().isElse()) { //The dangling else
+        if (incoming.isKeyword() && ((Keyword) incoming).isElse()) { //The dangling else
             AuxiliaryFunctions.FJLink(code, follow);
             code.Fixup(x.fixupLoc());
             new StatSequence(code, tokenizer).parse();
@@ -58,15 +58,15 @@ public class IfParser extends Parser {
         code.Fixlink(follow);
 
         final Token finalFiToken = tokenizer.next();
-        if (!finalFiToken.isKeyword() || !((Keyword) finalFiToken).type().isFi()) {
+        if (!finalFiToken.isKeyword() || !((Keyword) finalFiToken).isFi()) {
             throw new SyntaxErrorException(KeywordType.FI, finalFiToken);
         }
         return x;
     }
 
     private boolean elseIf(Token incoming, Token lookingAheadForIf) {
-        return incoming.isKeyword() && ((Keyword) incoming).type().isElse()
-                && lookingAheadForIf.isKeyword() && ((Keyword) incoming).type().isIf();
+        return incoming.isKeyword() && ((Keyword) incoming).isElse()
+                && lookingAheadForIf.isKeyword() && ((Keyword) incoming).isIf();
     }
 
 }

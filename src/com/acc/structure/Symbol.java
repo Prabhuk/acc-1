@@ -1,5 +1,7 @@
 package com.acc.structure;
 
+import java.lang.reflect.Field;
+
 /**
  * Created by prabhuk on 2/9/2015.
  */
@@ -8,7 +10,24 @@ public class Symbol {
     private int suffix; //Different version of the same variable will have different suffix value.
     private int length; //For arrays
     private SymbolType type;
+    private boolean isPointerValue;
     private Object value; //Could just be integer in our case.
+
+    /**
+     *
+     * @param name - unique symbol name in the symbol table
+     * @param suffix - -1 will represent declaration
+     * @param type - variable or procedure
+     * @param isPointerValue - true if assigning result of another instruction, false if constant
+     * @param value - value to be assigned. $TODO$ make it integer?
+     */
+    public Symbol(String name, int suffix, SymbolType type, boolean isPointerValue, Object value) {
+        this.name = name;
+        this.suffix = suffix;
+        this.type = type;
+        this.isPointerValue = isPointerValue;
+        this.value = value;
+    }
 
     private boolean isProcedure() {
         return this.type.isProcedure();
@@ -36,5 +55,23 @@ public class Symbol {
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    //based on http://stackoverflow.com/questions/869033/how-do-i-copy-an-object-in-java
+    public static Object cloneValue(Object obj){
+        try{
+            Object clone = obj.getClass().newInstance();
+            for (Field field : obj.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                field.set(clone, field.get(obj));
+            }
+            return clone;
+        }catch(Exception e){
+            return null;
+        }
+    }
+
+    public String getUniqueIdentifier() {
+        return name + suffix;
     }
 }

@@ -1,5 +1,7 @@
 package com.acc.structure;
 
+import com.acc.data.Instruction;
+
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -11,23 +13,23 @@ import java.util.Set;
  */
 public class BasicBlock {
     /*
-     * Storing the instruction number along with the
+     * Storing the instruction number along with the instruction
      */
-    private final Map<Integer, Integer> block = new LinkedHashMap<Integer, Integer>();
+    private final Map<Integer, Instruction> block = new LinkedHashMap<Integer, Instruction>();
     private final Set<BasicBlock> dominatesOver = new HashSet<BasicBlock>();
 
     public Set<BasicBlock> getDominatesOver() {
         return dominatesOver;
     }
 
-    public Map<Integer, Integer> getBlock() {
+    public Map<Integer, Instruction> getBlock() {
         return block;
     }
 
     /*
      * Adds an instruction to the basicBlock
      */
-    public void addToBlock(Integer instruction) {
+    public void addToBlock(Instruction instruction) {
         block.put((block.keySet().size() + 1), instruction);
     }
 

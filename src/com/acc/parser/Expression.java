@@ -21,20 +21,19 @@ public class Expression extends Parser {
     public Result parse() {
         Result x, y;
         x = new Term(code, tokenizer).parse();
-        final Token next = tokenizer.next();
+        Token next = tokenizer.next();
         Operator nextOperator;
         while (next.isOperator() && (((Operator) next).value().isPlus() || ((Operator) next).value().isMinus())) {
             nextOperator = ((Operator) next);
             int instructionCode;
             if (nextOperator.value().isPlus()) {
                 instructionCode = OperationCode.ADD;
-                //$TODO$ Add code to code
             } else { //Minus
                 instructionCode = OperationCode.SUB;
-                //$TODO$ Add code to code
             }
             y = new Term(code, tokenizer).parse();
             AuxiliaryFunctions.combine(code, instructionCode, x, y);
+            next = tokenizer.next();
         }
         tokenizer.previous(); //Rolling back the token which broke the while loop
         return x;

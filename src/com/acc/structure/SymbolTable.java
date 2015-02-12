@@ -1,9 +1,6 @@
 package com.acc.structure;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by prabhuk on 2/9/2015.
@@ -12,14 +9,18 @@ public class SymbolTable {
 
     private final boolean isGlobalTable;
     private final String ownerProcedure; //Will be set for procedures which will have their own symbol table.
-    private final Set<Symbol> symbols;
+    private final List<Symbol> symbols;
     private final Map<String, Symbol> symbolsByName = new HashMap<String, Symbol>();
     private static volatile SymbolTable globalTable;
 
     private SymbolTable() {
         this.isGlobalTable = true;
         this.ownerProcedure = null;
-        symbols = new HashSet<Symbol>();
+        symbols = new ArrayList<Symbol>();
+    }
+
+    public int getFramePointer() {
+        return this.symbols.size();
     }
 
     public static SymbolTable getGlobalSymbolTable() {
@@ -37,10 +38,10 @@ public class SymbolTable {
             throw new RuntimeException("You must associate the SymbolTable with a procedure.");
         }
         this.ownerProcedure = ownerProcedure;
-        symbols = new HashSet<Symbol>();
+        symbols = new ArrayList<Symbol>();
     }
 
-    private boolean isGlobalTable() {
+    public boolean isGlobalTable() {
         return isGlobalTable;
     }
 
@@ -48,7 +49,7 @@ public class SymbolTable {
         return ownerProcedure;
     }
 
-    public Set<Symbol> getSymbols() {
+    public List<Symbol> getSymbols() {
         return symbols;
     }
 

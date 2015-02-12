@@ -18,6 +18,7 @@ public class StatSequence extends Parser {
         while (tokenizer.next().isSemicolon()) {
             x = new Statement(code, tokenizer).parse();
         }
+        tokenizer.previous(); // moving a step back from the one who is not a semicolon
         return x; //Necessary to return the results at this level? what is the purpose at this level?
     }
 }

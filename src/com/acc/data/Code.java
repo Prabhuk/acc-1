@@ -15,7 +15,7 @@ public class Code {
     /*
      * List of instructions for the input program
      */
-    private final List<Integer> instructions = new LinkedList<Integer>();
+    private final List<Instruction> instructions = new LinkedList<Instruction>();
     private final List<BasicBlock> basicBlocks = new LinkedList<BasicBlock>();
     private BasicBlock currentBlock;
 
@@ -33,13 +33,14 @@ public class Code {
 
     /**
      * @param instruction - Takes an instruction and appends to the output code
+     * @param instructionCode
      * @return Returns the current program counter value
      */
-    public int addCode(int instruction) {
+    public int addCode(Instruction instruction, int instructionCode) {
         instructions.add(instruction);
         currentBlock.addToBlock(instruction);
-        if (instruction >= OperationCode.BEQ && instruction <= OperationCode.RET) {
-            addBasicBlock(instruction);
+        if (instructionCode >= OperationCode.BEQ && instructionCode <= OperationCode.RET) {
+            addBasicBlock();
         }
         return instructions.size();
     }
@@ -48,7 +49,7 @@ public class Code {
      * Creates a new Basic Block to which instructions will be added in the future
      */
 
-    private void addBasicBlock(Integer instruction) {
+    private void addBasicBlock() {
         final BasicBlock temp = new BasicBlock();
         currentBlock.addDominatedOverBlock(temp);
         currentBlock = temp;
@@ -57,10 +58,8 @@ public class Code {
     }
 
     public void Fixup(int location) {
-        final Integer targetInstruction = instructions.get(location);
-        final Integer updated = targetInstruction & 0xffff0000 + (getPc() - location);
-        instructions.remove(location);
-        instructions.add(location, updated); //$TODO$ does this automaticatlly update the basic block? need to test
+        instructions.get(location).FixUp(getPc() - location);
+        //$TODO$ this is not updated within the basicblock. Need to fix it in the basic block as well. Use instr number range?
     }
 
     public void Fixlink(Result follow) {
@@ -74,4 +73,7 @@ public class Code {
         return currentBlock;
     }
 
+    public List<Instruction> getInstructions() {
+        return instructions;
+    }
 }

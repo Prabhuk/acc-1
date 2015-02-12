@@ -1,10 +1,15 @@
 package com.acc.parser;
 
+import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.data.TokenType;
 import com.acc.exception.SyntaxErrorException;
+import com.acc.structure.Symbol;
+import com.acc.structure.SymbolTable;
+import com.acc.structure.SymbolType;
+import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
 import java.util.ArrayList;
@@ -31,7 +36,6 @@ public class FunctionCall extends Parser {
         }
         Token lookAhead = tokenizer.next();
         List<Result> parameters = new ArrayList<Result>();
-
         if(!lookAhead.getToken().equals(")")) {
             tokenizer.previous(); //Allowing expression to process the first parameter value
             parameters.add(new Expression(code, tokenizer).parse());
@@ -43,7 +47,34 @@ public class FunctionCall extends Parser {
                 throw new SyntaxErrorException("Expected [\")\"]. Found ["+lookAhead.getToken()+"] instead");
             }
         }
-        //$TODO$ Generate code to make the procedure call with parameters list
+        SymbolTable previous = null;
+        if(!getSymbolTable().isGlobalTable()) {
+            previous = getSymbolTable();
+        }
+        final SymbolTable procedureSymbolTable = new SymbolTable(procedureName.getToken());
+        setSymbolTable(procedureSymbolTable);
+        final List<String> args = getArgumentNamesForProcedure(procedureName.getToken());
+        if(args.size() != parameters.size()) {
+            throw new SyntaxErrorException("Argument list mismatch in the procedure call for the procedure ["+procedureName.getToken()+"]");
+        }
+
+        for(int i=0; i<parameters.size(); i++) {
+            Result parameter = parameters.get(i);
+            String argumentName = args.get(i);
+            final boolean added = AuxiliaryFunctions.assignToSymbol(code, argumentName, parameter, getSymbolTable());
+            if(!added) {
+                throw new RuntimeException("The parameters have to be either constant or variable. Found [" + parameter.kind().name() + "] instead");
+            }
+        }
+
+        //$TODO$ Add code to execute the functionBody.
+        new FunctionBody(code, tokenizer).parse();
+        if(previous != null) {
+            removeLocalSymbolTable();
+        } else {
+            setSymbolTable(previous);
+        }
+
         return null; //$TODO$ return relevant value
     }
 }

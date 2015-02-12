@@ -1,5 +1,8 @@
 package com.acc.constants;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by prabhuk on 1/25/2015.
  */
@@ -55,4 +58,72 @@ public class OperationCode {
     public static final int WRL = 53;
 
     public static final int ERR = 63;
+
+    /**
+     * Dummy instruction code to represent mov
+     */
+    public static final int MOV = 15; //This is not part of the opcodes supported by DLX architecture.
+
+    public static final int MOV_CONSTANT = 0;
+    public static final int MOV_VARIABLE = 1;
+
+    public static final Map<Integer, String> opcodeAndNames = new HashMap<Integer, String>();
+
+    static {
+        opcodeAndNames.put(0, "ADD");
+        opcodeAndNames.put(1, "SUB");
+        opcodeAndNames.put(2, "MUL");
+        opcodeAndNames.put(3, "DIV");
+        opcodeAndNames.put(4, "MOD");
+        opcodeAndNames.put(5, "CMP");
+        opcodeAndNames.put(8, "OR");
+        opcodeAndNames.put(9, "AND");
+        opcodeAndNames.put(10, "BIC");
+        opcodeAndNames.put(11, "XOR");
+        opcodeAndNames.put(12, "LSH");
+        opcodeAndNames.put(13, "ASH");
+        opcodeAndNames.put(14, "CHK");
+
+        opcodeAndNames.put(16, "ADDI");
+        opcodeAndNames.put(17, "SUBI");
+        opcodeAndNames.put(18, "MULI");
+        opcodeAndNames.put(19, "DIVI");
+        opcodeAndNames.put(20, "MODI");
+        opcodeAndNames.put(21, "CMPI");
+        opcodeAndNames.put(24, "ORI");
+        opcodeAndNames.put(25, "ANDI");
+        opcodeAndNames.put(26, "BICI");
+        opcodeAndNames.put(27, "XORI");
+        opcodeAndNames.put(28, "LSHI");
+        opcodeAndNames.put(29, "ASHI");
+        opcodeAndNames.put(30, "CHKI");
+
+        opcodeAndNames.put(32, "LDW");
+        opcodeAndNames.put(33, "LDX");
+        opcodeAndNames.put(34, "POP");
+        opcodeAndNames.put(36, "STW");
+        opcodeAndNames.put(37, "STX");
+        opcodeAndNames.put(38, "PSH");
+        opcodeAndNames.put(40, "BEQ");
+        opcodeAndNames.put(41, "BNE");
+        opcodeAndNames.put(42, "BLT");
+        opcodeAndNames.put(43, "BGE");
+        opcodeAndNames.put(44, "BLE");
+        opcodeAndNames.put(45, "BGT");
+        opcodeAndNames.put(46, "BSR");
+        opcodeAndNames.put(48, "JSR");
+        opcodeAndNames.put(49, "RET");
+
+        opcodeAndNames.put(50, "RDI");
+        opcodeAndNames.put(51, "WRD");
+        opcodeAndNames.put(52, "WRH");
+        opcodeAndNames.put(53, "WRL");
+
+        opcodeAndNames.put(63, "ERR");
+
+
+        opcodeAndNames.put(15, "MOV");
+
+    }
+
 }
