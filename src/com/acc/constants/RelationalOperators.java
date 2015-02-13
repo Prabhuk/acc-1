@@ -3,7 +3,7 @@ package com.acc.constants;
 /**
  * Created by Rumpy on 12-02-2015.
  */
-public enum Relop {
+public enum RelationalOperators {
     GREATER_THAN(">"),
     GREATER_THAN_EQUALS_TO(">="),
     LESSER_THAN("<"),
@@ -11,7 +11,7 @@ public enum Relop {
 
     private final String symbol;
 
-    Relop(String symbol) {
+    RelationalOperators(String symbol) {
         this.symbol = symbol;
     }
     public String getSymbol() {

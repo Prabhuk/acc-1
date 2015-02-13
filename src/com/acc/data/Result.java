@@ -76,6 +76,11 @@ public class Result {
         return fixupLoc;
     }
 
+    public void setCondition(Condition cond)
+    {
+        this.cond=cond;
+    }
+
     public void fixupLoc(Integer fixuploc) {
         this.fixupLoc = fixuploc;
     }

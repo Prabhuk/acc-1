@@ -1,7 +1,7 @@
 package com.acc.parser;
 
-import com.acc.data.Code;
-import com.acc.data.Result;
+import com.acc.data.*;
+import com.acc.exception.SyntaxErrorException;
 import com.acc.util.Tokenizer;
 
 /**
@@ -14,16 +14,13 @@ public class Relation extends Parser {
 
     @Override
     public Result parse() {
-        Result x = null;
-        x = new Expression(code, tokenizer).parse();
-        if (x != null)
-            x = new Relation(code, tokenizer).parse();
-        else
-            return null;
-        if (x != null)
-            x = new Expression(code, tokenizer).parse();
-        else
-            return null;
+        Result x = new Expression(code, tokenizer).parse();
+        Token next = tokenizer.next();
+        x.setCondition(new RelationalOperator(next.getToken()).value());
+
+        Result y = new Expression(code, tokenizer).parse();
+
+        //$TODO$ code should be generated to load expressions for x & y
         return x;
     }
 }

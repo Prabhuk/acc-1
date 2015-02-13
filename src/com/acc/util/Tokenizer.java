@@ -104,7 +104,7 @@ public class Tokenizer {
             } else if (currentChar == '=') {
                 token.append(input.charAt(currentPointer++));
             }
-            RelOp ro = new RelOp(token.toString());
+            RelationalOperator ro = new RelationalOperator(token.toString());
             tokenSet.put(++tokenCounter, ro);
             return ro;
         } else if (isOperatorCharacter(currentChar)) {

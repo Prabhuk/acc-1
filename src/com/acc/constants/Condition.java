@@ -20,7 +20,7 @@ public class Condition {
 
     private final Integer instruction;
 
-    Condition(int instruction) {
+    public Condition(int instruction) {
         this.instruction = instruction;
     }
 
