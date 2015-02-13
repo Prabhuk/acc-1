@@ -24,7 +24,7 @@ public class IfParser extends Parser {
 
     @Override
     public Result parse() {
-        Result x = new Relation(code, tokenizer).parse();
+        Result x = new Relation(code, tokenizer).parse();  //Statement eats the first word for all statements except assignment
         AuxiliaryFunctions.CJF(code, x);
         final Token next = tokenizer.next();
         if (!next.isKeyword() || !((Keyword) next).isThen()) {

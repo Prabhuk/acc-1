@@ -39,8 +39,6 @@ public class Computation extends Parser {
         if(!next.getToken().equals(".")) {
             throw new SyntaxErrorException("Your program should end with a dot [.] Found ["+next+"] instead");
         }
-
-
         return s;
     }
 }
