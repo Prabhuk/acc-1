@@ -17,6 +17,8 @@ public class BasicBlock {
      */
     private final Map<Integer, Instruction> block = new LinkedHashMap<Integer, Instruction>();
     private final Set<BasicBlock> dominatesOver = new HashSet<BasicBlock>();
+    private final Set<BasicBlock> children = new HashSet<BasicBlock>();
+    private final Set<BasicBlock> parents = new HashSet<BasicBlock>();
 
     public Set<BasicBlock> getDominatesOver() {
         return dominatesOver;
@@ -63,4 +65,11 @@ public class BasicBlock {
         return dominatesOver.remove(block);
     }
 
+    public Set<BasicBlock> getChildren() {
+        return children;
+    }
+
+    public Set<BasicBlock> getParents() {
+        return parents;
+    }
 }
