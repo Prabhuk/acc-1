@@ -7,6 +7,7 @@ import com.acc.structure.Symbol;
  * Created by prabhuk on 2/12/2015.
  */
 public class Instruction {
+    private final boolean isPhi;
     private Symbol symbol;
     private int opcode;
     private String instructionString;
@@ -14,11 +15,8 @@ public class Instruction {
     private Integer a; //if Move instruction, then this is the instruction number
     private Integer b;
     private Integer c;
+    private Integer location;
 
-
-    public Instruction(Integer ins) {
-        this.instruction = ins;
-    }
 
     public Instruction(int _instruction, int _opcode, Integer a, Integer b, Integer c, Symbol symbol, Result rhs) {
         this.instruction = _instruction;
@@ -27,7 +25,18 @@ public class Instruction {
         this.c = c;
         this.opcode = _opcode;
         this.symbol = symbol;
+        isPhi = false;
         instructionString = getInstructionAsString(symbol, opcode, a, b, c, rhs);
+    }
+
+    public Instruction(int opcode, String instructionString) {
+        this.isPhi = opcode == 64;
+        this.opcode = opcode;
+        this.instructionString = instructionString;
+    }
+
+    public int getOpcode() {
+        return opcode;
     }
 
     public void setC(Integer _c) {
@@ -96,6 +105,18 @@ public class Instruction {
     public void FixUp(int c) {
         instruction = instruction & 0xffff0000 + c;
         this.c = c;
+    }
+
+    public Symbol getSymbol() {
+        return symbol;
+    }
+
+    public Integer getLocation() {
+        return location;
+    }
+
+    public void setLocation(Integer location) {
+        this.location = location;
     }
 
     @Override

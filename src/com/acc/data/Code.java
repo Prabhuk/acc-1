@@ -1,7 +1,7 @@
 package com.acc.data;
 
 import com.acc.constants.OperationCode;
-import com.acc.structure.BasicBlock;
+import com.acc.structure.ControlFlowGraph;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,13 +16,8 @@ public class Code {
      * List of instructions for the input program
      */
     private final List<Instruction> instructions = new LinkedList<Instruction>();
-    private final List<BasicBlock> basicBlocks = new LinkedList<BasicBlock>();
-    private BasicBlock currentBlock;
+    private static ControlFlowGraph controlFlowGraph = ControlFlowGraph.getDominatorTree();
 
-    public Code() {
-        currentBlock = new BasicBlock();
-        basicBlocks.add(currentBlock);
-    }
 
     /**
      * @return Returns the current program counter value
@@ -33,29 +28,19 @@ public class Code {
 
     /**
      * @param instruction - Takes an instruction and appends to the output code
-     * @param instructionCode
      * @return Returns the current program counter value
      */
-    public int addCode(Instruction instruction, int instructionCode) {
+    public int addCode(Instruction instruction) {
+        instruction.setLocation(getPc());
         instructions.add(instruction);
-        currentBlock.addToBlock(instruction);
-        if (instructionCode >= OperationCode.BEQ && instructionCode <= OperationCode.RET) {
-            addBasicBlock();
+        if(instruction.getOpcode() == OperationCode.PHI) {
+            return instructions.size();
         }
+        controlFlowGraph.addInstruction(instruction, this);
         return instructions.size();
     }
 
-    /*
-     * Creates a new Basic Block to which instructions will be added in the future
-     */
 
-    private void addBasicBlock() {
-        final BasicBlock temp = new BasicBlock();
-        currentBlock.addDominatedOverBlock(temp);
-        currentBlock = temp;
-        basicBlocks.add(currentBlock);
-
-    }
 
     public void Fixup(int location) {
         instructions.get(location).FixUp(getPc() - location);
@@ -66,12 +51,6 @@ public class Code {
 
     }
 
-    /*
-     * @return Returns the current Basic Block
-     */
-    public BasicBlock getCurrentBlock() {
-        return currentBlock;
-    }
 
     public List<Instruction> getInstructions() {
         return instructions;

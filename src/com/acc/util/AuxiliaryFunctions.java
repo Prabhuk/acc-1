@@ -20,21 +20,20 @@ public class AuxiliaryFunctions {
         if (c < 0) c ^= 0xFFFF0000;
         final int ins = instructionCode << 26 | a << 21 | b << 16 | c;
         final Instruction instruction = new Instruction(ins, instructionCode, a, b, c, symbol, rhs);
-        code.addCode(instruction, instructionCode);
+        code.addCode(instruction);
     }
 
     public static void putF2(Code code, int instructionCode, int a, int b, int c) {
 
         final int ins = instructionCode << 26 | a << 21 | b << 16 | c;
         final Instruction instruction = new Instruction(ins, instructionCode, a, b, c, null, null);
-        code.addCode(instruction, instructionCode);
+        code.addCode(instruction);
     }
 
     public static void putF3(Code code, int instructionCode, int c) {
         final int ins = instructionCode << 26 | c;
         final Instruction instruction = new Instruction(ins, instructionCode, null, null, c, null, null);
-        code.addCode(instruction, instructionCode);
-        code.addCode(instruction, instructionCode);
+        code.addCode(instruction);
     }
 
     public static void BJ(Code code, int loc) {

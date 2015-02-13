@@ -30,7 +30,7 @@ public class BasicBlock {
      * Adds an instruction to the basicBlock
      */
     public void addToBlock(Instruction instruction) {
-        block.put((block.keySet().size() + 1), instruction);
+        block.put(instruction.getLocation(), instruction);
     }
 
     /*
