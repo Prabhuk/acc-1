@@ -57,6 +57,9 @@ public class Code {
         //$TODO$ Needs implementation
     }
 
+    public ControlFlowGraph getControlFlowGraph() {
+        return controlFlowGraph;
+    }
 
     public List<Instruction> getInstructions() {
         return instructions;

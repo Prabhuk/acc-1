@@ -4,6 +4,7 @@ import com.acc.data.Code;
 import com.acc.data.Instruction;
 import com.acc.data.Token;
 import com.acc.parser.Computation;
+import com.acc.structure.BasicBlock;
 import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
 import com.acc.structure.SymbolType;
@@ -63,6 +64,8 @@ public class CompileInputFile {
             }
             System.out.println(symbol.getUniqueIdentifier() + " : " + value);
         }
+
+        final BasicBlock rootNode = code.getControlFlowGraph().getRootBlock();
 
     }
 

@@ -106,4 +106,8 @@ public class ControlFlowGraph {
     public BasicBlock getCurrentBlock() {
         return currentBlock;
     }
+
+    public BasicBlock getRootBlock() {
+        return rootBlock;
+    }
 }
