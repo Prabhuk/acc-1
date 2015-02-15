@@ -3,6 +3,8 @@ package com.acc.data;
 import com.acc.constants.Condition;
 import com.acc.constants.Kind;
 
+import java.util.List;
+
 /**
  * Created by Rumpy on 14-01-2015.
  */
@@ -14,14 +16,20 @@ public class Result {
     private String variableName; //if variable. This might be merged with address later. $TODO$
     private Condition cond;   //Conditions: ET, LT, LE, GE, NE, EQ
     private Integer fixupLoc;  //Contains information on where I branch off from. ie: pcBranch
+    private List<Integer> dimensions; //Contains the dimensions for array initialization $TODO$ Add array initialization to the symbol table
 
-    public Result(Kind kind, Integer regno, Integer value, Integer address, Condition cond, Integer fixupLoc) {
+    public Result(Kind kind, Integer regno, Integer value, Integer address, Condition cond, Integer fixupLoc, List<Integer> dimensions) {
         this.kind = kind;
         this.regno = regno;
         this.value = value;
         this.address = address;
         this.cond = cond;
         this.fixupLoc = fixupLoc;
+        this.dimensions = dimensions;
+    }
+
+    public Result(Kind kind, Integer regno, Integer value, Integer address, Condition cond, Integer fixupLoc) {
+        this(kind, regno, value, address, cond, fixupLoc, null);
     }
 
     public String getVariableName() {
@@ -83,6 +91,10 @@ public class Result {
 
     public void fixupLoc(Integer fixuploc) {
         this.fixupLoc = fixuploc;
+    }
+
+    public List<Integer> dimensions() {
+        return dimensions;
     }
 
 }

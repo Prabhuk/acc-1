@@ -21,7 +21,7 @@ public class Factor extends Parser {
                 x = new Expression(code, tokenizer).parse();
             } else if (next.isConstant()) {
                 Constant nextConstant = (Constant) next;
-                x = new Result(Kind.CONST, null, nextConstant.value(), null, null, null);
+                x = new Result(Kind.CONSTANT, null, nextConstant.value(), null, null, null);
             } else if (next.isDesignator()) {
                 //$TODO$ implement lookup and set the address instead of 0
                 x = new Result(Kind.VAR, null, null, 0, null, null);

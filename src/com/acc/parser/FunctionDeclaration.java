@@ -18,7 +18,9 @@ public class FunctionDeclaration extends Parser {
         Token next = tokenizer.next();
         if(!isFunctionOrProcedureKeyword(next))
         {
-            throw new SyntaxErrorException("Expected \"function\" or \"parameter\" keyword. Found ["+next.getToken()+"] instead");
+            // No function declaration in the file
+            tokenizer.previous();
+            return null;
         }
         next = tokenizer.next();
         if(!next.isIdentifier()) {

@@ -12,6 +12,7 @@ public class Symbol {
     private SymbolType type;
     private boolean isPointerValue;
     private Object value; //Could just be integer in our case.
+    private int arrayDimension; //Could just be integer in our case.
 
     /**
      *
@@ -27,6 +28,14 @@ public class Symbol {
         this.type = type;
         this.isPointerValue = isPointerValue;
         this.value = value;
+    }
+
+    public void setArrayDimension(int arrayDimension) {
+        this.arrayDimension = arrayDimension;
+    }
+
+    public int getArrayDimension() {
+        return arrayDimension;
     }
 
     private boolean isProcedure() {
@@ -69,6 +78,18 @@ public class Symbol {
         }catch(Exception e){
             return null;
         }
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public SymbolType getType() {
+        return type;
+    }
+
+    public boolean isPointerValue() {
+        return isPointerValue;
     }
 
     public String getUniqueIdentifier() {

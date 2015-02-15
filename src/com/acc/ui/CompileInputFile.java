@@ -6,6 +6,7 @@ import com.acc.data.Token;
 import com.acc.parser.Computation;
 import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
+import com.acc.structure.SymbolType;
 import com.acc.util.Tokenizer;
 
 import java.io.IOException;
@@ -56,7 +57,11 @@ public class CompileInputFile {
             System.out.println("\n\nGlobal Symbol Table: \n");
         }
         for (Symbol symbol : symbols) {
-            System.out.println(symbol.getUniqueIdentifier() + " : " + symbol.getValue());
+            Object value = symbol.getValue();
+            if(symbol.getType().isArray()) {
+                value = "Array dimensions: " + symbol.getArrayDimension();
+            }
+            System.out.println(symbol.getUniqueIdentifier() + " : " + value);
         }
 
     }

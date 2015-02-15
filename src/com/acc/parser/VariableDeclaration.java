@@ -1,5 +1,6 @@
 package com.acc.parser;
 
+import com.acc.constants.Kind;
 import com.acc.data.Code;
 import com.acc.data.Keyword;
 import com.acc.data.Result;
@@ -8,6 +9,8 @@ import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.SymbolType;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
+
+import java.util.List;
 
 /**
  * Created by Rumpy on 05-02-2015.
@@ -25,17 +28,14 @@ public class VariableDeclaration extends Parser {
 
     @Override
     public Result parse() {
-        Token type = tokenizer.next();
-        //$TODO$ extract TypeDeclaration. Handle multidimensional arrays
-        if(!isVarOrArrayKeyword(type)) {
-            throw new SyntaxErrorException("Unexpected token ["+type.getToken()+"]. Exptected keyword [var] or [array]");
-        }
-        Keyword _type = (Keyword) type;
+        //$TODO$ extract TypeDeclaration. Handle multidimensional arrays => In progress
+        Result x = new TypeDeclaration(code,tokenizer).parse();
+        Kind _type = x.kind();
         final SymbolType symbolType = _type.isArray() ? SymbolType.ARRAY : SymbolType.VARIABLE;
-        declareSymbol(symbolType);
+        declareSymbol(symbolType, x.dimensions());
         Token next = tokenizer.next();
         while (next.getToken().equals(",")) {
-            declareSymbol(symbolType);
+            declareSymbol(symbolType, x.dimensions());
             next = tokenizer.next();
         }
 
@@ -43,10 +43,11 @@ public class VariableDeclaration extends Parser {
             throw new SyntaxErrorException("Expected \";\" Found [" + next.getToken() + "] instead");
         }
 
-        type = tokenizer.next();
+        Token type = tokenizer.next();
         while(isVarOrArrayKeyword(type)) {
             tokenizer.previous();
             parse();
+            type = tokenizer.next();
         }
         tokenizer.previous();
         return null;
@@ -54,15 +55,14 @@ public class VariableDeclaration extends Parser {
 
     private boolean isVarOrArrayKeyword(Token type) {
         return type.isKeyword() && (!((Keyword)type).isVar() || !((Keyword)type).isArray());
-//        return !type.isKeyword() || (!((Keyword)type).isVar() && !((Keyword)type).isArray());
     }
 
-    private void declareSymbol(SymbolType symbolType) {
+    private void declareSymbol(SymbolType symbolType, List<Integer> arrayDimensions) {
         Token symbolName = tokenizer.next();
         if(!symbolName.isDesignator()) {
             throw new SyntaxErrorException("Identifier expected. Found ["+symbolName.getToken()+"] instead");
         }
-        //$TODO$ handle multidimensional array.
-        AuxiliaryFunctions.declareSymbol(code, symbolName.getToken(), getSymbolTable(), symbolType);
+        //$TODO$ handle multidimensional array. => In progress
+        AuxiliaryFunctions.declareSymbol(code, symbolName.getToken(), getSymbolTable(), symbolType, arrayDimensions);
     }
 }

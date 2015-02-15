@@ -4,14 +4,15 @@ package com.acc.constants;
  * Created by Rumpy on 14-01-2015.
  */
 public enum Kind {
-    CONST,
+    CONSTANT,
     VAR,
+    ARRAY,
     REG,
     CONDITION,
     FIXUP_DUMMY;
 
-    public boolean isConst() {
-        return this == CONST;
+    public boolean isConstant() {
+        return this == CONSTANT;
     }
 
     public boolean isVariable() {
@@ -24,6 +25,10 @@ public enum Kind {
 
     public boolean isCondition() {
         return this == CONDITION;
+    }
+
+    public boolean isArray() {
+        return this == ARRAY;
     }
 
 }
