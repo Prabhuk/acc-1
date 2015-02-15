@@ -34,7 +34,7 @@ public class Statement extends Parser {
                     x = new IfParser(code, tokenizer).parse();
                 }
             }
-            tokenizer.previous(); // Statements breakout on semicolon or end curly brace.
+//            tokenizer.previous(); // Statements breakout on semicolon or end curly brace.
         } else {
             tokenizer.previous(); //moving back to reread the symbolName
             x = new AssignmentParser(code, tokenizer).parse();

@@ -2,9 +2,13 @@ main
 var x, y;
 array[3] b;
 {
-    if n <= 1 then
-        x <- 3
+    if 3 <= 1 then
+        let x <- 3
     fi;
-    x <- 3+2;
-    x <- y
+    let i <- 1;
+    while i < 4 do
+        let i <- i + 1
+    od;
+    let x <- 3+2;
+    let x <- y
 }.

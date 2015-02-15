@@ -16,7 +16,6 @@ import java.util.Set;
  * Created by prabhuk on 1/26/2015.
  */
 public class WhileParser extends Parser {
-    private BasicBlock loopBlock;
 
     public WhileParser(Code code, Tokenizer tokenizer) {
         super(code, tokenizer);
@@ -26,14 +25,16 @@ public class WhileParser extends Parser {
     @Override
     public Result parse() {
         final int loop = code.getPc();
-        loopBlock = code.getCurrentBlock();
+        BasicBlock loopBlock = code.getCurrentBlock();
         Result x = new Relation(code, tokenizer).parse();
         AuxiliaryFunctions.CJF(code, x);
 
         final BasicBlock currentBlock = code.getCurrentBlock();
         final Set<BasicBlock> parents = currentBlock.getParents();
-        if(parents.size() != 1) {
-            throw new RuntimeException("There should be only one parent for the join block at this time");
+        if(parents.size() > 1) {
+            final BasicBlock nextBlock = new BasicBlock();
+            currentBlock.addChild(nextBlock);
+            code.setCurrentBlock(nextBlock);
         }
         BasicBlock parent = null;
         for (BasicBlock p : parents) {
@@ -41,26 +42,34 @@ public class WhileParser extends Parser {
             break;
         }
 
-        BasicBlock join = currentBlock;
+        BasicBlock join = currentBlock; //Distinction is necessary to maintain readability of code
         join.setLeft(parent);
         x.setJoin(join);
 
         currentBlock.setJoinBlock(join); //basically self reference
 
-        final Token next = handleDoToken();
+        handleDoToken();
 
         final BasicBlock right = new BasicBlock();
+        currentBlock.addChild(right);
         join.setRight(right);
+
         final Result rightTree = new StatSequence(code, tokenizer).parse();
         if(rightTree.getJoin() != null) {
             x.setJoin(rightTree.getJoin());
         }
         AuxiliaryFunctions.BJ(code, loop, loopBlock); //Backward Jump to the loop beginning.
         AuxiliaryFunctions.createPhiInstructions(getSymbolTable(), join, code);
-        code.setCurrentBlock(new BasicBlock());
-        handleODtoken(next);
-        return x; //$TODO$ Do we need x at all?
+
+        final BasicBlock nextBlock = new BasicBlock();
+        join.addChild(nextBlock);
+
+        code.setCurrentBlock(nextBlock);
+        handleODtoken(tokenizer.next());
+
+        return x;
     }
+
 
     private void handleODtoken(Token next) {
         if (!next.isKeyword() || !((Keyword) next).isOd()) {

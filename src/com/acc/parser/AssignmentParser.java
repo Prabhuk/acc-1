@@ -29,8 +29,10 @@ public class AssignmentParser extends Parser {
         Result x = new Expression(code, tokenizer).parse();
         final boolean added = AuxiliaryFunctions.assignToSymbol(code, symbolName.getToken(), x, getSymbolTable());
         if (!added) {
-            throw new RuntimeException("The Assignment value have to be either constant or variable. Found [" + x.kind().name() + "] instead");
+            //$TODO$ handle registers
+//            throw new RuntimeException("The Assignment value have to be either constant or variable. Found [" + x.kind().name() + "] instead");
         }
+
         return x;
     }
 

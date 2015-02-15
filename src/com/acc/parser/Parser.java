@@ -4,6 +4,7 @@ import com.acc.data.Code;
 import com.acc.data.Result;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.SymbolTable;
+import com.acc.util.Printer;
 import com.acc.util.Tokenizer;
 
 import java.util.ArrayList;

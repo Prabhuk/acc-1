@@ -1,5 +1,6 @@
 package com.acc.structure;
 
+import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
 import com.acc.data.PhiInstruction;
@@ -34,8 +35,20 @@ public class BasicBlock {
         instructions.add(instruction);
     }
 
+    /**
+     * Adds the phi instruction to this basic block.
+     * Caller of this method is responsible for adding it to Code in the right place
+     * @param instruction
+     */
     public void addPhiInstruction(Instruction instruction) {
-        addInstruction(instruction);
+        int index = 0;
+        for (Instruction instruction1 : instructions) {
+            if(instruction.getOpcode() != OperationCode.PHI) {
+                break;
+            }
+            index++;
+        }
+        instructions.add(index, instruction); //PHI should always be added to the top
         phiMap.put(instruction.getSymbol().getName(), instruction);
     }
 
@@ -83,30 +96,6 @@ public class BasicBlock {
 
     public Collection<Instruction> getAllPhiInstructions() {
         return phiMap.values();
-    }
-
-    public BasicBlock getJoinBlock() {
-        return joinBlock;
-    }
-
-    public void commitLoopPhis(BasicBlock block) {
-
-        final List<Instruction> instructions = joinBlock.getInstructions();
-        for (int i = instructions.size() - 1; i >= 0; i--) {
-            block.getInstructions().add(0, instructions.get(i));
-        }
-        block.updateParentPhis();
-        //$TODO$ figure out who calls process Join. (Fixup, bj etc.) Distinguish if and while here
-
-    }
-
-    private void updateParentPhis() {
-        //$TODO$ update Phis to the outer loop
-    }
-
-    public void commitIFELSEPhis() {
-        //$TODO$ figure out who calls process Join. (Fixup, bj etc.) Distinguish if and while here
-        joinBlock.updateParentPhis();
     }
 
     public BasicBlock getLeft() {

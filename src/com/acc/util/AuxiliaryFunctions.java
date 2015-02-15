@@ -184,10 +184,7 @@ public class AuxiliaryFunctions {
                 final Symbol symbol = instruction.getSymbol();
                 if (join.getPhiInstruction(symbol.getName()) == null) {
                     //Processed left so expecting the symbol to be present in the currentSymbolTable
-                    Symbol targetSymbol = getTargetSymbol(table, symbol);
-                    final PhiInstruction phi = new PhiInstruction(targetSymbol);
-                    code.addPhiInstruction(phi); //$TODO$ this is not in order but should generate an unique suffix
-                    join.addPhiInstruction(phi);
+                    createPhi(join, table, code, symbol);
                 }
                 //If there is an NPE in the next line then the variable is not declared in the scope
                 final PhiInstruction phi = (PhiInstruction) join.getPhiInstruction(symbol.getName());
@@ -207,14 +204,19 @@ public class AuxiliaryFunctions {
                     //Update the existing phi instruction
                     phi = (PhiInstruction) join.getPhiInstruction(symbol.getName());
                 } else {
-                    Symbol targetSymbol = getTargetSymbol(table, symbol);
-                    phi = new PhiInstruction(targetSymbol);
-                    code.addPhiInstruction(phi);
-                    join.addPhiInstruction(phi);
+                    phi = createPhi(join, table, code, symbol);
                 }
                 phi.setLeftSymbol(symbol);
             }
         }
+    }
+
+    private static PhiInstruction createPhi(BasicBlock join, SymbolTable table, Code code, Symbol symbol) {
+        Symbol targetSymbol = getTargetSymbol(table, symbol);
+        PhiInstruction phi = new PhiInstruction(targetSymbol);
+        code.addPhiInstruction(phi);//$TODO$ this is not in order but should generate an unique suffix
+        join.addPhiInstruction(phi);
+        return phi;
     }
 
     private static Symbol getTargetSymbol(SymbolTable table, Symbol symbol) {

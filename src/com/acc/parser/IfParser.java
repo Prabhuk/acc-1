@@ -28,6 +28,7 @@ public class IfParser extends Parser {
         Result x = new Relation(code, tokenizer).parse();  //Statement eats the first word for all statements except assignment
         AuxiliaryFunctions.CJF(code, x);
         final BasicBlock currentBlock = code.getCurrentBlock();
+        BasicBlock localCurrentBlock = currentBlock;
 
         BasicBlock join = new BasicBlock();
         x.setJoin(join);
@@ -36,6 +37,8 @@ public class IfParser extends Parser {
 
         final BasicBlock left = new BasicBlock();
         join.setLeft(left);
+        localCurrentBlock.addChild(left);
+
         code.setCurrentBlock(left);
 
         handleThenToken();
@@ -50,6 +53,7 @@ public class IfParser extends Parser {
         if (isElse(incoming)) {
             final BasicBlock right = new BasicBlock();
             join.setRight(right);
+            localCurrentBlock.addChild(right);
             code.setCurrentBlock(right);
             AuxiliaryFunctions.FJLink(code, follow);
             code.Fixup(x.fixupLoc());
@@ -65,14 +69,16 @@ public class IfParser extends Parser {
         code.Fixlink(follow);
         AuxiliaryFunctions.createPhiInstructions(getSymbolTable(), join, code);
         handleFiToken();
-        eatSemiColonOrCurlyBracket();
+        if(join.getLeft() != null) {
+            join.getLeft().addChild(join);
+        }
+        if(join.getRight() != null) {
+            join.getRight().addChild(join);
+        }
         code.setCurrentBlock(join);
         return x;
     }
 
-    private void eatSemiColonOrCurlyBracket() {
-        tokenizer.next();
-    }
 
     private void handleFiToken() {
         final Token finalFiToken = tokenizer.next();
