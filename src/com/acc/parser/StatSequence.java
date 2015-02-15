@@ -16,7 +16,13 @@ public class StatSequence extends Parser {
     public Result parse() {
         Result x = new Statement(code, tokenizer).parse();
         while (tokenizer.next().isSemicolon()) {
-            x = new Statement(code, tokenizer).parse();
+            Result y = new Statement(code, tokenizer).parse();
+            if (y.getJoin() != null) {
+                if (x.getJoin() != null) {
+                    System.out.println("Seems to be Join block clashing"); //$TODO$ for debugging. Needs to be removed
+                }
+                x.setJoin(y.getJoin());
+            }
         }
         tokenizer.previous(); // moving a step back from the one who is not a semicolon
         return x; //Necessary to return the results at this level? what is the purpose at this level?

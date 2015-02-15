@@ -6,8 +6,7 @@ package com.acc.structure;
 public enum SymbolType {
     PROCEDURE,
     VARIABLE,
-    ARRAY
-    ;
+    ARRAY;
 
     public boolean isProcedure() {
         return this == PROCEDURE;
@@ -16,6 +15,7 @@ public enum SymbolType {
     public boolean isVariable() {
         return this == VARIABLE;
     }
+
     public boolean isArray() {
         return this == ARRAY;
     }

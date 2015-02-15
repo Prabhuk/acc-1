@@ -1,7 +1,6 @@
 package com.acc.exception;
 
 import com.acc.constants.KeywordType;
-import com.acc.data.Keyword;
 import com.acc.data.Token;
 import com.acc.data.TokenType;
 
@@ -14,7 +13,7 @@ public class SyntaxErrorException extends RuntimeException {
     }
 
     public SyntaxErrorException(TokenType expected, TokenType type) {
-        super("Unexpected token type [" + expected.name().toLowerCase()+"]. Expected ["+ type.name().toLowerCase()+"] instead");
+        super("Unexpected token type [" + expected.name().toLowerCase() + "]. Expected [" + type.name().toLowerCase() + "] instead");
     }
 
     public SyntaxErrorException(KeywordType expected, Token found) {

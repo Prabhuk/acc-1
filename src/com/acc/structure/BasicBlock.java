@@ -1,6 +1,8 @@
 package com.acc.structure;
 
+import com.acc.data.Code;
 import com.acc.data.Instruction;
+import com.acc.data.PhiInstruction;
 
 import java.util.*;
 
@@ -13,20 +15,34 @@ public class BasicBlock {
      * Storing the instruction number along with the instruction
      */
     private final List<Instruction> instructions = new ArrayList<Instruction>();
+    private final Map<String, Instruction> phiMap = new HashMap<String, Instruction>();
     private final Set<BasicBlock> dominatesOver = new HashSet<BasicBlock>();
     private final Set<BasicBlock> children = new HashSet<BasicBlock>();
     private final Set<BasicBlock> parents = new HashSet<BasicBlock>();
     private BasicBlock joinBlock;
+    private BasicBlock left;
+    private BasicBlock right;
 
     public Set<BasicBlock> getDominatesOver() {
         return dominatesOver;
     }
+
     /*
      * Adds an instruction to the basicBlock
      */
     public void addInstruction(Instruction instruction) {
         instructions.add(instruction);
     }
+
+    public void addPhiInstruction(Instruction instruction) {
+        addInstruction(instruction);
+        phiMap.put(instruction.getSymbol().getName(), instruction);
+    }
+
+    public Instruction getPhiInstruction(String symbolName) {
+        return phiMap.get(symbolName);
+    }
+
     /*
      * returns true if the block parameter is a dominating block for the current block
      */
@@ -65,10 +81,11 @@ public class BasicBlock {
         return instructions;
     }
 
+    public Collection<Instruction> getAllPhiInstructions() {
+        return phiMap.values();
+    }
+
     public BasicBlock getJoinBlock() {
-        if(joinBlock == null) {
-            joinBlock = new BasicBlock();
-        }
         return joinBlock;
     }
 
@@ -92,4 +109,23 @@ public class BasicBlock {
         joinBlock.updateParentPhis();
     }
 
+    public BasicBlock getLeft() {
+        return left;
+    }
+
+    public void setLeft(BasicBlock left) {
+        this.left = left;
+    }
+
+    public BasicBlock getRight() {
+        return right;
+    }
+
+    public void setRight(BasicBlock right) {
+        this.right = right;
+    }
+
+    public void setJoinBlock(BasicBlock joinBlock) {
+        this.joinBlock = joinBlock;
+    }
 }

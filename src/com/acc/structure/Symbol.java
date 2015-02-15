@@ -15,12 +15,11 @@ public class Symbol {
     private int arrayDimension; //Could just be integer in our case.
 
     /**
-     *
-     * @param name - unique symbol name in the symbol table
-     * @param suffix - -1 will represent declaration
-     * @param type - variable or procedure
+     * @param name           - unique symbol name in the symbol table
+     * @param suffix         - -1 will represent declaration
+     * @param type           - variable or procedure
      * @param isPointerValue - true if assigning result of another instruction, false if constant
-     * @param value - value to be assigned. $TODO$ make it integer?
+     * @param value          - value to be assigned. $TODO$ make it integer?
      */
     public Symbol(String name, int suffix, SymbolType type, boolean isPointerValue, Object value) {
         this.name = name;
@@ -28,6 +27,14 @@ public class Symbol {
         this.type = type;
         this.isPointerValue = isPointerValue;
         this.value = value;
+    }
+
+    public Symbol(Symbol symbol) {
+        name = symbol.getName();
+        suffix = -1; //should be set by the caller in due course
+        type = symbol.getType();
+        isPointerValue = symbol.isPointerValue();
+        value = Symbol.cloneValue(symbol.getValue());
     }
 
     public void setArrayDimension(int arrayDimension) {
@@ -67,15 +74,15 @@ public class Symbol {
     }
 
     //based on http://stackoverflow.com/questions/869033/how-do-i-copy-an-object-in-java
-    public static Object cloneValue(Object obj){
-        try{
+    public static Object cloneValue(Object obj) {
+        try {
             Object clone = obj.getClass().newInstance();
             for (Field field : obj.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
                 field.set(clone, field.get(obj));
             }
             return clone;
-        }catch(Exception e){
+        } catch (Exception e) {
             return null;
         }
     }

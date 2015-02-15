@@ -2,13 +2,11 @@ package com.acc.data;
 
 import com.acc.constants.Condition;
 import com.acc.constants.OperationCode;
-import com.acc.constants.Operators;
 import com.acc.exception.UnknownOperatorException;
-import com.acc.constants.RelationalOperators;
 
 /**
-* Created by Rumpy on 26-01-2015.
-*/
+ * Created by Rumpy on 26-01-2015.
+ */
 public class RelationalOperator extends Token {
     private Condition value;
 

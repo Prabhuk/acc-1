@@ -1,14 +1,11 @@
 package com.acc.parser;
 
-import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.data.TokenType;
 import com.acc.exception.SyntaxErrorException;
-import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
-import com.acc.structure.SymbolType;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
@@ -27,49 +24,49 @@ public class FunctionCall extends Parser {
     @Override
     public Result parse() {
         final Token procedureName = tokenizer.next();
-        if(!procedureName.isIdentifier()) {
+        if (!procedureName.isIdentifier()) {
             throw new SyntaxErrorException(procedureName.tokenType(), TokenType.IDENTIFIER);
         }
         final Token openBracket = tokenizer.next();
-        if(!openBracket.getToken().equals("(")) {
-            throw new SyntaxErrorException("Excpected \"(\" after procedure name ["+procedureName.getToken()+"]. Found ["+openBracket.getToken()+"] instead");
+        if (!openBracket.getToken().equals("(")) {
+            throw new SyntaxErrorException("Excpected \"(\" after procedure name [" + procedureName.getToken() + "]. Found [" + openBracket.getToken() + "] instead");
         }
         Token lookAhead = tokenizer.next();
         List<Result> parameters = new ArrayList<Result>();
-        if(!lookAhead.getToken().equals(")")) {
+        if (!lookAhead.getToken().equals(")")) {
             tokenizer.previous(); //Allowing expression to process the first parameter value
             parameters.add(new Expression(code, tokenizer).parse());
             lookAhead = tokenizer.next();
             while (lookAhead.getToken().equals(",")) {
                 parameters.add(new Expression(code, tokenizer).parse());
             }
-            if(!lookAhead.getToken().equals(")")) { //End brackets should've broken the while loop. Otherwise syntax error
-                throw new SyntaxErrorException("Expected [\")\"]. Found ["+lookAhead.getToken()+"] instead");
+            if (!lookAhead.getToken().equals(")")) { //End brackets should've broken the while loop. Otherwise syntax error
+                throw new SyntaxErrorException("Expected [\")\"]. Found [" + lookAhead.getToken() + "] instead");
             }
         }
         SymbolTable previous = null;
-        if(!getSymbolTable().isGlobalTable()) {
+        if (!getSymbolTable().isGlobalTable()) {
             previous = getSymbolTable();
         }
         final SymbolTable procedureSymbolTable = new SymbolTable(procedureName.getToken());
         setSymbolTable(procedureSymbolTable);
         final List<String> args = getArgumentNamesForProcedure(procedureName.getToken());
-        if(args.size() != parameters.size()) {
-            throw new SyntaxErrorException("Argument list mismatch in the procedure call for the procedure ["+procedureName.getToken()+"]");
+        if (args.size() != parameters.size()) {
+            throw new SyntaxErrorException("Argument list mismatch in the procedure call for the procedure [" + procedureName.getToken() + "]");
         }
 
-        for(int i=0; i<parameters.size(); i++) {
+        for (int i = 0; i < parameters.size(); i++) {
             Result parameter = parameters.get(i);
             String argumentName = args.get(i);
             final boolean added = AuxiliaryFunctions.assignToSymbol(code, argumentName, parameter, getSymbolTable());
-            if(!added) {
+            if (!added) {
                 throw new RuntimeException("The parameters have to be either constant or variable. Found [" + parameter.kind().name() + "] instead");
             }
         }
 
         //$TODO$ Add code to execute the functionBody.
         new FunctionBody(code, tokenizer).parse();
-        if(previous != null) {
+        if (previous != null) {
             removeLocalSymbolTable();
         } else {
             setSymbolTable(previous);

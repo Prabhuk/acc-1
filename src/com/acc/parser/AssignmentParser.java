@@ -1,11 +1,9 @@
 package com.acc.parser;
 
-import com.acc.constants.OperationCode;
-import com.acc.data.*;
+import com.acc.data.Code;
+import com.acc.data.Result;
+import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
-import com.acc.structure.Symbol;
-import com.acc.structure.SymbolTable;
-import com.acc.structure.SymbolType;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
@@ -30,7 +28,7 @@ public class AssignmentParser extends Parser {
         //$TODO Pending implementation. How do you generate code for assignment? How do you link it to PHI
         Result x = new Expression(code, tokenizer).parse();
         final boolean added = AuxiliaryFunctions.assignToSymbol(code, symbolName.getToken(), x, getSymbolTable());
-        if(!added) {
+        if (!added) {
             throw new RuntimeException("The Assignment value have to be either constant or variable. Found [" + x.kind().name() + "] instead");
         }
         return x;

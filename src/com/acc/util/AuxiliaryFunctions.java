@@ -5,6 +5,7 @@ import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
+import com.acc.data.PhiInstruction;
 import com.acc.data.Result;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.Symbol;
@@ -12,6 +13,7 @@ import com.acc.structure.SymbolTable;
 import com.acc.structure.SymbolType;
 
 import java.lang.reflect.Array;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -42,7 +44,6 @@ public class AuxiliaryFunctions {
 
     public static void BJ(Code code, int loc, BasicBlock loopBlock) {
         putF1(code, OperationCode.BEQ, 0, 0, loc - code.getPc(), null, null);
-        code.processJoins(loopBlock);
     }
 
     public static void FJLink(Code code, Result x) {
@@ -51,7 +52,8 @@ public class AuxiliaryFunctions {
     }
 
     public static void CJF(Code code, Result x) {
-        putF1(code, OperationCode.BEQ + Condition.getNegatedInstruction(x.condition()), x.regNo(), 0, 0, null, null);
+        //OperationCode.BEQ + $TODO$ WTF
+        putF1(code, Condition.getNegatedInstruction(x.condition()), x.regNo() == null ? 0 : x.regNo(), 0, 0, null, null);
         x.fixupLoc(code.getPc() - 1);
     }
 
@@ -133,7 +135,7 @@ public class AuxiliaryFunctions {
 
     public static void declareSymbol(Code code, String symbolName, SymbolTable symbolTable, SymbolType type, List<Integer> arrayDimensions) {
         final Symbol s = new Symbol(symbolName, -1, type, false, null);
-        if(type == SymbolType.ARRAY) {
+        if (type == SymbolType.ARRAY) {
             final int dimensionCount = arrayDimensions.size();
             int[] dimensionsArray = new int[dimensionCount];
             for (int i = 0; i < arrayDimensions.size(); i++) {
@@ -154,5 +156,75 @@ public class AuxiliaryFunctions {
         final Code code = new Code();
         AuxiliaryFunctions.putF1(code, OperationCode.ADD, 1, 2, 5, null, null);
 //        Printer.print(code.toString());
+    }
+
+    public static void createPhiInstructions(SymbolTable table, BasicBlock join, Code code) {
+        handleLeft(join, table, code);
+        handleRight(join, table, code);
+        fillincompleteRight(join, table);
+    }
+
+    private static void fillincompleteRight(BasicBlock join, SymbolTable table) {
+        //Handle Phi Statements where right did not have assignments
+        final Collection<Instruction> allPhiInstructions = join.getAllPhiInstructions();
+        for (Instruction allPhiInstruction : allPhiInstructions) {
+            final PhiInstruction phi = (PhiInstruction) allPhiInstruction;
+            if (!phi.isComplete()) {
+                Symbol targetSymbol = getTargetSymbol(table, phi.getSymbol());
+                phi.setRightSymbol(targetSymbol);
+            }
+        }
+    }
+
+    private static void handleRight(BasicBlock join, SymbolTable table, Code code) {
+        final BasicBlock right = join.getRight();
+        final List<Instruction> rightInstructions = right.getInstructions();
+        for (Instruction instruction : rightInstructions) {
+            if (instruction.getOpcode() == OperationCode.MOV) {
+                final Symbol symbol = instruction.getSymbol();
+                if (join.getPhiInstruction(symbol.getName()) == null) {
+                    //Processed left so expecting the symbol to be present in the currentSymbolTable
+                    Symbol targetSymbol = getTargetSymbol(table, symbol);
+                    final PhiInstruction phi = new PhiInstruction(targetSymbol);
+                    code.addPhiInstruction(phi); //$TODO$ this is not in order but should generate an unique suffix
+                    join.addPhiInstruction(phi);
+                }
+                //If there is an NPE in the next line then the variable is not declared in the scope
+                final PhiInstruction phi = (PhiInstruction) join.getPhiInstruction(symbol.getName());
+                phi.setRightSymbol(instruction.getSymbol());
+            }
+        }
+    }
+
+    private static void handleLeft(BasicBlock join, SymbolTable table, Code code) {
+        final BasicBlock left = join.getLeft();
+        final List<Instruction> leftInstructions = left.getInstructions();
+        for (Instruction instruction : leftInstructions) {
+            if (instruction.getOpcode() == OperationCode.MOV) {
+                final Symbol symbol = instruction.getSymbol();
+                PhiInstruction phi;
+                if (join.getPhiInstruction(symbol.getName()) != null) {
+                    //Update the existing phi instruction
+                    phi = (PhiInstruction) join.getPhiInstruction(symbol.getName());
+                } else {
+                    Symbol targetSymbol = getTargetSymbol(table, symbol);
+                    phi = new PhiInstruction(targetSymbol);
+                    code.addPhiInstruction(phi);
+                    join.addPhiInstruction(phi);
+                }
+                phi.setLeftSymbol(symbol);
+            }
+        }
+    }
+
+    private static Symbol getTargetSymbol(SymbolTable table, Symbol symbol) {
+        final List<Symbol> symbols = table.getSymbols();
+        Symbol targetSymbol = null;
+        for (Symbol symbol1 : symbols) {
+            if (symbol1.getName().equals(symbol.getName())) {
+                targetSymbol = symbol1;
+            }
+        }
+        return targetSymbol;
     }
 }

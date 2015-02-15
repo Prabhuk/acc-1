@@ -1,6 +1,9 @@
 package com.acc.structure;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by prabhuk on 2/9/2015.
@@ -56,6 +59,7 @@ public class SymbolTable {
 
     /**
      * Adds the symbol to the symbol table if it does not exist already. If it does, then throws an error.
+     *
      * @param s
      */
     public void addSymbol(Symbol s) {
@@ -87,6 +91,7 @@ public class SymbolTable {
             symbolsByName.remove(symbolKey);
         }
     }
+
     private String getSymbolKey(Symbol s) {
         return s.getName() + s.getSuffix();
     }

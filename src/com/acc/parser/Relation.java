@@ -1,7 +1,9 @@
 package com.acc.parser;
 
-import com.acc.data.*;
-import com.acc.exception.SyntaxErrorException;
+import com.acc.data.Code;
+import com.acc.data.RelationalOperator;
+import com.acc.data.Result;
+import com.acc.data.Token;
 import com.acc.util.Tokenizer;
 
 /**

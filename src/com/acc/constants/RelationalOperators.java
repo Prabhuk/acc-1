@@ -14,6 +14,7 @@ public enum RelationalOperators {
     RelationalOperators(String symbol) {
         this.symbol = symbol;
     }
+
     public String getSymbol() {
         return symbol;
     }

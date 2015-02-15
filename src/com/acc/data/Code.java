@@ -17,7 +17,7 @@ public class Code {
      * List of instructions for the input program
      */
     private final List<Instruction> instructions = new LinkedList<Instruction>();
-    private static ControlFlowGraph controlFlowGraph = ControlFlowGraph.getDominatorTree();
+    private static ControlFlowGraph controlFlowGraph = ControlFlowGraph.getCFG();
 
 
     /**
@@ -34,10 +34,17 @@ public class Code {
     public int addCode(Instruction instruction) {
         instruction.setLocation(getPc());
         instructions.add(instruction);
-        if(instruction.getOpcode() == OperationCode.PHI) {
-            return instructions.size();
-        }
-        controlFlowGraph.addInstruction(instruction, this);
+        controlFlowGraph.addInstruction(instruction);
+        return instructions.size();
+    }
+
+    /**
+     * @param instruction - Takes an instruction and appends to the output code
+     * @return Returns the current program counter value
+     */
+    public int addPhiInstruction(PhiInstruction instruction) {
+        instruction.setLocation(getPc());
+        instructions.add(instruction);
         return instructions.size();
     }
 
@@ -45,11 +52,13 @@ public class Code {
         return controlFlowGraph.getCurrentBlock();
     }
 
+    public void setCurrentBlock(BasicBlock block) {
+        controlFlowGraph.setCurrentBlock(block);
+    }
 
 
     public void Fixup(int location) {
         instructions.get(location).FixUp(getPc() - location);
-        controlFlowGraph.processIFELSEJoinBlock(this);
         //$TODO$ this is not updated within the basicblock. Need to fix it in the basic block as well. Use instr number range?
     }
 
@@ -65,7 +74,4 @@ public class Code {
         return instructions;
     }
 
-    public void processJoins(BasicBlock loopBlock) {
-        controlFlowGraph.processLoopJoinBlock(loopBlock, this);
-    }
 }

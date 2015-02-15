@@ -2,6 +2,7 @@ package com.acc.data;
 
 import com.acc.constants.Condition;
 import com.acc.constants.Kind;
+import com.acc.structure.BasicBlock;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class Result {
     private Condition cond;   //Conditions: ET, LT, LE, GE, NE, EQ
     private Integer fixupLoc;  //Contains information on where I branch off from. ie: pcBranch
     private List<Integer> dimensions; //Contains the dimensions for array initialization $TODO$ Add array initialization to the symbol table
+    private BasicBlock join;
 
     public Result(Kind kind, Integer regno, Integer value, Integer address, Condition cond, Integer fixupLoc, List<Integer> dimensions) {
         this.kind = kind;
@@ -84,9 +86,8 @@ public class Result {
         return fixupLoc;
     }
 
-    public void setCondition(Condition cond)
-    {
-        this.cond=cond;
+    public void setCondition(Condition cond) {
+        this.cond = cond;
     }
 
     public void fixupLoc(Integer fixuploc) {
@@ -97,4 +98,11 @@ public class Result {
         return dimensions;
     }
 
+    public BasicBlock getJoin() {
+        return join;
+    }
+
+    public void setJoin(BasicBlock join) {
+        this.join = join;
+    }
 }

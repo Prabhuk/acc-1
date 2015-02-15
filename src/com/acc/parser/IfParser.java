@@ -7,6 +7,7 @@ import com.acc.data.Keyword;
 import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
+import com.acc.structure.BasicBlock;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
@@ -26,47 +27,69 @@ public class IfParser extends Parser {
     public Result parse() {
         Result x = new Relation(code, tokenizer).parse();  //Statement eats the first word for all statements except assignment
         AuxiliaryFunctions.CJF(code, x);
-        final Token next = tokenizer.next();
-        if (!next.isKeyword() || !((Keyword) next).isThen()) {
-            throw new SyntaxErrorException(KeywordType.THEN, next);
+        final BasicBlock currentBlock = code.getCurrentBlock();
+
+        BasicBlock join = new BasicBlock();
+        x.setJoin(join);
+
+        currentBlock.setJoinBlock(join);
+
+        final BasicBlock left = new BasicBlock();
+        join.setLeft(left);
+        code.setCurrentBlock(left);
+
+        handleThenToken();
+
+        final Result leftTree = new StatSequence(code, tokenizer).parse();//Ignoring the return type. Shouldn't mean anything at this context.
+        if (leftTree.getJoin() != null) {
+            join.setLeft(leftTree.getJoin());
         }
 
-        new StatSequence(code, tokenizer).parse(); //Ignoring the return type. Shouldn't mean anything at this context.
         Result follow = new Result(Kind.FIXUP_DUMMY, 0, 0, 0, null, ZERO);
-
         Token incoming = tokenizer.next();
-        Token lookingAheadToken = tokenizer.next();
-        while (elseIf(incoming, lookingAheadToken)) {
+        if (isElse(incoming)) {
+            final BasicBlock right = new BasicBlock();
+            join.setRight(right);
+            code.setCurrentBlock(right);
             AuxiliaryFunctions.FJLink(code, follow);
             code.Fixup(x.fixupLoc());
-            x = parse();
-            AuxiliaryFunctions.CJF(code, x);
-
-            new StatSequence(code, tokenizer).parse();
-            incoming = tokenizer.next();
-            lookingAheadToken = tokenizer.next();
-        }
-        tokenizer.previous(); //compensating the looking ahead token
-
-        if (incoming.isKeyword() && ((Keyword) incoming).isElse()) { //The dangling else
-            AuxiliaryFunctions.FJLink(code, follow);
-            code.Fixup(x.fixupLoc());
-            new StatSequence(code, tokenizer).parse();
+            final Result rightTree = new StatSequence(code, tokenizer).parse();
+            if (rightTree.getJoin() != null) {
+                join.setRight(rightTree.getJoin());
+            }
         } else {
+            tokenizer.previous();
+            join.setRight(currentBlock);
             code.Fixup(x.fixupLoc());
         }
         code.Fixlink(follow);
+        AuxiliaryFunctions.createPhiInstructions(getSymbolTable(), join, code);
+        handleFiToken();
+        eatSemiColonOrCurlyBracket();
+        code.setCurrentBlock(join);
+        return x;
+    }
 
+    private void eatSemiColonOrCurlyBracket() {
+        tokenizer.next();
+    }
+
+    private void handleFiToken() {
         final Token finalFiToken = tokenizer.next();
         if (!finalFiToken.isKeyword() || !((Keyword) finalFiToken).isFi()) {
             throw new SyntaxErrorException(KeywordType.FI, finalFiToken);
         }
-        return x;
     }
 
-    private boolean elseIf(Token incoming, Token lookingAheadForIf) {
-        return incoming.isKeyword() && ((Keyword) incoming).isElse()
-                && lookingAheadForIf.isKeyword() && ((Keyword) incoming).isIf();
+    private void handleThenToken() {
+        final Token next = tokenizer.next();
+        if (!next.isKeyword() || !((Keyword) next).isThen()) {
+            throw new SyntaxErrorException(KeywordType.THEN, next);
+        }
+    }
+
+    private boolean isElse(Token incoming) {
+        return incoming.isKeyword() && ((Keyword) incoming).isElse();
     }
 
 }

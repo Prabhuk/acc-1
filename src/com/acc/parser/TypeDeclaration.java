@@ -1,7 +1,10 @@
 package com.acc.parser;
 
 import com.acc.constants.Kind;
-import com.acc.data.*;
+import com.acc.data.Code;
+import com.acc.data.Keyword;
+import com.acc.data.Result;
+import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.util.Tokenizer;
 
@@ -42,7 +45,7 @@ public class TypeDeclaration extends Parser {
                 }
                 next = tokenizer.next();
             }
-            if(dimensions.size() == 0) {
+            if (dimensions.size() == 0) {
                 throw new SyntaxErrorException("Symbol \"[\" expected for array declaration. Found [" + next.getToken() + "] instead");
             }
             tokenizer.previous(); // fixing the tokenizer to refer back to the previous variable

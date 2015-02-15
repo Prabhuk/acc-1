@@ -4,7 +4,6 @@ import com.acc.data.Code;
 import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
-import com.acc.structure.SymbolTable;
 import com.acc.util.Tokenizer;
 
 /**
@@ -26,18 +25,18 @@ public class Computation extends Parser {
         new FunctionDeclaration(code, tokenizer).parse();
 
         next = tokenizer.next();
-        if(!next.getToken().equals("{")) {
-            throw new SyntaxErrorException("Expected \"{\". Found ["+next+"] instead");
+        if (!next.getToken().equals("{")) {
+            throw new SyntaxErrorException("Expected \"{\". Found [" + next + "] instead");
         }
         final Result s = new StatSequence(code, tokenizer).parse();
 
         next = tokenizer.next();
-        if(!next.getToken().equals("}")) {
-            throw new SyntaxErrorException("Expected \"}\". Found ["+next+"] instead");
+        if (!next.getToken().equals("}")) {
+            throw new SyntaxErrorException("Expected \"}\". Found [" + next + "] instead");
         }
         next = tokenizer.next();
-        if(!next.getToken().equals(".")) {
-            throw new SyntaxErrorException("Your program should end with a dot [.] Found ["+next+"] instead");
+        if (!next.getToken().equals(".")) {
+            throw new SyntaxErrorException("Your program should end with a dot [.] Found [" + next + "] instead");
         }
         return s;
     }

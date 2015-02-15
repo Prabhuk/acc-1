@@ -2,6 +2,9 @@ main
 var x, y;
 array[3] b;
 {
+    if n <= 1 then
+        x <- 3
+    fi;
     x <- 3+2;
     x <- y
 }.

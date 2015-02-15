@@ -35,7 +35,7 @@ public abstract class Parser {
     }
 
     public SymbolTable getSymbolTable() {
-        if(symbolTable != null) {
+        if (symbolTable != null) {
             return symbolTable;
         }
         return globalTable;
@@ -60,23 +60,23 @@ public abstract class Parser {
     /**
      * For the given procedureName, stores the list of argument names in order.
      * throws SyntaxErrorException when duplicate argument name is passed
+     *
      * @param procedureName
      * @param argumentName
      * @return true on successful addition of argument name, false otherwise
      */
     public boolean addArgumentNameForProcedure(String procedureName, String argumentName) {
-        if(procedureArguments.get(procedureName) == null) {
+        if (procedureArguments.get(procedureName) == null) {
             procedureArguments.put(procedureName, new ArrayList<String>());
         }
 
         List<String> args = procedureArguments.get(procedureName);
-        if(args.contains(argumentName)) {
-            throw new SyntaxErrorException("Duplicate argument name: ["+argumentName+"] in the procedure ["+procedureName+"]");
+        if (args.contains(argumentName)) {
+            throw new SyntaxErrorException("Duplicate argument name: [" + argumentName + "] in the procedure [" + procedureName + "]");
         }
 
         return args.add(argumentName);
     }
-
 
 
     public abstract Result parse();

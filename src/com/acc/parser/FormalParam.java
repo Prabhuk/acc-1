@@ -9,7 +9,7 @@ import com.acc.util.Tokenizer;
 /**
  * Created by Rumpy on 12-02-2015.
  */
-public class FormalParam extends Parser{
+public class FormalParam extends Parser {
 
     public FormalParam(Code code, Tokenizer tokenizer) {
         super(code, tokenizer);
@@ -18,18 +18,16 @@ public class FormalParam extends Parser{
     @Override
     public Result parse() {
         Token next = tokenizer.next();
-        if(!isOpenParanthesis(next))
-        {
-            throw new SyntaxErrorException("Expected \"(\". Found ["+next.getToken()+"] instead");
+        if (!isOpenParanthesis(next)) {
+            throw new SyntaxErrorException("Expected \"(\". Found [" + next.getToken() + "] instead");
         }
         next = tokenizer.next();
-        while(!isClosedParanthesis(next))
-        {
-            if(next.getToken().equals(",")) {
+        while (!isClosedParanthesis(next)) {
+            if (next.getToken().equals(",")) {
                 next = tokenizer.next();
             }
             //$TODO$ next is identifier at this point of time. Set symbol table and Use AuxilaryFunctions.assignSymbol to populate.
-           //do something for: ident{"," ident}
+            //do something for: ident{"," ident}
             next = tokenizer.next();
         }
 

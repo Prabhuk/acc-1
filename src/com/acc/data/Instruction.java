@@ -7,10 +7,10 @@ import com.acc.structure.Symbol;
  * Created by prabhuk on 2/12/2015.
  */
 public class Instruction {
-    private final boolean isPhi;
-    private Symbol symbol;
+    protected final boolean isPhi = false;
+    protected Symbol symbol;
     private int opcode;
-    private String instructionString;
+    protected String instructionString;
     private Integer instruction;
     private Integer a; //if Move instruction, then this is the instruction number
     private Integer b;
@@ -25,14 +25,12 @@ public class Instruction {
         this.c = c;
         this.opcode = opcode;
         this.symbol = symbol;
-        isPhi = false;
         instructionString = getInstructionAsString(symbol, opcode, a, b, c, rhs);
     }
 
-    public Instruction(int opcode, String instructionString) {
-        this.isPhi = opcode == 64;
+    //Made for Phi Instruction
+    protected Instruction(int opcode) {
         this.opcode = opcode;
-        this.instructionString = instructionString;
     }
 
     public boolean isPhi() {
@@ -52,30 +50,30 @@ public class Instruction {
         this.instruction = instruction;
     }
 
-    private String getInstructionAsString(Symbol symbol, int opcode, Integer a, Integer b, Integer c, Result rhs) {
+    protected String getInstructionAsString(Symbol symbol, int opcode, Integer a, Integer b, Integer c, Result rhs) {
         final String operationName = OperationCode.opcodeAndNames.get(opcode);
         final StringBuilder sb = new StringBuilder(operationName).append(" ");
         boolean addComma = false;
-        if(a != null) {
-            if(opcode == 15) {
+        if (a != null) {
+            if (opcode == 15) {
                 sb.append(symbol.getUniqueIdentifier());
             } else {
                 sb.append(String.valueOf(a));
             }
             addComma = true;
         }
-        if(opcode == 15) { //mov
+        if (opcode == 15) { //mov
             buildMoveInstruction(b, c, sb, addComma, rhs);
         } else {
-            if(b != null) {
-                if(addComma) {
+            if (b != null) {
+                if (addComma) {
                     sb.append(",");
                 }
                 addComma = true;
                 sb.append(String.valueOf(b));
             }
-            if(c != null) {
-                if(addComma) {
+            if (c != null) {
+                if (addComma) {
                     sb.append(String.valueOf(c));
                 }
             }
@@ -84,13 +82,13 @@ public class Instruction {
     }
 
     private void buildMoveInstruction(Integer b, Integer c, StringBuilder sb, boolean addComma, Result rhs) {
-        if(b==null) {
+        if (b == null) {
             return;
         }
-        if(addComma) {
+        if (addComma) {
             sb.append(",");
         }
-        if(c==1) { //variable
+        if (c == 1) { //variable
             sb.append("(").append(rhs.getVariableName()).append(")");
         } else {
             sb.append(String.valueOf(b));
@@ -125,6 +123,14 @@ public class Instruction {
 
     @Override
     public String toString() {
+        return instructionString;
+    }
+
+    public String getNewIdentifierForSymbol() {
+        return symbol.getName() + ":" + location;
+    }
+
+    public String getInstructionString() {
         return instructionString;
     }
 }

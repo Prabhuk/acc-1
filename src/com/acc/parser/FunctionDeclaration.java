@@ -16,35 +16,31 @@ public class FunctionDeclaration extends Parser {
     @Override
     public Result parse() {
         Token next = tokenizer.next();
-        if(!isFunctionOrProcedureKeyword(next))
-        {
+        if (!isFunctionOrProcedureKeyword(next)) {
             // No function declaration in the file
             tokenizer.previous();
             return null;
         }
         next = tokenizer.next();
-        if(!next.isIdentifier()) {
+        if (!next.isIdentifier()) {
             throw new SyntaxErrorException(next.tokenType(), TokenType.IDENTIFIER);
         }
         //$TODO$ DEAL WITH ident
 
-        if(!isSemiColonToken(tokenizer.next()))
-        {
+        if (!isSemiColonToken(tokenizer.next())) {
             tokenizer.previous();
             new FormalParam(code, tokenizer).parse();
-            next=tokenizer.next();
-            if(!isSemiColonToken(next))
-            {
-                throw new SyntaxErrorException("Expected \";\" keyword. Found ["+next.getToken()+"] instead");
+            next = tokenizer.next();
+            if (!isSemiColonToken(next)) {
+                throw new SyntaxErrorException("Expected \";\" keyword. Found [" + next.getToken() + "] instead");
             }
         }
 
 
         new FunctionBody(code, tokenizer).parse();
-        next=tokenizer.next();
-        if(!isSemiColonToken(next))
-        {
-            throw new SyntaxErrorException("Expected \";\" keyword. Found ["+next.getToken()+"] instead");
+        next = tokenizer.next();
+        if (!isSemiColonToken(next)) {
+            throw new SyntaxErrorException("Expected \";\" keyword. Found [" + next.getToken() + "] instead");
         }
         return null;
     }
@@ -54,6 +50,6 @@ public class FunctionDeclaration extends Parser {
     }
 
     private boolean isFunctionOrProcedureKeyword(Token next) {
-        return next.isKeyword() && (((Keyword)next).isFunction() || ((Keyword)next).isProcedure());
+        return next.isKeyword() && (((Keyword) next).isFunction() || ((Keyword) next).isProcedure());
     }
 }

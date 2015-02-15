@@ -19,6 +19,7 @@ public class VariableDeclaration extends Parser {
 
     /**
      * Handles one or more variable declarations { varDecl } where varDecl = typeDecl indent { “,” ident } “;”
+     *
      * @param code
      * @param tokenizer
      */
@@ -29,7 +30,7 @@ public class VariableDeclaration extends Parser {
     @Override
     public Result parse() {
         //$TODO$ extract TypeDeclaration. Handle multidimensional arrays => In progress
-        Result x = new TypeDeclaration(code,tokenizer).parse();
+        Result x = new TypeDeclaration(code, tokenizer).parse();
         Kind _type = x.kind();
         final SymbolType symbolType = _type.isArray() ? SymbolType.ARRAY : SymbolType.VARIABLE;
         declareSymbol(symbolType, x.dimensions());
@@ -39,12 +40,12 @@ public class VariableDeclaration extends Parser {
             next = tokenizer.next();
         }
 
-        if(!next.getToken().equals(";")) {
+        if (!next.getToken().equals(";")) {
             throw new SyntaxErrorException("Expected \";\" Found [" + next.getToken() + "] instead");
         }
 
         Token type = tokenizer.next();
-        while(isVarOrArrayKeyword(type)) {
+        while (isVarOrArrayKeyword(type)) {
             tokenizer.previous();
             parse();
             type = tokenizer.next();
@@ -54,13 +55,13 @@ public class VariableDeclaration extends Parser {
     }
 
     private boolean isVarOrArrayKeyword(Token type) {
-        return type.isKeyword() && (!((Keyword)type).isVar() || !((Keyword)type).isArray());
+        return type.isKeyword() && (!((Keyword) type).isVar() || !((Keyword) type).isArray());
     }
 
     private void declareSymbol(SymbolType symbolType, List<Integer> arrayDimensions) {
         Token symbolName = tokenizer.next();
-        if(!symbolName.isDesignator()) {
-            throw new SyntaxErrorException("Identifier expected. Found ["+symbolName.getToken()+"] instead");
+        if (!symbolName.isDesignator()) {
+            throw new SyntaxErrorException("Identifier expected. Found [" + symbolName.getToken() + "] instead");
         }
         //$TODO$ handle multidimensional array. => In progress
         AuxiliaryFunctions.declareSymbol(code, symbolName.getToken(), getSymbolTable(), symbolType, arrayDimensions);
