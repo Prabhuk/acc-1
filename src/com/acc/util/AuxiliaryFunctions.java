@@ -6,6 +6,7 @@ import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
 import com.acc.data.Result;
+import com.acc.structure.BasicBlock;
 import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
 import com.acc.structure.SymbolType;
@@ -39,8 +40,9 @@ public class AuxiliaryFunctions {
         code.addCode(instruction);
     }
 
-    public static void BJ(Code code, int loc) {
+    public static void BJ(Code code, int loc, BasicBlock loopBlock) {
         putF1(code, OperationCode.BEQ, 0, 0, loc - code.getPc(), null, null);
+        code.processJoins(loopBlock);
     }
 
     public static void FJLink(Code code, Result x) {

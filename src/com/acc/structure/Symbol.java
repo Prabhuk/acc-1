@@ -93,6 +93,6 @@ public class Symbol {
     }
 
     public String getUniqueIdentifier() {
-        return name + suffix;
+        return name + ":" + suffix;
     }
 }

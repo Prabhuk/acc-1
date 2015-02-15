@@ -63,7 +63,7 @@ public class OperationCode {
      * Dummy instruction code to represent mov
      */
     public static final int MOV = 15; //This is not part of the opcodes supported by DLX architecture.
-    public static final int PHI = 64; //This is not part of the opcodes supported by DLX architecture.
+    public static final int PHI = 64; //And 64 is never converted to Integer instruction
 
     public static final int MOV_CONSTANT = 0;
     public static final int MOV_VARIABLE = 1;
@@ -124,6 +124,7 @@ public class OperationCode {
 
 
         opcodeAndNames.put(15, "MOV");
+        opcodeAndNames.put(64, "PHI");
 
     }
 

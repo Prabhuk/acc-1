@@ -18,12 +18,12 @@ public class Instruction {
     private Integer location;
 
 
-    public Instruction(int _instruction, int _opcode, Integer a, Integer b, Integer c, Symbol symbol, Result rhs) {
-        this.instruction = _instruction;
+    public Instruction(int instruction, int opcode, Integer a, Integer b, Integer c, Symbol symbol, Result rhs) {
+        this.instruction = instruction;
         this.a = a;
         this.b = b;
         this.c = c;
-        this.opcode = _opcode;
+        this.opcode = opcode;
         this.symbol = symbol;
         isPhi = false;
         instructionString = getInstructionAsString(symbol, opcode, a, b, c, rhs);
@@ -33,6 +33,10 @@ public class Instruction {
         this.isPhi = opcode == 64;
         this.opcode = opcode;
         this.instructionString = instructionString;
+    }
+
+    public boolean isPhi() {
+        return isPhi;
     }
 
     public int getOpcode() {

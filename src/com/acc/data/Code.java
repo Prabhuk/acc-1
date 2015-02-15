@@ -1,6 +1,7 @@
 package com.acc.data;
 
 import com.acc.constants.OperationCode;
+import com.acc.structure.BasicBlock;
 import com.acc.structure.ControlFlowGraph;
 
 import java.util.LinkedList;
@@ -40,19 +41,28 @@ public class Code {
         return instructions.size();
     }
 
+    public BasicBlock getCurrentBlock() {
+        return controlFlowGraph.getCurrentBlock();
+    }
+
 
 
     public void Fixup(int location) {
         instructions.get(location).FixUp(getPc() - location);
+        controlFlowGraph.processIFELSEJoinBlock(this);
         //$TODO$ this is not updated within the basicblock. Need to fix it in the basic block as well. Use instr number range?
     }
 
     public void Fixlink(Result follow) {
-
+        //$TODO$ Needs implementation
     }
 
 
     public List<Instruction> getInstructions() {
         return instructions;
+    }
+
+    public void processJoins(BasicBlock loopBlock) {
+        controlFlowGraph.processLoopJoinBlock(loopBlock, this);
     }
 }

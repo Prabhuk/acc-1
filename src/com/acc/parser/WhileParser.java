@@ -6,13 +6,16 @@ import com.acc.data.Keyword;
 import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
+import com.acc.structure.BasicBlock;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
 /**
  * Created by prabhuk on 1/26/2015.
  */
-public class WhileParser extends Parser {
+public class WhileParser extends  Parser {
+    private BasicBlock loopBlock;
+
     public WhileParser(Code code, Tokenizer tokenizer) {
         super(code, tokenizer);
 
@@ -21,6 +24,7 @@ public class WhileParser extends Parser {
     @Override
     public Result parse() {
         final int loop = code.getPc();
+        loopBlock = code.getCurrentBlock();
         Result x = new Relation(code, tokenizer).parse();
         AuxiliaryFunctions.CJF(code, x);
         final Token next = tokenizer.next();
@@ -28,7 +32,7 @@ public class WhileParser extends Parser {
             throw new SyntaxErrorException(KeywordType.DO, next);
         }
         new StatSequence(code, tokenizer).parse();
-        AuxiliaryFunctions.BJ(code, loop); //Backward Jump to the loop beginning.
+        AuxiliaryFunctions.BJ(code, loop, loopBlock); //Backward Jump to the loop beginning.
         if (!next.isKeyword() || !((Keyword) next).isOd()) {
             throw new SyntaxErrorException(KeywordType.OD, next);
         }

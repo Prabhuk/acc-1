@@ -2,10 +2,7 @@ package com.acc.structure;
 
 import com.acc.data.Instruction;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by prabhuk on 1/25/2015.
@@ -15,35 +12,21 @@ public class BasicBlock {
     /*
      * Storing the instruction number along with the instruction
      */
-    private final Map<Integer, Instruction> block = new LinkedHashMap<Integer, Instruction>();
+    private final List<Instruction> instructions = new ArrayList<Instruction>();
     private final Set<BasicBlock> dominatesOver = new HashSet<BasicBlock>();
     private final Set<BasicBlock> children = new HashSet<BasicBlock>();
     private final Set<BasicBlock> parents = new HashSet<BasicBlock>();
+    private BasicBlock joinBlock;
 
     public Set<BasicBlock> getDominatesOver() {
         return dominatesOver;
     }
-
-    public Map<Integer, Instruction> getBlock() {
-        return block;
-    }
-
     /*
      * Adds an instruction to the basicBlock
      */
-    public void addToBlock(Instruction instruction) {
-        block.put(instruction.getLocation(), instruction);
+    public void addInstruction(Instruction instruction) {
+        instructions.add(instruction);
     }
-
-    /*
-     * Removes the given instruction from the basicBlock if it already exists.
-     * Returns true on successful removal and false otherwise
-     */
-    public boolean removeFromBlock(Integer instructionNumber) {
-        return block.remove(instructionNumber) != null;
-    }
-
-
     /*
      * returns true if the block parameter is a dominating block for the current block
      */
@@ -72,4 +55,41 @@ public class BasicBlock {
     public Set<BasicBlock> getParents() {
         return parents;
     }
+
+    public void addChild(BasicBlock child) {
+        child.getParents().add(this);
+        this.children.add(child);
+    }
+
+    public List<Instruction> getInstructions() {
+        return instructions;
+    }
+
+    public BasicBlock getJoinBlock() {
+        if(joinBlock == null) {
+            joinBlock = new BasicBlock();
+        }
+        return joinBlock;
+    }
+
+    public void commitLoopPhis(BasicBlock block) {
+
+        final List<Instruction> instructions = joinBlock.getInstructions();
+        for (int i = instructions.size() - 1; i >= 0; i--) {
+            block.getInstructions().add(0, instructions.get(i));
+        }
+        block.updateParentPhis();
+        //$TODO$ figure out who calls process Join. (Fixup, bj etc.) Distinguish if and while here
+
+    }
+
+    private void updateParentPhis() {
+        //$TODO$ update Phis to the outer loop
+    }
+
+    public void commitIFELSEPhis() {
+        //$TODO$ figure out who calls process Join. (Fixup, bj etc.) Distinguish if and while here
+        joinBlock.updateParentPhis();
+    }
+
 }
