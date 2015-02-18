@@ -1,14 +1,22 @@
 main
-var x, y;
-array[3] b;
+var x, y, i;
+array[3][2] b;
 {
-    if 3 <= 1 then
-        let x <- 3
+    let i <- 0;
+    let b [ 0 ][ i + 2 ] <- 1;
+    let x <- 3;
+    if x <= 1 then
+        if i <= 1 then
+            let i <- 1
+        else
+            let i <- 5
+        fi
     fi;
-    let i <- 1;
+
     while i < 4 do
         let i <- i + 1
     od;
     let x <- 3+2;
+    let y <- 8;
     let x <- y
 }.

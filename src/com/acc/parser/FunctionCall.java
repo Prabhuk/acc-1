@@ -5,6 +5,7 @@ import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.data.TokenType;
 import com.acc.exception.SyntaxErrorException;
+import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
@@ -58,10 +59,10 @@ public class FunctionCall extends Parser {
         for (int i = 0; i < parameters.size(); i++) {
             Result parameter = parameters.get(i);
             String argumentName = args.get(i);
-            final boolean added = AuxiliaryFunctions.assignToSymbol(code, argumentName, parameter, getSymbolTable());
-            if (!added) {
-                throw new RuntimeException("The parameters have to be either constant or variable. Found [" + parameter.kind().name() + "] instead");
-            }
+            final Symbol recent = getSymbolTable().getRecentOccurence(argumentName);
+            List<Result> arrayIdentifiers = accumulateArrayIdentifiers(recent);
+            assignSymbol(argumentName, recent, parameter, arrayIdentifiers);
+
         }
 
         //$TODO$ Add code to execute the functionBody.

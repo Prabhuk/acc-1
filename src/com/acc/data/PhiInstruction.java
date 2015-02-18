@@ -7,12 +7,11 @@ import com.acc.structure.Symbol;
  * Created by prabhuk on 2/14/2015.
  */
 public class PhiInstruction extends Instruction {
-    protected final boolean isPhi = true;
     private Symbol leftSymbol;
     private Symbol rightSymbol;
 
     public PhiInstruction(Symbol symbol) {
-        super(OperationCode.PHI);
+        super(OperationCode.PHI, true);
         this.symbol = symbol;
 
     }
@@ -37,7 +36,14 @@ public class PhiInstruction extends Instruction {
         return rightSymbol != null && leftSymbol != null;
     }
 
+    public boolean canIgnore() {
+        return leftSymbol == rightSymbol || leftSymbol == null || rightSymbol == null;
+    }
+
     public String getInstructionString() {
+//        if(canIgnore()) {
+//            return "";
+//        }
         StringBuilder sb = new StringBuilder("phi ");
         if(leftSymbol != null) {
             sb.append(leftSymbol.getUniqueIdentifier()).append(" ");

@@ -20,6 +20,9 @@ public class Result {
     private List<Integer> dimensions; //Contains the dimensions for array initialization $TODO$ Add array initialization to the symbol table
     private BasicBlock join;
 
+    public Result(){
+    }
+
     public Result(Kind kind, Integer regno, Integer value, Integer address, Condition cond, Integer fixupLoc, List<Integer> dimensions) {
         this.kind = kind;
         this.regno = regno;

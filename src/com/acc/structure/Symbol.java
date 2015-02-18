@@ -1,6 +1,9 @@
 package com.acc.structure;
 
+import com.acc.data.Result;
+
 import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * Created by prabhuk on 2/9/2015.
@@ -13,6 +16,8 @@ public class Symbol {
     private boolean isPointerValue;
     private Object value; //Could just be integer in our case.
     private int arrayDimension; //Could just be integer in our case.
+    private List<Result> arrayIdentifiers; //used in assignment
+    private Result result; //used in assignment
 
     /**
      * @param name           - unique symbol name in the symbol table
@@ -29,12 +34,17 @@ public class Symbol {
         this.value = value;
     }
 
-    public Symbol(Symbol symbol) {
-        name = symbol.getName();
-        suffix = -1; //should be set by the caller in due course
-        type = symbol.getType();
-        isPointerValue = symbol.isPointerValue();
-        value = Symbol.cloneValue(symbol.getValue());
+
+    public Symbol() {
+
+    }
+
+    public void setType(SymbolType type) {
+        this.type = type;
+    }
+
+    public void setPointerValue(boolean isPointerValue) {
+        this.isPointerValue = isPointerValue;
     }
 
     public void setArrayDimension(int arrayDimension) {
@@ -76,6 +86,9 @@ public class Symbol {
     //based on http://stackoverflow.com/questions/869033/how-do-i-copy-an-object-in-java
     public static Object cloneValue(Object obj) {
         try {
+            if(obj.getClass() == Integer.class) {
+                return new Integer((Integer)obj);
+            }
             Object clone = obj.getClass().newInstance();
             for (Field field : obj.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
@@ -101,5 +114,21 @@ public class Symbol {
 
     public String getUniqueIdentifier() {
         return name + ":" + suffix;
+    }
+
+    public List<Result> getArrayIdentifiers() {
+        return arrayIdentifiers;
+    }
+
+    public void setArrayIdentifiers(List<Result> arrayIdentifiers) {
+        this.arrayIdentifiers = arrayIdentifiers;
+    }
+
+    public Result getResult() {
+        return result;
+    }
+
+    public void setResult(Result result) {
+        this.result = result;
     }
 }

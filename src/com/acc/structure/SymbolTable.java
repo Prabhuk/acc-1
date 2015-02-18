@@ -92,6 +92,16 @@ public class SymbolTable {
         }
     }
 
+    public Symbol getRecentOccurence(String symbolName) {
+        Symbol s = null;
+        for (Symbol symbol : symbols) {
+            if(symbol.getName().equals(symbolName)) {
+                s = symbol;
+            }
+        }
+        return s;
+    }
+
     private String getSymbolKey(Symbol s) {
         return s.getName() + s.getSuffix();
     }

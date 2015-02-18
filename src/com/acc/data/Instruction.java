@@ -10,8 +10,9 @@ import java.util.List;
  * Created by prabhuk on 2/12/2015.
  */
 public class Instruction {
-    protected final boolean isPhi = false;
-    private Result rhs; //MOV specific
+    protected boolean isPhi = false;
+    private Symbol rhs; //MOV specific
+    private Symbol lhs; //MOV specific
     protected Symbol symbol;
     private int opcode;
     protected String instructionString;
@@ -50,19 +51,27 @@ public class Instruction {
     }
 
 
-    public Instruction(int instruction, int opcode, Integer a, Integer b, Integer c, Symbol symbol, Result rhs) {
+    public Instruction(int instruction, int opcode, Integer a, Integer b, Integer c, Symbol symbol) {
         this.instruction = instruction;
         this.a = a;
         this.b = b;
         this.c = c;
         this.opcode = opcode;
         this.symbol = symbol;
+   }
+
+    //Made for mov instruction
+    public Instruction(Symbol rhs, Symbol lhs) {
+        this.opcode = OperationCode.MOV;
         this.rhs = rhs;
+        this.lhs = lhs;
+        this.symbol = lhs;
     }
 
     //Made for Phi Instruction
-    protected Instruction(int opcode) {
+    protected Instruction(int opcode, boolean isPhi) {
         this.opcode = opcode;
+        this.isPhi = isPhi;
     }
 
     public boolean isPhi() {
@@ -81,49 +90,36 @@ public class Instruction {
         this.instruction = instruction;
     }
 
-    protected String getInstructionAsString() {
-        final String operationName = OperationCode.opcodeAndNames.get(opcode);
-        final StringBuilder sb = new StringBuilder(operationName).append(" ");
-        boolean addComma = false;
-        if (a != null && !excludeA.contains(opcode)) {
-            if (opcode == 15) {
-                sb.append(symbol.getUniqueIdentifier());
-            } else {
-                sb.append(String.valueOf(a));
-            }
-            addComma = true;
-        }
-        if (opcode == OperationCode.MOV) {
-            buildMoveInstruction(b, c, sb, addComma, rhs);
+    private void buildMoveInstruction(StringBuilder sb) {
+        if(rhs.getResult().kind().isRegister()) {
+            sb.append("(R").append(rhs.getResult().regNo()).append(")");
+        } else if (rhs.getResult().kind().isVariable()) { //variable
+            //Should be address field
+            sb.append("(").append(String.valueOf(rhs.getResult().address())).append(")");
         } else {
-            if (b != null && !excludeB.contains(opcode)) {
-                if (addComma) {
-                    sb.append(",");
-                }
-                addComma = true;
-                sb.append(String.valueOf(b));
-            }
-            if (c != null) {
-                if (addComma) {
-                    sb.append(",");
-                }
-                sb.append(String.valueOf(c));
-            }
+            sb.append(String.valueOf(rhs.getResult().value()));
         }
-        return sb.toString();
-    }
 
-    private void buildMoveInstruction(Integer b, Integer c, StringBuilder sb, boolean addComma, Result rhs) {
-        if (b == null) {
-            return;
-        }
-        if (addComma) {
-            sb.append(",");
-        }
-        if (c == 1) { //variable
-            sb.append("(").append(rhs.getVariableName()).append(")");
+        if(lhs.getType().isArray()) {
+            sb.append(",").append(lhs.getUniqueIdentifier());
+            for (Result result : lhs.getArrayIdentifiers()) {
+                //$TODO$ result types must be handled
+                sb.append("[");
+                if(result.kind().isConstant()) {
+                    sb.append(result.value());
+                } else if (result.kind().isVariable()) {
+                    sb.append("(");
+                    sb.append(result.address());
+                    sb.append(")");
+                } else {
+                    sb.append("(R");
+                    sb.append(result.regNo());
+                    sb.append(")");
+                }
+                sb.append("]");
+            }
         } else {
-            sb.append(String.valueOf(b));
+            sb.append(",").append(lhs.getUniqueIdentifier());
         }
     }
 
@@ -155,7 +151,7 @@ public class Instruction {
 
     @Override
     public String toString() {
-        return getInstructionAsString();
+        return getInstructionString();
     }
 
     public String getNewIdentifierForSymbol() {
@@ -163,6 +159,34 @@ public class Instruction {
     }
 
     public String getInstructionString() {
-        return getInstructionAsString();
+        final String operationName = OperationCode.opcodeAndNames.get(opcode);
+        final StringBuilder sb = new StringBuilder(operationName).append(" ");
+        if (opcode == OperationCode.MOV) {
+            buildMoveInstruction(sb);
+        } else {
+            boolean addComma = false;
+            if (a != null && !excludeA.contains(opcode)) {
+                if (opcode == 15) {
+                    sb.append(symbol.getUniqueIdentifier());
+                } else {
+                    sb.append(String.valueOf(a));
+                }
+                addComma = true;
+            }
+            if (b != null && !excludeB.contains(opcode)) {
+                if (addComma) {
+                    sb.append(",");
+                }
+                addComma = true;
+                sb.append(String.valueOf(b));
+            }
+            if (c != null) {
+                if (addComma) {
+                    sb.append(",");
+                }
+                sb.append(String.valueOf(c));
+            }
+        }
+        return sb.toString();
     }
 }

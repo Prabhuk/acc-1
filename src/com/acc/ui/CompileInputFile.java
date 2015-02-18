@@ -2,6 +2,7 @@ package com.acc.ui;
 
 import com.acc.data.Code;
 import com.acc.data.Instruction;
+import com.acc.data.PhiInstruction;
 import com.acc.graph.GraphHelper;
 import com.acc.graph.VCGWorker;
 import com.acc.parser.Computation;
