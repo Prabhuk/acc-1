@@ -2,6 +2,8 @@ package com.acc.ui;
 
 import com.acc.data.Code;
 import com.acc.data.Instruction;
+import com.acc.graph.GraphHelper;
+import com.acc.graph.VCGWorker;
 import com.acc.parser.Computation;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.Symbol;
@@ -62,8 +64,19 @@ public class CompileInputFile {
             }
             System.out.println(symbol.getUniqueIdentifier() + " : " + value);
         }
+        GraphHelper v = new GraphHelper(new VCGWorker());
+        BasicBlock bb0= new BasicBlock();
+        BasicBlock bb1= new BasicBlock();
+        BasicBlock bb2= new BasicBlock();
+        BasicBlock bb3= new BasicBlock();
 
-        final BasicBlock rootNode = code.getControlFlowGraph().getRootBlock();
+        bb0.addChild(bb1);
+        bb1.addChild(bb2);
+        bb1.addChild(bb3);
+        bb2.addChild(bb1);
+
+        v.begin(bb0);
+
 
     }
 

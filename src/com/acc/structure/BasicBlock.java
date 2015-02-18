@@ -20,10 +20,20 @@ public class BasicBlock {
     private final Set<BasicBlock> dominatesOver = new HashSet<BasicBlock>();
     private final Set<BasicBlock> children = new HashSet<BasicBlock>();
     private final Set<BasicBlock> parents = new HashSet<BasicBlock>();
+
+    private int VCGVisitationCounter = 0;
+    private int label = 0;
     private BasicBlock joinBlock;
     private BasicBlock left;
     private BasicBlock right;
 
+    public int visitationCounter()
+    {return VCGVisitationCounter;}
+
+    public void countVisit()
+    {
+        this.VCGVisitationCounter++;
+    }
     public Set<BasicBlock> getDominatesOver() {
         return dominatesOver;
     }
@@ -112,6 +122,14 @@ public class BasicBlock {
 
     public void setRight(BasicBlock right) {
         this.right = right;
+    }
+
+    public int getLabel() {
+        return label;
+    }
+
+    public void setLabel(int label) {
+        this.label = label;
     }
 
     public void setJoinBlock(BasicBlock joinBlock) {
