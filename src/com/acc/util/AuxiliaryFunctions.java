@@ -21,6 +21,7 @@ import java.util.List;
  * The auxilary methods to cre
  */
 public class AuxiliaryFunctions {
+    private static int registerNumber = 0;
 
     public static void putF1(Code code, int instructionCode, int a, int b, int c, Symbol symbol, Result rhs) {
         if (c < 0) c ^= 0xFFFF0000;
@@ -43,7 +44,7 @@ public class AuxiliaryFunctions {
     }
 
     public static void BJ(Code code, int loc, BasicBlock loopBlock) {
-        putF1(code, OperationCode.BEQ, 0, 0, loc - code.getPc(), null, null);
+        putF1(code, OperationCode.BEQ, 0, 0, code.getPc() - loc, null, null);
     }
 
     public static void FJLink(Code code, Result x) {
@@ -94,7 +95,7 @@ public class AuxiliaryFunctions {
      * @params - x is a subtree (result object)
      * Puts the subtree's value in register and updated x will be a register Kind
      */
-    private static void load(Code code, Result x) {
+    public static void load(Code code, Result x) {
         if (x.kind().isRegister()) {
             return;
         }
@@ -149,7 +150,7 @@ public class AuxiliaryFunctions {
 
     private static int allocateReg() {
         //$TODO$ pending implementation
-        return 0;
+        return ++registerNumber;
     }
 
     public static void main(String[] args) {

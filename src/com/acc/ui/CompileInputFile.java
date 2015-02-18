@@ -64,20 +64,19 @@ public class CompileInputFile {
             }
             System.out.println(symbol.getUniqueIdentifier() + " : " + value);
         }
-        GraphHelper v = new GraphHelper(new VCGWorker());
-        BasicBlock bb0= new BasicBlock();
-        BasicBlock bb1= new BasicBlock();
-        BasicBlock bb2= new BasicBlock();
-        BasicBlock bb3= new BasicBlock();
-
-        bb0.addChild(bb1);
-        bb1.addChild(bb2);
-        bb1.addChild(bb3);
-        bb2.addChild(bb1);
-
-        v.begin(bb0);
+        new GraphHelper(new VCGWorker(), code.getControlFlowGraph().getRootBlock());
 
 
+//        BasicBlock bb0= new BasicBlock();
+//        BasicBlock bb1= new BasicBlock();
+//        BasicBlock bb2= new BasicBlock();
+//        BasicBlock bb3= new BasicBlock();
+//
+//        bb0.addChild(bb1);
+//        bb1.addChild(bb2);
+//        bb1.addChild(bb3);
+//        bb2.addChild(bb1);
+//        GraphHelper v = new GraphHelper(new VCGWorker(), bb0);
     }
 
 }

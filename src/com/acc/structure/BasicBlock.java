@@ -20,20 +20,18 @@ public class BasicBlock {
     private final Set<BasicBlock> dominatesOver = new HashSet<BasicBlock>();
     private final Set<BasicBlock> children = new HashSet<BasicBlock>();
     private final Set<BasicBlock> parents = new HashSet<BasicBlock>();
+    private boolean isVisited = false;
 
-    private int VCGVisitationCounter = 0;
+    private static volatile int count = 0;
     private int label = 0;
     private BasicBlock joinBlock;
     private BasicBlock left;
     private BasicBlock right;
 
-    public int visitationCounter()
-    {return VCGVisitationCounter;}
-
-    public void countVisit()
-    {
-        this.VCGVisitationCounter++;
+    public BasicBlock() {
+        label = count++;
     }
+
     public Set<BasicBlock> getDominatesOver() {
         return dominatesOver;
     }
@@ -135,4 +133,13 @@ public class BasicBlock {
     public void setJoinBlock(BasicBlock joinBlock) {
         this.joinBlock = joinBlock;
     }
+
+    public boolean isVisited() {
+        return isVisited;
+    }
+
+    public void setVisited(boolean isVisited) {
+        this.isVisited = isVisited;
+    }
+
 }

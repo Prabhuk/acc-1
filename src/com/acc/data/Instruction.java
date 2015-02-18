@@ -74,8 +74,9 @@ public class Instruction {
             }
             if (c != null) {
                 if (addComma) {
-                    sb.append(String.valueOf(c));
+                    sb.append(",");
                 }
+                sb.append(String.valueOf(c));
             }
         }
         return sb.toString();
