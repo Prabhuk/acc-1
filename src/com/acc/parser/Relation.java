@@ -28,8 +28,11 @@ public class Relation extends Parser {
         Result y = new Expression(code, tokenizer).parse();
         AuxiliaryFunctions.load(code, y);
 
-        AuxiliaryFunctions.putF2(code, OperationCode.CMP, 5, x.regNo(), y.regNo()); //$TODO$ 5 should become a proper register address for the result
+        final int registerNumber = AuxiliaryFunctions.allocateReg();
+        AuxiliaryFunctions.putF2(code, OperationCode.CMP, registerNumber, x.regNo(), y.regNo()); //$TODO$ 5 should become a proper register address for the result
         //$TODO$ code should be generated to load expressions for x & y
+
+        x.regNo(registerNumber);
         return x;
     }
 }

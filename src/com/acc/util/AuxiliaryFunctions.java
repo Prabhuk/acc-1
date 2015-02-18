@@ -7,12 +7,10 @@ import com.acc.data.Code;
 import com.acc.data.Instruction;
 import com.acc.data.PhiInstruction;
 import com.acc.data.Result;
-import com.acc.structure.BasicBlock;
-import com.acc.structure.Symbol;
-import com.acc.structure.SymbolTable;
-import com.acc.structure.SymbolType;
+import com.acc.structure.*;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -21,7 +19,14 @@ import java.util.List;
  * The auxilary methods to cre
  */
 public class AuxiliaryFunctions {
-    private static int registerNumber = 0;
+    private static final List<Register> registers = new ArrayList<Register>(32);
+
+    static {
+        //Create registers
+        for(int i =0; i<32; i++) {
+            registers.add(new Register());
+        }
+    }
 
     public static void putF1(Code code, int instructionCode, int a, int b, int c, Symbol symbol, Result rhs) {
         if (c < 0) c ^= 0xFFFF0000;
@@ -44,7 +49,7 @@ public class AuxiliaryFunctions {
     }
 
     public static void BJ(Code code, int loc, BasicBlock loopBlock) {
-        putF1(code, OperationCode.BEQ, 0, 0, code.getPc() - loc, null, null);
+        putF1(code, OperationCode.BEQ, 0, 0, loc, null, null);
     }
 
     public static void FJLink(Code code, Result x) {
@@ -54,7 +59,8 @@ public class AuxiliaryFunctions {
 
     public static void CJF(Code code, Result x) {
         //OperationCode.BEQ + $TODO$ WTF
-        putF1(code, Condition.getNegatedInstruction(x.condition()), x.regNo() == null ? 0 : x.regNo(), 0, 0, null, null);
+        putF1(code, Condition.getNegatedInstruction(x.condition()), x.regNo(), 0, 0, null, null);
+        deallocate(x.regNo());
         x.fixupLoc(code.getPc() - 1);
     }
 
@@ -88,6 +94,8 @@ public class AuxiliaryFunctions {
     }
 
     private static void deallocate(int regno) {
+        registers.get(regno).setAvailable(true);
+        registers.get(regno).setValue(null);
         //$TODO$ needs implementation
     }
 
@@ -105,7 +113,8 @@ public class AuxiliaryFunctions {
             x.kind(Kind.REG);
             x.regNo(regNo);
         } else if (x.kind().isVariable()) {
-            //$TODO$ Frame pointer doesn't make any sense to our design as of now or doesn't make any sense to me :P
+            //$TODO$ Implement variable space along with Framepointer
+            // Offset Hard coded to 0. Should point to the actual Framepointer
             putF1(code, OperationCode.LDW, regNo, 0, x.address(), null, null);
             x.kind(Kind.REG);
             x.regNo(regNo);
@@ -148,9 +157,14 @@ public class AuxiliaryFunctions {
         symbolTable.addSymbol(s);
     }
 
-    private static int allocateReg() {
-        //$TODO$ pending implementation
-        return ++registerNumber;
+    public static int allocateReg() {
+        for (Register register : registers) {
+            if(register.isAvailable()) {
+                register.setAvailable(false);
+                return registers.indexOf(register);
+            }
+        }
+        throw new RuntimeException("Registers are full");
     }
 
     public static void main(String[] args) {
