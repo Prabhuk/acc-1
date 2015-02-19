@@ -129,10 +129,6 @@ public class BasicBlock {
         return label;
     }
 
-    public void setLabel(int label) {
-        this.label = label;
-    }
-
     public void setJoinBlock(BasicBlock joinBlock) {
         this.joinBlock = joinBlock;
     }

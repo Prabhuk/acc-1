@@ -22,21 +22,7 @@ public class PhiInstructionHelper {
         handleLeft(join, table, code);
         handleRight(join, table, code);
         fillIncomplete(join, table);
-        final List<Instruction> instructions = join.getInstructions();
-        final List<Instruction> remove = new ArrayList<Instruction>();
-        for (Instruction instruction : instructions) {
-            if(instruction.isPhi()) {
-                PhiInstruction phi = (PhiInstruction) instruction;
-                if(phi.canIgnore()) {
-                    remove.add(instruction);
-                }
-            }
-        }
-        for (Instruction instruction : remove) {
-            code.removeCode(instruction);
-            join.getInstructions().remove(instruction);
-            join.removePhiInstruction(instruction.getSymbol().getName());
-        }
+        AuxiliaryFunctions.removeInstruction(code, join);
     }
 
     private static void fillIncomplete(BasicBlock join, SymbolTable table) {

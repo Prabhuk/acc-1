@@ -134,4 +134,22 @@ public class AuxiliaryFunctions {
         AuxiliaryFunctions.putF1(code, OperationCode.ADD, 1, 2, 5, null);
 //        Printer.print(code.toString());
     }
+
+    public static void removeInstruction(Code code, BasicBlock node) {
+        final List<Instruction> instructions = node.getInstructions();
+        final List<Instruction> remove = new ArrayList<Instruction>();
+        for (Instruction instruction : instructions) {
+            if(instruction.isPhi()) {
+                PhiInstruction phi = (PhiInstruction) instruction;
+                if(phi.canIgnore()) {
+                    remove.add(instruction);
+                }
+            }
+        }
+        for (Instruction instruction : remove) {
+            code.removeCode(instruction);
+            node.getInstructions().remove(instruction);
+            node.removePhiInstruction(instruction.getSymbol().getName());
+        }
+    }
 }
