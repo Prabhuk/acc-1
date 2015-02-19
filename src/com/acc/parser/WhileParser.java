@@ -26,17 +26,19 @@ public class WhileParser extends Parser {
     @Override
     public Result parse() {
         final int loop = code.getPc();
-        BasicBlock loopBlock = code.getCurrentBlock();
-        Result x = new Relation(code, tokenizer).parse();
-        AuxiliaryFunctions.CJF(code, x);
-
-        final BasicBlock currentBlock = code.getCurrentBlock();
+        BasicBlock currentBlock = code.getCurrentBlock();
         final Set<BasicBlock> parents = currentBlock.getParents();
         if(parents.size() > 1) {
             final BasicBlock nextBlock = new BasicBlock();
             currentBlock.addChild(nextBlock);
             code.setCurrentBlock(nextBlock);
         }
+        currentBlock = code.getCurrentBlock();
+        BasicBlock loopBlock = code.getCurrentBlock();
+        Result x = new Relation(code, tokenizer).parse();
+        AuxiliaryFunctions.CJF(code, x);
+
+
         BasicBlock parent = null;
         for (BasicBlock p : parents) {
             parent = p;

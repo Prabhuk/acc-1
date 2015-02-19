@@ -98,7 +98,7 @@ public class VCGWorker implements Worker {
         StringBuilder instructionString = new StringBuilder();
         final List<Instruction> instructions = destination.getInstructions();
         for (Instruction instruction : instructions) {
-            instructionString.append(instruction.getInstructionString()).append("\n");
+            instructionString.append(instruction.getLocation()).append(" ").append(instruction.getInstructionString()).append("\n");
         }
         return instructionString;
     }

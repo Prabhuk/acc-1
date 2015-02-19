@@ -26,7 +26,7 @@ public class FormalParam extends Parser {
             if (next.getToken().equals(",")) {
                 next = tokenizer.next();
             }
-            //$TODO$ next is identifier at this point of time. Set symbol table and Use AuxilaryFunctions.assignSymbol to populate.
+            //$TODO$ next is identifier at this point of time. Set symbol table and Use assign symbol to populate.
             //do something for: ident{"," ident}
             next = tokenizer.next();
         }

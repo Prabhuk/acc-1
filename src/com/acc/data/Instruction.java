@@ -189,4 +189,8 @@ public class Instruction {
         }
         return sb.toString();
     }
+
+    public void setSymbol(Symbol symbol) {
+        this.symbol = symbol;
+    }
 }
