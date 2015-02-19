@@ -4,6 +4,7 @@ import com.acc.constants.OperationCode;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.ControlFlowGraph;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 

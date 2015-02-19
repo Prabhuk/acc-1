@@ -51,7 +51,7 @@ public class BasicBlock {
     public void addPhiInstruction(Instruction instruction) {
         int index = 0;
         for (Instruction instruction1 : instructions) {
-            if(instruction.getOpcode() != OperationCode.PHI) {
+            if(!instruction1.isPhi()) {
                 break;
             }
             index++;

@@ -49,6 +49,8 @@ public class WhileParser extends Parser {
         join.setLeft(parent);
         x.setJoin(join);
 
+
+
         currentBlock.setJoinBlock(join); //basically self reference
 
         handleDoToken();
@@ -56,11 +58,16 @@ public class WhileParser extends Parser {
         final BasicBlock right = new BasicBlock();
         currentBlock.addChild(right);
         join.setRight(right);
+        code.setCurrentBlock(right);
 
         final Result rightTree = new StatSequence(code, tokenizer).parse();
         if(rightTree.getJoin() != null) {
             x.setJoin(rightTree.getJoin());
+            rightTree.getJoin().addChild(loopBlock);
+        } else {
+            right.addChild(loopBlock);
         }
+
         AuxiliaryFunctions.BJ(code, loop, loopBlock); //Backward Jump to the loop beginning.
         PhiInstructionHelper.createPhiInstructions(getSymbolTable(), join, code);
 

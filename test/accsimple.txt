@@ -15,7 +15,11 @@ array[3][2] b;
     fi;
 
     while i < 4 do
-        let i <- i + 1
+        if i < 2 then
+            let i <- i + 1
+        else
+            let i <- i + 2
+        fi
     od;
     let x <- 3+2;
     let y <- 8;
