@@ -50,7 +50,7 @@ public class CompileInputFile {
             System.out.println("Code:\n");
         }
         for (Instruction instruction : instructions) {
-            System.out.println(instruction.getLocation() + "  " + instruction.toString());
+            System.out.println(instruction.getLocation() + "  " + instruction.getSSAString());
         }
 
         final SymbolTable symbolTable = parser.getSymbolTable();

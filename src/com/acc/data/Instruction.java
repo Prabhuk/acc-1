@@ -123,6 +123,41 @@ public class Instruction {
         }
     }
 
+    private void buildSSAMoveInstruction(StringBuilder sb) {
+        if(rhs.getResult().kind().isRegister()) {
+            sb.append("(R").append(rhs.getResult().regNo()).append(")");
+        } else if (rhs.getResult().kind().isVariable()) { //variable
+            //Should be address field
+            sb.append("(").append(String.valueOf(rhs.getResult().address())).append(")");
+        } else {
+            sb.append(String.valueOf(rhs.getResult().value()));
+        }
+
+        if(lhs.getType().isArray()) {
+            sb.append(",").append(lhs.getName());
+            for (Result result : lhs.getArrayIdentifiers()) {
+                //$TODO$ result types must be handled
+                sb.append("[");
+                if(result.kind().isConstant()) {
+                    sb.append(result.value());
+                } else if (result.kind().isVariable()) {
+                    sb.append("(");
+                    sb.append(result.address());
+                    sb.append(")");
+                } else {
+                    sb.append("(R");
+                    sb.append(result.regNo());
+                    sb.append(")");
+                }
+                sb.append("]");
+            }
+        } else {
+            sb.append(",").append(lhs.getName());
+        }
+    }
+
+
+
 
     /*
      * Returns the integer form of the instruction
@@ -156,6 +191,28 @@ public class Instruction {
 
     public String getNewIdentifierForSymbol() {
         return symbol.getName() + ":" + location;
+    }
+
+    public String getSSAString() {
+        final String operationName = OperationCode.opcodeAndNames.get(opcode);
+        final StringBuilder sb = new StringBuilder(operationName).append(" ");
+        if (opcode == OperationCode.MOV) {
+            buildSSAMoveInstruction(sb);
+        } else {
+            boolean addComma = false;
+
+            if (b != null && !excludeB.contains(opcode)) {
+                addComma = true;
+                sb.append(String.valueOf(b));
+            }
+            if (c != null) {
+                if (addComma) {
+                    sb.append(",");
+                }
+                sb.append(String.valueOf(c));
+            }
+        }
+        return sb.toString();
     }
 
     public String getInstructionString() {

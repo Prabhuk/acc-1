@@ -54,4 +54,18 @@ public class PhiInstruction extends Instruction {
         instructionString = sb.toString();
         return instructionString;
     }
+
+    public String getSSAString() {
+//        if(canIgnore()) {
+//            return "";
+//        }
+        StringBuilder sb = new StringBuilder("phi ");
+        if(leftSymbol != null) {
+            sb.append(leftSymbol.getName()).append(" ");
+        }
+        if(rightSymbol != null) {
+            sb.append(rightSymbol.getName());
+        }
+        return sb.toString();
+    }
 }
