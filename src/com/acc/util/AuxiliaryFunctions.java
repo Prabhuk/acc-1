@@ -108,7 +108,7 @@ public class AuxiliaryFunctions {
         } else if (x.kind().isVariable()) {
             //$TODO$ Implement variable space along with Framepointer
             // Offset Hard coded to 0. Should point to the actual Framepointer
-            putF1(code, OperationCode.LDW, regNo, 0, x.address(), null);
+            putF1(code, OperationCode.LDW, regNo, 0, x.address(), new Symbol(x.getVariableName(), code.getPc(), SymbolType.VARIABLE, true, x.address()));
             x.kind(Kind.REG);
             x.regNo(regNo);
         }

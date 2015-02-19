@@ -5,11 +5,8 @@ import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.Symbol;
-import com.acc.structure.SymbolType;
-import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

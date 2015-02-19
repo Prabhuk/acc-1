@@ -128,7 +128,8 @@ public class Instruction {
             sb.append("(R").append(rhs.getResult().regNo()).append(")");
         } else if (rhs.getResult().kind().isVariable()) { //variable
             //Should be address field
-            sb.append("(").append(String.valueOf(rhs.getResult().address())).append(")");
+            sb.append(String.valueOf(rhs.getName()));
+//            sb.append("(").append(String.valueOf(rhs.getResult().address())).append(")");
         } else {
             sb.append(String.valueOf(rhs.getResult().value()));
         }
@@ -195,13 +196,24 @@ public class Instruction {
 
     public String getSSAString() {
         final String operationName = OperationCode.opcodeAndNames.get(opcode);
-        final StringBuilder sb = new StringBuilder(operationName).append(" ");
+        StringBuilder sb = new StringBuilder(operationName).append(" ");
         if (opcode == OperationCode.MOV) {
             buildSSAMoveInstruction(sb);
         } else {
             boolean addComma = false;
+            if(opcode == OperationCode.LDW) {
+                sb = new StringBuilder("load ").append(symbol.getName());
+                return sb.toString();
+            }
+            if (a != null && opcode >= OperationCode.BEQ && opcode <= OperationCode.BSR) {
+                sb.append(String.valueOf(a));
+                addComma = true;
+            }
 
             if (b != null && !excludeB.contains(opcode)) {
+                if (addComma) {
+                    sb.append(",");
+                }
                 addComma = true;
                 sb.append(String.valueOf(b));
             }

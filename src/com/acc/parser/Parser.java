@@ -93,16 +93,19 @@ public abstract class Parser {
             rhs.setValue(x.value());
             rhs.setPointerValue(false);
         } else {
+            final Symbol rhsRecent = getSymbolTable().getRecentOccurence(x.getVariableName());
             //$TODO$ what if not declared in the scope?
-            rhs = new Symbol(symbolName, recent.getSuffix(), recent.getType(), true, null);
+            final int address = getSymbolTable().getSymbols().indexOf(rhsRecent);
+            x.address(address);
+            rhs = new Symbol(rhsRecent.getName(), rhsRecent.getSuffix(), rhsRecent.getType(), true, Symbol.cloneValue(rhsRecent.getValue()));
         }
-        Symbol lhs = new Symbol(symbolName, code.getPc(), recent.getType(), !x.kind().isConstant(), null);
+        Symbol lhs = new Symbol(symbolName, this.code.getPc(), recent.getType(), !x.kind().isConstant(), null);
         if (recent.getType().isArray()) {
             lhs.setArrayDimension(recent.getArrayDimension());
             lhs.setArrayIdentifiers(arrayIdentifiers);
         }
         rhs.setResult(x);
-        assignToSymbol(code, rhs, lhs, getSymbolTable());
+        assignToSymbol(this.code, rhs, lhs, getSymbolTable());
     }
     public static void assignToSymbol(Code code, Symbol rhs, Symbol lhs, SymbolTable symbolTable) {
         lhs.setValue(Symbol.cloneValue(rhs.getValue()));

@@ -35,6 +35,9 @@ public class Expression extends Parser {
             AuxiliaryFunctions.combine(code, instructionCode, x, y);
             next = tokenizer.next();
         }
+//        if(x.kind().isVariable()) {
+//            x.address(getSymbolTable().getRecentOccurence(x.getVariableName())
+//        }
         tokenizer.previous(); //Rolling back the token which broke the while loop
         return x;
     }
