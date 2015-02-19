@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Created by Rumpy on 14-02-2015.
  */
-public class VCGWorker implements Worker {
+public class VCGWorker extends Worker {
 
     private BufferedWriter bufferedWriter;
 
@@ -56,6 +56,7 @@ public class VCGWorker implements Worker {
 
     @Override
     public void visit(BasicBlock node) {
+        super.visit(node);
         final String name = String.valueOf(node.getLabel());
         StringBuilder instructionString = getInstructionString(node);
 
@@ -69,6 +70,7 @@ public class VCGWorker implements Worker {
 
     @Override
     public void finish() {
+        super.finish();
         print("}");
         if(bufferedWriter != null) {
             try {

@@ -13,9 +13,9 @@ smanhattenedges: yes
 fasticons: yes
 iconcolors: 32
 edge: { sourcename: "0"
-targetname: "1"
-}edge: { sourcename: "0"
 targetname: "2"
+}edge: { sourcename: "0"
+targetname: "1"
 }node: {title: "0"
 label: "0[
 0 MOV 0,i:0
@@ -27,6 +27,29 @@ label: "0[
 6 ADDI 2,0,1
 7 CMP 3,1,2
 8 BGT 3,10
+ ]"
+}edge: { sourcename: "2"
+targetname: "4"
+}edge: { sourcename: "2"
+targetname: "5"
+}node: {title: "2"
+label: "2[
+9 LDW 3,0,0
+10 ADDI 4,0,1
+11 CMP 5,3,4
+12 BGT 5,3
+ ]"
+}edge: { sourcename: "4"
+targetname: "3"
+}node: {title: "4"
+label: "4[
+13 MOV 1,i:13
+ ]"
+}edge: { sourcename: "3"
+targetname: "1"
+}node: {title: "3"
+label: "3[
+17 phi i:13 i:15
  ]"
 }edge: { sourcename: "1"
 targetname: "6"
@@ -61,17 +84,6 @@ label: "8[
 }node: {title: "7"
 label: "7[
  ]"
-}edge: { sourcename: "2"
-targetname: "5"
-}edge: { sourcename: "2"
-targetname: "4"
-}node: {title: "2"
-label: "2[
-9 LDW 3,0,0
-10 ADDI 4,0,1
-11 CMP 5,3,4
-12 BGT 5,3
- ]"
 }edge: { sourcename: "5"
 targetname: "3"
 }node: {title: "5"
@@ -79,17 +91,5 @@ label: "5[
 14 BEQ 0,0
 15 MOV 5,i:15
 16 MOV 1,b:16[0][1]
- ]"
-}edge: { sourcename: "3"
-targetname: "1"
-}node: {title: "3"
-label: "3[
-17 phi i:13 i:15
- ]"
-}edge: { sourcename: "4"
-targetname: "3"
-}node: {title: "4"
-label: "4[
-13 MOV 1,i:13
  ]"
 }}
