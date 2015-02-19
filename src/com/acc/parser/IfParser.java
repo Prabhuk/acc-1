@@ -9,6 +9,7 @@ import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.BasicBlock;
 import com.acc.util.AuxiliaryFunctions;
+import com.acc.util.PhiInstructionHelper;
 import com.acc.util.Tokenizer;
 
 
@@ -67,7 +68,7 @@ public class IfParser extends Parser {
             code.Fixup(x.fixupLoc());
         }
         code.Fixlink(follow);
-        AuxiliaryFunctions.createPhiInstructions(getSymbolTable(), join, code);
+        PhiInstructionHelper.createPhiInstructions(getSymbolTable(), join, code);
         handleFiToken();
         if(join.getLeft() != null) {
             join.getLeft().addChild(join);

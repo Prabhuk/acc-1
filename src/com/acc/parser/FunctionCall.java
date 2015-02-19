@@ -60,8 +60,8 @@ public class FunctionCall extends Parser {
             Result parameter = parameters.get(i);
             String argumentName = args.get(i);
             final Symbol recent = getSymbolTable().getRecentOccurence(argumentName);
-            List<Result> arrayIdentifiers = accumulateArrayIdentifiers(recent);
-            assignSymbol(argumentName, recent, parameter, arrayIdentifiers);
+            List<Result> arrayIdentifiers = AssignmentParser.accumulateArrayIdentifiers(recent, code, tokenizer);
+            AssignmentParser.assignSymbol(code, argumentName, recent, parameter, arrayIdentifiers, getSymbolTable());
 
         }
 

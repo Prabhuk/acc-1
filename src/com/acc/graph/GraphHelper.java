@@ -13,7 +13,9 @@ public class GraphHelper {
     public GraphHelper(Worker worker, BasicBlock root)
     {
         this.worker = worker;
+        worker.begin();
         processGraph(root);
+        worker.finish();
     }
 
     public void processGraph(BasicBlock node)

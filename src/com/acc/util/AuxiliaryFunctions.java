@@ -7,6 +7,7 @@ import com.acc.data.Code;
 import com.acc.data.Instruction;
 import com.acc.data.PhiInstruction;
 import com.acc.data.Result;
+import com.acc.memory.RegisterAllocator;
 import com.acc.structure.*;
 
 import java.lang.reflect.Array;
@@ -19,20 +20,6 @@ import java.util.List;
  * The auxilary methods to cre
  */
 public class AuxiliaryFunctions {
-    private static final List<Register> registers = new ArrayList<Register>(32);
-    private static final List<Integer> memory = new ArrayList<Integer>(1000);
-    //$TODO$ need to load variables here
-
-    static {
-        //This should be read from a properties file
-        int NUMBER_OF_REGISTERS = 32;
-        int MEMORY = 1000;
-        //Create registers
-        for(int i =0; i< NUMBER_OF_REGISTERS; i++) {
-            registers.add(new Register());
-        }
-
-    }
 
     public static void putF1(Code code, int instructionCode, int a, int b, int c, Symbol symbol) {
         if (c < 0) c ^= 0xFFFF0000;
@@ -70,7 +57,7 @@ public class AuxiliaryFunctions {
     public static void CJF(Code code, Result x) {
         //OperationCode.BEQ + $TODO$ WTF
         putF1(code, Condition.getNegatedInstruction(x.condition()), x.regNo(), 0, 0, null);
-        deallocate(x.regNo());
+        RegisterAllocator.deallocate(x.regNo());
         x.fixupLoc(code.getPc() - 1);
     }
 
@@ -98,16 +85,12 @@ public class AuxiliaryFunctions {
             } else {
                 load(code, y);
                 putF1(code, op, x.regNo(), x.regNo(), y.regNo(), null);
-                deallocate(y.regNo());
+                RegisterAllocator.deallocate(y.regNo());
             }
         }
     }
 
-    private static void deallocate(int regno) {
-        registers.get(regno).setAvailable(true);
-        registers.get(regno).setValue(null);
-        //$TODO$ needs implementation
-    }
+
 
     /*
      * @params - x is a subtree (result object)
@@ -117,7 +100,7 @@ public class AuxiliaryFunctions {
         if (x.kind().isRegister()) {
             return;
         }
-        int regNo = allocateReg();
+        int regNo = RegisterAllocator.allocateReg();
         if (x.kind().isConstant()) {
             putF1(code, OperationCode.ADDI, regNo, 0, x.value(), null);
             x.kind(Kind.REG);
@@ -131,13 +114,7 @@ public class AuxiliaryFunctions {
         }
     }
 
-    public static void assignToSymbol(Code code, Symbol rhs, Symbol lhs, SymbolTable symbolTable) {
-        lhs.setValue(Symbol.cloneValue(rhs.getValue()));
-        AuxiliaryFunctions.putMOV(code, rhs, lhs);
-        symbolTable.addSymbol(lhs);
-    }
-
-    public static void declareSymbol(Code code, String symbolName, SymbolTable symbolTable, SymbolType type, List<Integer> arrayDimensions) {
+    public static void declareSymbol(String symbolName, SymbolTable symbolTable, SymbolType type, List<Integer> arrayDimensions) {
         final Symbol s = new Symbol(symbolName, -1, type, false, null);
         if (type == SymbolType.ARRAY) {
             final int dimensionCount = arrayDimensions.size();
@@ -151,91 +128,10 @@ public class AuxiliaryFunctions {
         symbolTable.addSymbol(s);
     }
 
-    public static int allocateReg() {
-        for (Register register : registers) {
-            if(register.isAvailable()) {
-                register.setAvailable(false);
-                return registers.indexOf(register);
-            }
-        }
-        throw new RuntimeException("Registers are full");
-    }
 
     public static void main(String[] args) {
         final Code code = new Code();
         AuxiliaryFunctions.putF1(code, OperationCode.ADD, 1, 2, 5, null);
 //        Printer.print(code.toString());
-    }
-
-    public static void createPhiInstructions(SymbolTable table, BasicBlock join, Code code) {
-        handleLeft(join, table, code);
-        handleRight(join, table, code);
-        fillincompleteRight(join, table);
-    }
-
-    private static void fillincompleteRight(BasicBlock join, SymbolTable table) {
-        //Handle Phi Statements where right did not have assignments
-        final Collection<Instruction> allPhiInstructions = join.getAllPhiInstructions();
-        for (Instruction allPhiInstruction : allPhiInstructions) {
-            final PhiInstruction phi = (PhiInstruction) allPhiInstruction;
-            if (!phi.isComplete()) {
-                Symbol targetSymbol = getTargetSymbol(table, phi.getSymbol());
-                phi.setRightSymbol(targetSymbol);
-            }
-        }
-    }
-
-    private static void handleRight(BasicBlock join, SymbolTable table, Code code) {
-        final BasicBlock right = join.getRight();
-        final List<Instruction> rightInstructions = right.getInstructions();
-        for (Instruction instruction : rightInstructions) {
-            if (instruction.getOpcode() == OperationCode.MOV) {
-                final Symbol symbol = instruction.getSymbol();
-                if (join.getPhiInstruction(symbol.getName()) == null) {
-                    //Processed left so expecting the symbol to be present in the currentSymbolTable
-                    createPhi(join, table, code, symbol);
-                }
-                //If there is an NPE in the next line then the variable is not declared in the scope
-                final PhiInstruction phi = (PhiInstruction) join.getPhiInstruction(symbol.getName());
-                phi.setRightSymbol(instruction.getSymbol());
-            }
-        }
-    }
-
-    private static void handleLeft(BasicBlock join, SymbolTable table, Code code) {
-        final BasicBlock left = join.getLeft();
-        final List<Instruction> leftInstructions = left.getInstructions();
-        for (Instruction instruction : leftInstructions) {
-            if (instruction.getOpcode() == OperationCode.MOV) {
-                final Symbol symbol = instruction.getSymbol();
-                PhiInstruction phi;
-                if (join.getPhiInstruction(symbol.getName()) != null) {
-                    //Update the existing phi instruction
-                    phi = (PhiInstruction) join.getPhiInstruction(symbol.getName());
-                } else {
-                    phi = createPhi(join, table, code, symbol);
-                }
-                phi.setLeftSymbol(symbol);
-            }
-        }
-    }
-
-    private static PhiInstruction createPhi(BasicBlock join, SymbolTable table, Code code, Symbol symbol) {
-        Symbol targetSymbol = getTargetSymbol(table, symbol);
-        PhiInstruction phi = new PhiInstruction(targetSymbol);
-        code.addPhiInstruction(phi);//$TODO$ this is not in order but should generate an unique suffix
-        join.addPhiInstruction(phi);
-        return phi;
-    }
-
-    private static Symbol getTargetSymbol(SymbolTable table, Symbol symbol) {
-        final List<Symbol> symbols = table.getSymbols();
-        Symbol targetSymbol = null;
-        for (Symbol symbol1 : symbols) {
-            if (symbol1.getName().equals(symbol.getName())) {
-                targetSymbol = symbol1;
-            }
-        }
-        return targetSymbol;
     }
 }

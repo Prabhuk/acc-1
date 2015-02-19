@@ -131,4 +131,8 @@ public class Symbol {
     public void setResult(Result result) {
         this.result = result;
     }
+
+    public void setSuffix(int suffix) {
+        this.suffix = suffix;
+    }
 }

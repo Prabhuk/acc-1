@@ -5,6 +5,7 @@ import com.acc.data.Code;
 import com.acc.data.RelationalOperator;
 import com.acc.data.Result;
 import com.acc.data.Token;
+import com.acc.memory.RegisterAllocator;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
@@ -28,7 +29,7 @@ public class Relation extends Parser {
         Result y = new Expression(code, tokenizer).parse();
         AuxiliaryFunctions.load(code, y);
 
-        final int registerNumber = AuxiliaryFunctions.allocateReg();
+        final int registerNumber = RegisterAllocator.allocateReg();
         AuxiliaryFunctions.putF2(code, OperationCode.CMP, registerNumber, x.regNo(), y.regNo()); //$TODO$ 5 should become a proper register address for the result
         //$TODO$ code should be generated to load expressions for x & y
 

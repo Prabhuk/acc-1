@@ -1,0 +1,93 @@
+graph: {
+x: 150
+y: 20
+xmax: 960
+ymax: 900
+width: 950
+height: 900
+layoutdownfactor: 100
+layoutupfactor: 0
+layoutnearfactor: 0
+yspace: 30
+smanhattenedges: yes
+fasticons: yes
+iconcolors: 32
+edge: { sourcename: "0"
+targetname: "1"
+}edge: { sourcename: "0"
+targetname: "2"
+}node: {title: "0"
+label: "0[
+MOV 0,i:0
+LDW 0,0,0
+ADDI 0,0,2
+MOV 1,b:3[0][(R0)]
+MOV 3,x:4
+LDW 1,0,0
+ADDI 2,0,1
+CMP 3,1,2
+BGT 3,9
+ ]"
+}edge: { sourcename: "1"
+targetname: "6"
+}edge: { sourcename: "1"
+targetname: "7"
+}edge: { sourcename: "1"
+targetname: "8"
+}node: {title: "1"
+label: "1[
+phi i:0 i:15
+phi b:3 b:3
+phi x:4 x:4
+LDW 5,0,0
+ADDI 6,0,4
+CMP 7,5,6
+BGE 7,0
+ ]"
+}node: {title: "6"
+label: "6[
+LDW 7,0,0
+ADDI 7,7,1
+MOV (R7),i:26
+BEQ 0,20
+ ]"
+}node: {title: "7"
+label: "7[
+ ]"
+}node: {title: "8"
+label: "8[
+MOV 5,x:28
+MOV 8,y:29
+MOV (0),x:30
+ ]"
+}edge: { sourcename: "2"
+targetname: "4"
+}edge: { sourcename: "2"
+targetname: "5"
+}node: {title: "2"
+label: "2[
+LDW 3,0,0
+ADDI 4,0,1
+CMP 5,3,4
+BGT 5,3
+ ]"
+}edge: { sourcename: "4"
+targetname: "3"
+}node: {title: "4"
+label: "4[
+MOV 1,i:13
+ ]"
+}edge: { sourcename: "3"
+targetname: "1"
+}node: {title: "3"
+label: "3[
+phi i:13 i:15
+ ]"
+}edge: { sourcename: "5"
+targetname: "3"
+}node: {title: "5"
+label: "5[
+BEQ 0,0
+MOV 5,i:15
+ ]"
+}}

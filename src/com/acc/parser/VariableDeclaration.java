@@ -64,6 +64,6 @@ public class VariableDeclaration extends Parser {
             throw new SyntaxErrorException("Identifier expected. Found [" + symbolName.getToken() + "] instead");
         }
         //$TODO$ handle multidimensional array. => In progress
-        AuxiliaryFunctions.declareSymbol(code, symbolName.getToken(), getSymbolTable(), symbolType, arrayDimensions);
+        AuxiliaryFunctions.declareSymbol(symbolName.getToken(), getSymbolTable(), symbolType, arrayDimensions);
     }
 }

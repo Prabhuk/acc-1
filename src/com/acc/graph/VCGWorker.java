@@ -3,6 +3,10 @@ package com.acc.graph;
 import com.acc.data.Instruction;
 import com.acc.structure.BasicBlock;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -10,6 +14,45 @@ import java.util.Set;
  * Created by Rumpy on 14-02-2015.
  */
 public class VCGWorker implements Worker {
+
+    private BufferedWriter bufferedWriter;
+
+    public VCGWorker() {
+    }
+
+    @Override
+    public void begin() {
+        final long l = System.currentTimeMillis();
+//        String fileName = "output_"+ String.valueOf(l) +".vcg";
+        String fileName = "output.vcg";
+        final File file = new File(fileName);
+        System.out.println(file.getAbsolutePath());
+        try {
+            FileWriter out = new FileWriter(file);
+            bufferedWriter = new BufferedWriter(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+            try {
+                bufferedWriter.close();
+            } catch (IOException e1) {
+                //ignore
+            }
+        }
+        print("graph: {\n" +
+                "x: 150\n" +
+                "y: 20\n" +
+                "xmax: 960\n" +
+                "ymax: 900\n" +
+                "width: 950\n" +
+                "height: 900\n" +
+                "layoutdownfactor: 100\n" +
+                "layoutupfactor: 0\n" +
+                "layoutnearfactor: 0\n" +
+                "yspace: 30\n" +
+                "smanhattenedges: yes\n" +
+                "fasticons: yes\n" +
+                "iconcolors: 32\n");
+    }
 
     @Override
     public void visit(BasicBlock node) {
@@ -22,6 +65,18 @@ public class VCGWorker implements Worker {
             print(getEdge(name, destinationName));
         }
         print(getNodeString(node, instructionString));
+    }
+
+    @Override
+    public void finish() {
+        print("}");
+        if(bufferedWriter != null) {
+            try {
+                bufferedWriter.close();
+            } catch (IOException e) {
+                //ignore
+            }
+        }
     }
 
     private String getNodeString(BasicBlock node, StringBuilder instructionString) {
@@ -49,6 +104,20 @@ public class VCGWorker implements Worker {
     }
 
     private void print(String text) {
-        System.out.println(text);
+        if(bufferedWriter != null) {
+            try {
+                bufferedWriter.write(text);
+            } catch (IOException e) {
+                e.printStackTrace();
+                if(bufferedWriter != null) {
+                    try {
+                        bufferedWriter.close();
+                    } catch (IOException e1) {
+                        //ignore
+                    }
+                }
+            }
+        }
+//        System.out.println(text);
     }
 }

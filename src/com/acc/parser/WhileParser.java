@@ -8,6 +8,7 @@ import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.BasicBlock;
 import com.acc.util.AuxiliaryFunctions;
+import com.acc.util.PhiInstructionHelper;
 import com.acc.util.Tokenizer;
 
 import java.util.Set;
@@ -59,7 +60,7 @@ public class WhileParser extends Parser {
             x.setJoin(rightTree.getJoin());
         }
         AuxiliaryFunctions.BJ(code, loop, loopBlock); //Backward Jump to the loop beginning.
-        AuxiliaryFunctions.createPhiInstructions(getSymbolTable(), join, code);
+        PhiInstructionHelper.createPhiInstructions(getSymbolTable(), join, code);
 
         final BasicBlock nextBlock = new BasicBlock();
         join.addChild(nextBlock);
