@@ -27,7 +27,7 @@ public class WhileParser extends Parser {
     public Result parse() {
         final int loop = code.getPc();
         BasicBlock currentBlock = code.getCurrentBlock();
-        final Set<BasicBlock> parents = currentBlock.getParents();
+        Set<BasicBlock> parents = currentBlock.getParents();
         if(parents.size() > 1) {
             final BasicBlock nextBlock = new BasicBlock();
             currentBlock.addChild(nextBlock);
@@ -38,7 +38,7 @@ public class WhileParser extends Parser {
         Result x = new Relation(code, tokenizer).parse();
         AuxiliaryFunctions.CJF(code, x);
 
-
+        parents = currentBlock.getParents();
         BasicBlock parent = null;
         for (BasicBlock p : parents) {
             parent = p;

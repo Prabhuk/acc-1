@@ -8,6 +8,7 @@ import com.acc.structure.BasicBlock;
 import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,9 +18,25 @@ import java.util.List;
 public class PhiInstructionHelper {
 
     public static void createPhiInstructions(SymbolTable table, BasicBlock join, Code code) {
+
         handleLeft(join, table, code);
         handleRight(join, table, code);
         fillIncomplete(join, table);
+        final List<Instruction> instructions = join.getInstructions();
+        final List<Instruction> remove = new ArrayList<Instruction>();
+        for (Instruction instruction : instructions) {
+            if(instruction.isPhi()) {
+                PhiInstruction phi = (PhiInstruction) instruction;
+                if(phi.canIgnore()) {
+                    remove.add(instruction);
+                }
+            }
+        }
+        for (Instruction instruction : remove) {
+            code.removeCode(instruction);
+            join.getInstructions().remove(instruction);
+            join.removePhiInstruction(instruction.getSymbol().getName());
+        }
     }
 
     private static void fillIncomplete(BasicBlock join, SymbolTable table) {

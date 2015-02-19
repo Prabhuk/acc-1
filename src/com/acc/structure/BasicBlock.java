@@ -63,6 +63,9 @@ public class BasicBlock {
     public Instruction getPhiInstruction(String symbolName) {
         return phiMap.get(symbolName);
     }
+    public Instruction removePhiInstruction(String symbolName) {
+        return phiMap.remove(symbolName);
+    }
 
     /*
      * returns true if the block parameter is a dominating block for the current block

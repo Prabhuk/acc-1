@@ -26,20 +26,19 @@ label: "0[
 5 LDW 1,0,0
 6 ADDI 2,0,1
 7 CMP 3,1,2
-8 BGT 3,9
+8 BGT 3,10
  ]"
 }edge: { sourcename: "1"
 targetname: "6"
 }node: {title: "1"
 label: "1[
-17 phi i:16 i:0
-18 phi b:3 b:3
-19 phi x:4 x:4
+18 phi i:17 i:0
+19 phi b:16 b:3
  ]"
 }edge: { sourcename: "6"
-targetname: "7"
-}edge: { sourcename: "6"
 targetname: "8"
+}edge: { sourcename: "6"
+targetname: "7"
 }node: {title: "6"
 label: "6[
 20 LDW 5,0,0
@@ -50,16 +49,17 @@ label: "6[
 25 ADDI 7,7,1
 26 MOV (R7),i:26
 27 BEQ 0,20
-28 phi i:16 i:26
- ]"
-}node: {title: "7"
-label: "7[
+28 phi i:18 i:26
+29 phi b:19 b:16
  ]"
 }node: {title: "8"
 label: "8[
-29 MOV 5,x:29
-30 MOV 8,y:30
-31 MOV (0),x:31
+30 MOV 5,x:30
+31 MOV 8,y:31
+32 MOV (0),x:32
+ ]"
+}node: {title: "7"
+label: "7[
  ]"
 }edge: { sourcename: "2"
 targetname: "5"
@@ -78,12 +78,13 @@ targetname: "3"
 label: "5[
 14 BEQ 0,0
 15 MOV 5,i:15
+16 MOV 1,b:16[0][1]
  ]"
 }edge: { sourcename: "3"
 targetname: "1"
 }node: {title: "3"
 label: "3[
-16 phi i:13 i:15
+17 phi i:13 i:15
  ]"
 }edge: { sourcename: "4"
 targetname: "3"

@@ -9,7 +9,8 @@ array[3][2] b;
         if i <= 1 then
             let i <- 1
         else
-            let i <- 5
+            let i <- 5;
+            let b[0][1] <- 1
         fi
     fi;
 

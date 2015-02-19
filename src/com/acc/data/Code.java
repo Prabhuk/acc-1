@@ -42,6 +42,15 @@ public class Code {
      * @param instruction - Takes an instruction and appends to the output code
      * @return Returns the current program counter value
      */
+    public int removeCode(Instruction instruction) {
+        instructions.remove(instruction);
+        return instructions.size();
+    }
+
+    /**
+     * @param instruction - Takes an instruction and appends to the output code
+     * @return Returns the current program counter value
+     */
     public int addPhiInstruction(PhiInstruction instruction) {
         instruction.setLocation(getPc());
         instructions.add(instruction);
