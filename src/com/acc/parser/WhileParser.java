@@ -26,14 +26,16 @@ public class WhileParser extends Parser {
     @Override
     public Result parse() {
         final int loop = code.getPc();
-        BasicBlock currentBlock = code.getCurrentBlock();
-        Set<BasicBlock> parents = currentBlock.getParents();
+
+        final BasicBlock _currentBlock = code.getCurrentBlock();
+        Set<BasicBlock> parents = _currentBlock.getParents();
         if(parents.size() > 1) {
             final BasicBlock nextBlock = new BasicBlock();
-            currentBlock.addChild(nextBlock);
+            _currentBlock.addChild(nextBlock, true);
             code.setCurrentBlock(nextBlock);
         }
-        currentBlock = code.getCurrentBlock();
+
+        final BasicBlock currentBlock = code.getCurrentBlock();
         BasicBlock loopBlock = code.getCurrentBlock();
         Result x = new Relation(code, tokenizer).parse();
         AuxiliaryFunctions.CJF(code, x);
@@ -56,14 +58,14 @@ public class WhileParser extends Parser {
         handleDoToken();
 
         final BasicBlock right = new BasicBlock();
-        currentBlock.addChild(right);
+        currentBlock.addChild(right, true);
         join.setRight(right);
         code.setCurrentBlock(right);
 
         final Result rightTree = new StatSequence(code, tokenizer).parse();
         if(rightTree.getJoin() != null) {
             x.setJoin(rightTree.getJoin());
-            rightTree.getJoin().addChild(loopBlock);
+            rightTree.getJoin().addChild(loopBlock); //Does loop body dominate loop condition block?
         } else {
             right.addChild(loopBlock);
         }
@@ -72,7 +74,7 @@ public class WhileParser extends Parser {
         PhiInstructionHelper.createPhiInstructions(getSymbolTable(), join, code);
 
         final BasicBlock nextBlock = new BasicBlock();
-        join.addChild(nextBlock);
+        join.addChild(nextBlock, true);
 
         code.setCurrentBlock(nextBlock);
         handleODtoken(tokenizer.next());

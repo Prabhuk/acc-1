@@ -90,15 +90,27 @@ label: "11[
 41 MOV (0),x
  ]"
 }edge: { sourcename: "2"
-targetname: "5"
-}edge: { sourcename: "2"
 targetname: "4"
+}edge: { sourcename: "2"
+targetname: "5"
 }node: {title: "2"
 label: "2[
 9 LDW 0,0
 10 ADDI 0,1
 11 CMP 3,4
 12 BGT 3
+ ]"
+}edge: { sourcename: "4"
+targetname: "3"
+}node: {title: "4"
+label: "4[
+13 MOV 1,i
+ ]"
+}edge: { sourcename: "3"
+targetname: "1"
+}node: {title: "3"
+label: "3[
+17 phi i i
  ]"
 }edge: { sourcename: "5"
 targetname: "3"
@@ -107,17 +119,5 @@ label: "5[
 14 BEQ 0
 15 MOV 5,i
 16 MOV 1,b[0][1]
- ]"
-}edge: { sourcename: "3"
-targetname: "1"
-}node: {title: "3"
-label: "3[
-17 phi i i
- ]"
-}edge: { sourcename: "4"
-targetname: "3"
-}node: {title: "4"
-label: "4[
-13 MOV 1,i
  ]"
 }}

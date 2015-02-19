@@ -29,19 +29,18 @@ public class IfParser extends Parser {
         Result x = new Relation(code, tokenizer).parse();  //Statement eats the first word for all statements except assignment
         AuxiliaryFunctions.CJF(code, x);
         final BasicBlock currentBlock = code.getCurrentBlock();
-        BasicBlock localCurrentBlock = currentBlock;
 
         BasicBlock join = new BasicBlock();
         x.setJoin(join);
-
         currentBlock.setJoinBlock(join);
+        currentBlock.addDominatedOverBlock(join);
+
 
         final BasicBlock left = new BasicBlock();
         join.setLeft(left);
-        localCurrentBlock.addChild(left);
+        currentBlock.addChild(left, true);
 
         code.setCurrentBlock(left);
-
         handleThenToken();
 
         final Result leftTree = new StatSequence(code, tokenizer).parse();//Ignoring the return type. Shouldn't mean anything at this context.
@@ -54,7 +53,8 @@ public class IfParser extends Parser {
         if (isElse(incoming)) {
             final BasicBlock right = new BasicBlock();
             join.setRight(right);
-            localCurrentBlock.addChild(right);
+            currentBlock.addChild(right, true);
+
             code.setCurrentBlock(right);
             AuxiliaryFunctions.FJLink(code, follow);
             code.Fixup(x.fixupLoc());

@@ -10,7 +10,6 @@ import java.util.List;
  * Created by prabhuk on 2/8/2015.
  */
 public class ControlFlowGraph {
-    private final List<BasicBlock> allBlocks = new LinkedList<BasicBlock>();
     private BasicBlock currentBlock;
     private final BasicBlock rootBlock;
     private static volatile ControlFlowGraph tree;
@@ -27,7 +26,6 @@ public class ControlFlowGraph {
     private ControlFlowGraph() {
         rootBlock = new BasicBlock();
         currentBlock = rootBlock;
-        allBlocks.add(rootBlock);
     }
 
     /**
@@ -48,4 +46,5 @@ public class ControlFlowGraph {
     public BasicBlock getRootBlock() {
         return rootBlock;
     }
+
 }

@@ -20,6 +20,8 @@ public class BasicBlock {
     private final Set<BasicBlock> dominatesOver = new HashSet<BasicBlock>();
     private final Set<BasicBlock> children = new HashSet<BasicBlock>();
     private final Set<BasicBlock> parents = new HashSet<BasicBlock>();
+
+    private static volatile Set<BasicBlock> allBlocks = new HashSet<BasicBlock>();
     private boolean isVisited = false;
 
     private static volatile int count = 0;
@@ -30,6 +32,7 @@ public class BasicBlock {
 
     public BasicBlock() {
         label = count++;
+        allBlocks.add(this);
     }
 
     public Set<BasicBlock> getDominatesOver() {
@@ -79,6 +82,11 @@ public class BasicBlock {
      */
     public void addDominatedOverBlock(BasicBlock block) {
         dominatesOver.add(block);
+        for (BasicBlock allBlock : allBlocks) {
+            if(allBlock.getDominatesOver().contains(this)) {
+                allBlock.getDominatesOver().add(block);
+            }
+        }
     }
 
     /*
@@ -96,9 +104,16 @@ public class BasicBlock {
         return parents;
     }
 
-    public void addChild(BasicBlock child) {
+    public void addChild(BasicBlock child, boolean addDominatedOver) {
         child.getParents().add(this);
         this.children.add(child);
+        if(addDominatedOver) {
+            this.addDominatedOverBlock(child);
+        }
+    }
+
+    public void addChild(BasicBlock child) {
+        addChild(child, false);
     }
 
     public List<Instruction> getInstructions() {
