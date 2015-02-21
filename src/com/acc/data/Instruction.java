@@ -11,6 +11,7 @@ import java.util.List;
  */
 public class Instruction {
     protected boolean isPhi = false;
+    protected boolean isKill = false;
     private Symbol rhs; //MOV specific
     private Symbol lhs; //MOV specific
     protected Symbol symbol;
@@ -21,7 +22,7 @@ public class Instruction {
     private Integer b;
     private Integer c;
     private Integer location;
-    
+
     private static List<Integer> excludeB = new ArrayList<Integer>();
     private static List<Integer> excludeA = new ArrayList<Integer>();
 
@@ -58,7 +59,7 @@ public class Instruction {
         this.c = c;
         this.opcode = opcode;
         this.symbol = symbol;
-   }
+    }
 
     //Made for mov instruction
     public Instruction(Symbol rhs, Symbol lhs) {
@@ -72,6 +73,16 @@ public class Instruction {
     protected Instruction(int opcode, boolean isPhi) {
         this.opcode = opcode;
         this.isPhi = isPhi;
+    }
+
+    //Made for Kill Instruction
+    protected Instruction(boolean isKill, Symbol s) {
+        this.isKill = isKill;
+        symbol = s;
+    }
+
+    public boolean isKill() {
+        return isKill;
     }
 
     public boolean isPhi() {
@@ -91,7 +102,7 @@ public class Instruction {
     }
 
     private void buildMoveInstruction(StringBuilder sb) {
-        if(rhs.getResult().kind().isRegister()) {
+        if (rhs.getResult().kind().isRegister()) {
             sb.append("(R").append(rhs.getResult().regNo()).append(")");
         } else if (rhs.getResult().kind().isVariable()) { //variable
             //Should be address field
@@ -100,12 +111,12 @@ public class Instruction {
             sb.append(String.valueOf(rhs.getResult().value()));
         }
 
-        if(lhs.getType().isArray()) {
+        if (lhs.getType().isArray()) {
             sb.append(",").append(lhs.getUniqueIdentifier());
             for (Result result : lhs.getArrayIdentifiers()) {
                 //$TODO$ result types must be handled
                 sb.append("[");
-                if(result.kind().isConstant()) {
+                if (result.kind().isConstant()) {
                     sb.append(result.value());
                 } else if (result.kind().isVariable()) {
                     sb.append("(");
@@ -124,7 +135,7 @@ public class Instruction {
     }
 
     private void buildSSAMoveInstruction(StringBuilder sb) {
-        if(rhs.getResult().kind().isRegister()) {
+        if (rhs.getResult().kind().isRegister()) {
             sb.append("(R").append(rhs.getResult().regNo()).append(")");
         } else if (rhs.getResult().kind().isVariable()) { //variable
             //Should be address field
@@ -134,12 +145,12 @@ public class Instruction {
             sb.append(String.valueOf(rhs.getResult().value()));
         }
 
-        if(lhs.getType().isArray()) {
+        if (lhs.getType().isArray()) {
             sb.append(",").append(lhs.getName());
             for (Result result : lhs.getArrayIdentifiers()) {
                 //$TODO$ result types must be handled
                 sb.append("[");
-                if(result.kind().isConstant()) {
+                if (result.kind().isConstant()) {
                     sb.append(result.value());
                 } else if (result.kind().isVariable()) {
                     sb.append("(");
@@ -156,8 +167,6 @@ public class Instruction {
             sb.append(",").append(lhs.getName());
         }
     }
-
-
 
 
     /*
@@ -199,9 +208,11 @@ public class Instruction {
         StringBuilder sb = new StringBuilder(operationName).append(" ");
         if (opcode == OperationCode.MOV) {
             buildSSAMoveInstruction(sb);
+        } else if (opcode == OperationCode.STW || opcode == OperationCode.STX) {
+            buildSSAStoreInstruction(sb);
         } else {
             boolean addComma = false;
-            if(opcode == OperationCode.LDW) {
+            if (opcode == OperationCode.LDW) {
                 sb = new StringBuilder("load ").append(symbol.getName());
                 return sb.toString();
             }
@@ -209,7 +220,6 @@ public class Instruction {
                 sb.append(String.valueOf(a));
                 addComma = true;
             }
-
             if (b != null && !excludeB.contains(opcode)) {
                 if (addComma) {
                     sb.append(",");
@@ -225,6 +235,10 @@ public class Instruction {
             }
         }
         return sb.toString();
+    }
+
+    private void buildSSAStoreInstruction(StringBuilder sb) {
+        sb.append("store ").append(symbol.getName()).append(" ").append(symbol.getResult().address());
     }
 
     public String getInstructionString() {

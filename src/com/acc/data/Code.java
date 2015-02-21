@@ -36,6 +36,11 @@ public class Code {
         instruction.setLocation(getPc());
         instructions.add(instruction);
         controlFlowGraph.addInstruction(instruction);
+        if(instruction.getOpcode() == OperationCode.STW || instruction.getOpcode() == OperationCode.STX) {
+            final KillInstruction kill = new KillInstruction(instruction.getSymbol());
+            instructions.add(kill);
+            controlFlowGraph.getCurrentBlock().getJoinBlock().addInstruction(kill);
+        }
         return instructions.size();
     }
 

@@ -148,6 +148,10 @@ public class BasicBlock {
         this.joinBlock = joinBlock;
     }
 
+    public BasicBlock getJoinBlock() {
+        return joinBlock;
+    }
+
     public boolean isVisited() {
         return isVisited;
     }
