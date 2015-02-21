@@ -38,13 +38,14 @@ public class IfParser extends Parser {
 
         final BasicBlock left = new BasicBlock();
         join.setLeft(left);
+        left.setJoinBlock(join);
         currentBlock.addChild(left, true);
 
         code.setCurrentBlock(left);
         handleThenToken();
 
         final Result leftTree = new StatSequence(code, tokenizer).parse();//Ignoring the return type. Shouldn't mean anything at this context.
-        if (leftTree.getJoin() != null) {
+        if (leftTree.getJoin() != null && !leftTree.getJoin().equals(join)) {
             join.setLeft(leftTree.getJoin());
         }
 
@@ -53,13 +54,14 @@ public class IfParser extends Parser {
         if (isElse(incoming)) {
             final BasicBlock right = new BasicBlock();
             join.setRight(right);
+            right.setJoinBlock(join);
             currentBlock.addChild(right, true);
 
             code.setCurrentBlock(right);
             AuxiliaryFunctions.FJLink(code, follow);
             code.Fixup(x.fixupLoc());
             final Result rightTree = new StatSequence(code, tokenizer).parse();
-            if (rightTree.getJoin() != null) {
+            if (rightTree.getJoin() != null && !rightTree.getJoin().equals(join)) {
                 join.setRight(rightTree.getJoin());
             }
         } else {

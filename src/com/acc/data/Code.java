@@ -38,8 +38,14 @@ public class Code {
         controlFlowGraph.addInstruction(instruction);
         if(instruction.getOpcode() == OperationCode.STW || instruction.getOpcode() == OperationCode.STX) {
             final KillInstruction kill = new KillInstruction(instruction.getSymbol());
+            kill.setLocation(getPc());
             instructions.add(kill);
-            controlFlowGraph.getCurrentBlock().getJoinBlock().addInstruction(kill);
+            if(controlFlowGraph.getCurrentBlock().getJoinBlock() != null) {
+                controlFlowGraph.getCurrentBlock().getJoinBlock().addInstruction(kill);
+            }
+//            else {
+//                controlFlowGraph.getCurrentBlock().addInstruction(kill);
+//            }
         }
         return instructions.size();
     }

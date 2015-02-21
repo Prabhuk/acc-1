@@ -205,12 +205,15 @@ public class Instruction {
 
     public String getSSAString() {
         final String operationName = OperationCode.opcodeAndNames.get(opcode);
-        StringBuilder sb = new StringBuilder(operationName).append(" ");
+        StringBuilder sb;
         if (opcode == OperationCode.MOV) {
+            sb = new StringBuilder(operationName).append(" ");
             buildSSAMoveInstruction(sb);
         } else if (opcode == OperationCode.STW || opcode == OperationCode.STX) {
+            sb = new StringBuilder();
             buildSSAStoreInstruction(sb);
         } else {
+            sb = new StringBuilder(operationName).append(" ");
             boolean addComma = false;
             if (opcode == OperationCode.LDW) {
                 sb = new StringBuilder("load ").append(symbol.getName());
@@ -238,7 +241,8 @@ public class Instruction {
     }
 
     private void buildSSAStoreInstruction(StringBuilder sb) {
-        sb.append("store ").append(symbol.getName()).append(" ").append(symbol.getResult().address());
+        sb.append("store ").append(symbol.getName());
+//                .append(" ").append(symbol.getResult().address());
     }
 
     public String getInstructionString() {

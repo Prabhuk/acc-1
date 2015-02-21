@@ -30,6 +30,7 @@ public class AuxiliaryFunctions {
 
     public static void putMOV(Code code, Symbol rhs, Symbol lhs) {
         code.addCode(new Instruction(rhs, lhs));
+        putF1(code, OperationCode.STW, 0, 0, 0, lhs);
     }
 
     public static void putF2(Code code, int instructionCode, int a, int b, int c) {
