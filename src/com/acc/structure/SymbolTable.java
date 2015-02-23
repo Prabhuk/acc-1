@@ -105,4 +105,8 @@ public class SymbolTable {
     private String getSymbolKey(Symbol s) {
         return s.getName() + s.getSuffix();
     }
+
+    public int getOffset(Symbol s) {
+        return symbols.indexOf(s);
+    }
 }

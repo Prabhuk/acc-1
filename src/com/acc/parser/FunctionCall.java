@@ -1,9 +1,6 @@
 package com.acc.parser;
 
-import com.acc.data.Code;
-import com.acc.data.Result;
-import com.acc.data.Token;
-import com.acc.data.TokenType;
+import com.acc.data.*;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
@@ -17,8 +14,8 @@ import java.util.List;
  */
 public class FunctionCall extends Parser {
 
-    public FunctionCall(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public FunctionCall(Code code, Tokenizer tokenizer, SSACode ssaCode) {
+        super(code, tokenizer, ssaCode);
     }
 
     @Override
@@ -35,10 +32,10 @@ public class FunctionCall extends Parser {
         List<Result> parameters = new ArrayList<Result>();
         if (!lookAhead.getToken().equals(")")) {
             tokenizer.previous(); //Allowing expression to process the first parameter value
-            parameters.add(new Expression(code, tokenizer).parse());
+            parameters.add(new Expression(code, tokenizer, ssaCode).parse());
             lookAhead = tokenizer.next();
             while (lookAhead.getToken().equals(",")) {
-                parameters.add(new Expression(code, tokenizer).parse());
+                parameters.add(new Expression(code, tokenizer, ssaCode).parse());
             }
             if (!lookAhead.getToken().equals(")")) { //End brackets should've broken the while loop. Otherwise syntax error
                 throw new SyntaxErrorException("Expected [\")\"]. Found [" + lookAhead.getToken() + "] instead");
@@ -65,7 +62,7 @@ public class FunctionCall extends Parser {
         }
 
         //$TODO$ Add code to execute the functionBody.
-        new FunctionBody(code, tokenizer).parse();
+        new FunctionBody(code, tokenizer, ssaCode).parse();
         if (previous != null) {
             removeLocalSymbolTable();
         } else {

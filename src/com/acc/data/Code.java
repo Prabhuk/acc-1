@@ -4,6 +4,7 @@ import com.acc.constants.OperationCode;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.ControlFlowGraph;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +18,8 @@ public class Code {
     /*
      * List of instructions for the input program
      */
-    private final List<Instruction> instructions = new LinkedList<Instruction>();
+    private final List<Instruction> instructions = new ArrayList<Instruction>();
+    private final List<SSAInstruction> ssaInstructions = new ArrayList<SSAInstruction>();
     private static ControlFlowGraph controlFlowGraph = ControlFlowGraph.getCFG();
 
 
@@ -33,14 +35,12 @@ public class Code {
      * @return Returns the current program counter value
      */
     public int addCode(Instruction instruction) {
-        instruction.setLocation(getPc());
         instructions.add(instruction);
         controlFlowGraph.addInstruction(instruction);
         if(instruction.getOpcode() == OperationCode.STW || instruction.getOpcode() == OperationCode.STX) {
-            final KillInstruction kill = new KillInstruction(instruction.getSymbol());
-            kill.setLocation(getPc());
-            instructions.add(kill);
             if(controlFlowGraph.getCurrentBlock().getJoinBlock() != null) {
+                final KillInstruction kill = new KillInstruction(instruction.getSymbol(), getPc());
+                instructions.add(kill);
                 controlFlowGraph.getCurrentBlock().getJoinBlock().addInstruction(kill);
             }
 //            else {
@@ -64,7 +64,6 @@ public class Code {
      * @return Returns the current program counter value
      */
     public int addPhiInstruction(PhiInstruction instruction) {
-        instruction.setLocation(getPc());
         instructions.add(instruction);
         return instructions.size();
     }

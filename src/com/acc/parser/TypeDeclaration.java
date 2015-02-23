@@ -1,10 +1,7 @@
 package com.acc.parser;
 
 import com.acc.constants.Kind;
-import com.acc.data.Code;
-import com.acc.data.Keyword;
-import com.acc.data.Result;
-import com.acc.data.Token;
+import com.acc.data.*;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.util.Tokenizer;
 
@@ -16,8 +13,8 @@ import java.util.List;
  */
 public class TypeDeclaration extends Parser {
 
-    public TypeDeclaration(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public TypeDeclaration(Code code, Tokenizer tokenizer, SSACode ssaCode) {
+        super(code, tokenizer, ssaCode);
     }
 
     @Override

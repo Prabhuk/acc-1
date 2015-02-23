@@ -1,5 +1,6 @@
 package com.acc.data;
 
+import com.acc.constants.OperationCode;
 import com.acc.structure.Symbol;
 
 /**
@@ -7,8 +8,8 @@ import com.acc.structure.Symbol;
  */
 public class KillInstruction extends Instruction {
 
-    public KillInstruction(Symbol s) {
-        super(true, s);
+    public KillInstruction(Symbol s, int pc) {
+        super(null, OperationCode.KILL, null, null, null, s, false, true, null, null, pc);
     }
 
     @Override

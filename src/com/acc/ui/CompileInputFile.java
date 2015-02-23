@@ -1,8 +1,6 @@
 package com.acc.ui;
 
-import com.acc.data.Code;
-import com.acc.data.Instruction;
-import com.acc.data.PhiInstruction;
+import com.acc.data.*;
 import com.acc.graph.GraphHelper;
 import com.acc.graph.VCGWorker;
 import com.acc.parser.Computation;
@@ -30,7 +28,8 @@ public class CompileInputFile {
         try {
             tokenizer = new Tokenizer(filePath);
             Code code = new Code();
-            parser = new Computation(code, tokenizer);
+            SSACode ssaCode = new SSACode();
+            parser = new Computation(code, tokenizer, ssaCode);
             parser.parse();
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Input file [" + filePath + "] not found");
@@ -51,8 +50,15 @@ public class CompileInputFile {
         }
         for (Instruction instruction : instructions) {
 //            System.out.println(instruction.getLocation() + "  " + instruction.getSSAString());
-            System.out.println(instruction.getLocation() + "  " + instruction.getInstructionString() + "\t\t" + instruction.getSSAString());
+//            System.out.println(instruction.getLocation() + "  "+ instruction.getInstructionString());
         }
+
+        final SSACode ssaCode = parser.getSsaCode();
+        final List<SSAInstruction> ssaInstructions = ssaCode.getInstructions();
+        for (SSAInstruction ssaInstruction : ssaInstructions) {
+            System.out.println(ssaInstruction.getLocation() + " " + ssaInstruction.getInstruction());
+        }
+
 
         final SymbolTable symbolTable = parser.getSymbolTable();
         final List<Symbol> symbols = symbolTable.getSymbols();

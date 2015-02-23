@@ -2,6 +2,7 @@ package com.acc.structure;
 
 import com.acc.data.Code;
 import com.acc.data.Instruction;
+import com.acc.data.SSAInstruction;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +34,11 @@ public class ControlFlowGraph {
      */
     public void addInstruction(Instruction instruction) {
         currentBlock.addInstruction(instruction);
+    }
+
+
+    public void addSSAInstruction(SSAInstruction instruction) {
+        currentBlock.addSSAInstruction(instruction);
     }
 
     public BasicBlock getCurrentBlock() {

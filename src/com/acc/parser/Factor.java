@@ -9,8 +9,8 @@ import com.acc.util.Tokenizer;
  */
 public class Factor extends Parser {
 
-    public Factor(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public Factor(Code code, Tokenizer tokenizer, SSACode ssaCode) {
+        super(code, tokenizer, ssaCode);
     }
 
     @Override
@@ -18,7 +18,7 @@ public class Factor extends Parser {
         Result x = null;
         final Token next = tokenizer.next();
         if (next.isOperator() && next.getToken().equals("(")) {
-            x = new Expression(code, tokenizer).parse();
+            x = new Expression(code, tokenizer, ssaCode).parse();
         } else if (next.isConstant()) {
             Constant nextConstant = (Constant) next;
             x = new Result(Kind.CONSTANT, null, nextConstant.value(), null, null, null);
@@ -27,7 +27,7 @@ public class Factor extends Parser {
             x = new Result(Kind.VAR, null, null, 0, null, null);
             x.setVariableName(next.getToken());
         } else if (next.isKeyword() && ((Keyword) next).isCall()) {
-            x = new FunctionCall(code, tokenizer).parse();
+            x = new FunctionCall(code, tokenizer, ssaCode).parse();
         }
         return x;
     }

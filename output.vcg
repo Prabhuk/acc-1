@@ -18,22 +18,25 @@ targetname: "1"
 targetname: "2"
 }node: {title: "0"
 label: "0[
-0 MOV 0,i
-1 load i
-2 ADDI 0,2
-3 MOV 1,b[0][(R0)]
-4 MOV 3,x
-5 load x
-6 ADDI 0,1
-7 CMP 1,2
-8 BGT 3,10
+0 MOV move 0,i:0
+1 STW 0,0,0
+2 LDW 0,0,0
+3 ADDI 0,0,2
+4 MOV move 1,b:4[0][(R0)]
+5 STW 0,0,0
+6 MOV move 3,x:6
+7 STW 0,0,0
+8 LDW 1,0,0
+9 ADDI 2,0,1
+10 CMP 3,1,2
+11 BGT 3,16
  ]"
 }edge: { sourcename: "1"
 targetname: "6"
 }node: {title: "1"
 label: "1[
-18 phi i:17 i:0
-19 phi b:16 b:3
+27 phi i:26 i:0
+28 phi b:23 b:4
  ]"
 }edge: { sourcename: "6"
 targetname: "7"
@@ -41,53 +44,60 @@ targetname: "7"
 targetname: "11"
 }node: {title: "6"
 label: "6[
-37 phi i:18 i:34
-38 phi b:19 b:16
-20 load i
-21 ADDI 0,4
-22 CMP 5,6
-23 BGE 7,0
+50 phi i:27 i:45
+51 phi b:28 b:23
+29 LDW 5,0,0
+30 ADDI 6,0,4
+31 CMP 7,5,6
+32 BGE 7,0
  ]"
-}edge: { sourcename: "7"
-targetname: "10"
 }edge: { sourcename: "7"
 targetname: "9"
+}edge: { sourcename: "7"
+targetname: "10"
 }node: {title: "7"
 label: "7[
-24 load i
-25 ADDI 0,2
-26 CMP 7,8
-27 BGE 9,5
- ]"
-}edge: { sourcename: "10"
-targetname: "8"
-}node: {title: "10"
-label: "10[
-31 BEQ 0,0
-32 load i
-33 ADDI 10,2
-34 MOV (R10),i
- ]"
-}edge: { sourcename: "8"
-targetname: "6"
-}node: {title: "8"
-label: "8[
-35 phi i:30 i:34
-36 BEQ 0,20
+33 LDW 7,0,0
+34 ADDI 8,0,2
+35 CMP 9,7,8
+36 BGE 9,7
  ]"
 }edge: { sourcename: "9"
 targetname: "8"
 }node: {title: "9"
 label: "9[
-28 load i
-29 ADDI 9,1
-30 MOV (R9),i
+37 LDW 9,0,0
+38 ADDI 9,9,1
+39 MOV move (R9),i:39
+40 STW 0,0,0
+ ]"
+}edge: { sourcename: "8"
+targetname: "6"
+}node: {title: "8"
+label: "8[
+48 phi i:39 i:45
+41 KILL i
+47 KILL i
+49 BEQ 0,29
+ ]"
+}edge: { sourcename: "10"
+targetname: "8"
+}node: {title: "10"
+label: "10[
+42 BEQ 0,0
+43 LDW 10,0,0
+44 ADDI 10,10,2
+45 MOV move (R10),i:45
+46 STW 0,0,0
  ]"
 }node: {title: "11"
 label: "11[
-39 MOV 5,x
-40 MOV 8,y
-41 MOV y,x
+52 MOV move 5,x:52
+53 STW 0,0,0
+54 MOV move 8,y:54
+55 STW 0,0,0
+56 MOV move (13),x:56
+57 STW 0,0,0
  ]"
 }edge: { sourcename: "2"
 targetname: "5"
@@ -95,29 +105,35 @@ targetname: "5"
 targetname: "4"
 }node: {title: "2"
 label: "2[
-9 load i
-10 ADDI 0,1
-11 CMP 3,4
-12 BGT 5,3
+12 LDW 3,0,0
+13 ADDI 4,0,1
+14 CMP 5,3,4
+15 BGT 5,5
  ]"
 }edge: { sourcename: "5"
 targetname: "3"
 }node: {title: "5"
 label: "5[
-14 BEQ 0,0
-15 MOV 5,i
-16 MOV 1,b[0][1]
+19 BEQ 0,0
+20 MOV move 5,i:20
+21 STW 0,0,0
+23 MOV move 1,b:23[0][1]
+24 STW 0,0,0
  ]"
 }edge: { sourcename: "3"
 targetname: "1"
 }node: {title: "3"
 label: "3[
-17 phi i:13 i:15
+26 phi i:16 i:20
+18 KILL i
+22 KILL i
+25 KILL b
  ]"
 }edge: { sourcename: "4"
 targetname: "3"
 }node: {title: "4"
 label: "4[
-13 MOV 1,i
+16 MOV move 1,i:16
+17 STW 0,0,0
  ]"
 }}

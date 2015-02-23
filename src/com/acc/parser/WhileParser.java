@@ -1,10 +1,7 @@
 package com.acc.parser;
 
 import com.acc.constants.KeywordType;
-import com.acc.data.Code;
-import com.acc.data.Keyword;
-import com.acc.data.Result;
-import com.acc.data.Token;
+import com.acc.data.*;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.BasicBlock;
 import com.acc.util.AuxiliaryFunctions;
@@ -18,8 +15,8 @@ import java.util.Set;
  */
 public class WhileParser extends Parser {
 
-    public WhileParser(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public WhileParser(Code code, Tokenizer tokenizer, SSACode ssaCode) {
+        super(code, tokenizer, ssaCode);
 
     }
 
@@ -37,7 +34,7 @@ public class WhileParser extends Parser {
 
         final BasicBlock currentBlock = code.getCurrentBlock();
         BasicBlock loopBlock = code.getCurrentBlock();
-        Result x = new Relation(code, tokenizer).parse();
+        Result x = new Relation(code, tokenizer, ssaCode).parse();
         AuxiliaryFunctions.CJF(code, x);
 
         parents = currentBlock.getParents();
@@ -62,7 +59,7 @@ public class WhileParser extends Parser {
         join.setRight(right);
         code.setCurrentBlock(right);
 
-        final Result rightTree = new StatSequence(code, tokenizer).parse();
+        final Result rightTree = new StatSequence(code, tokenizer, ssaCode).parse();
         if(rightTree.getJoin() != null) {
             x.setJoin(rightTree.getJoin());
             rightTree.getJoin().addChild(loopBlock); //Does loop body dominate loop condition block?

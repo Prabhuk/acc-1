@@ -2,10 +2,7 @@ package com.acc.parser;
 
 import com.acc.constants.KeywordType;
 import com.acc.constants.Kind;
-import com.acc.data.Code;
-import com.acc.data.Keyword;
-import com.acc.data.Result;
-import com.acc.data.Token;
+import com.acc.data.*;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.BasicBlock;
 import com.acc.util.AuxiliaryFunctions;
@@ -20,13 +17,13 @@ public class IfParser extends Parser {
 
     public static final Integer ZERO = 0;
 
-    public IfParser(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public IfParser(Code code, Tokenizer tokenizer, SSACode ssaCode) {
+        super(code, tokenizer, ssaCode);
     }
 
     @Override
     public Result parse() {
-        Result x = new Relation(code, tokenizer).parse();  //Statement eats the first word for all statements except assignment
+        Result x = new Relation(code, tokenizer, ssaCode).parse();  //Statement eats the first word for all statements except assignment
         AuxiliaryFunctions.CJF(code, x);
         final BasicBlock currentBlock = code.getCurrentBlock();
 
@@ -44,7 +41,7 @@ public class IfParser extends Parser {
         code.setCurrentBlock(left);
         handleThenToken();
 
-        final Result leftTree = new StatSequence(code, tokenizer).parse();//Ignoring the return type. Shouldn't mean anything at this context.
+        final Result leftTree = new StatSequence(code, tokenizer, ssaCode).parse();//Ignoring the return type. Shouldn't mean anything at this context.
         if (leftTree.getJoin() != null && !leftTree.getJoin().equals(join)) {
             join.setLeft(leftTree.getJoin());
         }
@@ -60,7 +57,7 @@ public class IfParser extends Parser {
             code.setCurrentBlock(right);
             AuxiliaryFunctions.FJLink(code, follow);
             code.Fixup(x.fixupLoc());
-            final Result rightTree = new StatSequence(code, tokenizer).parse();
+            final Result rightTree = new StatSequence(code, tokenizer, ssaCode).parse();
             if (rightTree.getJoin() != null && !rightTree.getJoin().equals(join)) {
                 join.setRight(rightTree.getJoin());
             }

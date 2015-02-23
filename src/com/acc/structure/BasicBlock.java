@@ -4,6 +4,7 @@ import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
 import com.acc.data.PhiInstruction;
+import com.acc.data.SSAInstruction;
 
 import java.util.*;
 
@@ -16,6 +17,8 @@ public class BasicBlock {
      * Storing the instruction number along with the instruction
      */
     private final List<Instruction> instructions = new ArrayList<Instruction>();
+    private final List<SSAInstruction> ssaInstructions = new ArrayList<SSAInstruction>();
+
     private final Map<String, Instruction> phiMap = new HashMap<String, Instruction>();
     private final Set<BasicBlock> dominatesOver = new HashSet<BasicBlock>();
     private final Set<BasicBlock> children = new HashSet<BasicBlock>();
@@ -44,6 +47,13 @@ public class BasicBlock {
      */
     public void addInstruction(Instruction instruction) {
         instructions.add(instruction);
+    }
+
+    /*
+     * Adds an instruction to the basicBlock
+     */
+    public void addSSAInstruction(SSAInstruction instruction) {
+        ssaInstructions.add(instruction);
     }
 
     /**

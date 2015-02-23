@@ -1,10 +1,7 @@
 package com.acc.parser;
 
 import com.acc.constants.Kind;
-import com.acc.data.Code;
-import com.acc.data.Keyword;
-import com.acc.data.Result;
-import com.acc.data.Token;
+import com.acc.data.*;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.SymbolType;
 import com.acc.util.AuxiliaryFunctions;
@@ -17,20 +14,16 @@ import java.util.List;
  */
 public class VariableDeclaration extends Parser {
 
-    /**
-     * Handles one or more variable declarations { varDecl } where varDecl = typeDecl indent { “,” ident } “;”
-     *
-     * @param code
-     * @param tokenizer
-     */
-    public VariableDeclaration(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public VariableDeclaration(Code code, Tokenizer tokenizer, SSACode ssaCode) {
+        super(code, tokenizer, ssaCode);
     }
+
+
 
     @Override
     public Result parse() {
         //$TODO$ extract TypeDeclaration. Handle multidimensional arrays => In progress
-        Result x = new TypeDeclaration(code, tokenizer).parse();
+        Result x = new TypeDeclaration(code, tokenizer, ssaCode).parse();
         Kind _type = x.kind();
         final SymbolType symbolType = _type.isArray() ? SymbolType.ARRAY : SymbolType.VARIABLE;
         declareSymbol(symbolType, x.dimensions());

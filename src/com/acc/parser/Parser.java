@@ -1,7 +1,9 @@
 package com.acc.parser;
 
+import com.acc.constants.Kind;
 import com.acc.data.Code;
 import com.acc.data.Result;
+import com.acc.data.SSACode;
 import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.Symbol;
@@ -21,14 +23,20 @@ import java.util.Map;
  */
 public abstract class Parser {
     protected Code code;
+    protected SSACode ssaCode;
     protected Tokenizer tokenizer;
     private SymbolTable symbolTable;
     private static final SymbolTable globalTable = SymbolTable.getGlobalSymbolTable();
     private final Map<String, List<String>> procedureArguments = new HashMap<String, List<String>>();
 
-    public Parser(Code code, Tokenizer tokenizer) {
+    public Parser(Code code, Tokenizer tokenizer, SSACode ssaCode) {
         this.code = code;
         this.tokenizer = tokenizer;
+        this.ssaCode = ssaCode;
+    }
+
+    public SSACode getSsaCode() {
+        return ssaCode;
     }
 
     public static SymbolTable getGlobalTable() {
@@ -109,6 +117,10 @@ public abstract class Parser {
     }
     public static void assignToSymbol(Code code, Symbol rhs, Symbol lhs, SymbolTable symbolTable) {
         lhs.setValue(Symbol.cloneValue(rhs.getValue()));
+        final Symbol recent = symbolTable.getRecentOccurence(lhs.getName());
+        final Result result = new Result(Kind.VAR, null, null, symbolTable.getOffset(recent), null, null);
+        result.setVariableName(lhs.getName());
+        lhs.setResult(result);
         AuxiliaryFunctions.putMOV(code, rhs, lhs);
         symbolTable.addSymbol(lhs);
     }
@@ -117,7 +129,7 @@ public abstract class Parser {
         if (recent.getType().isArray()) {
             for (int i = 0; i < recent.getArrayDimension(); i++) {
                 handleOpenBoxBracket();
-                arrayIdentifiers.add(new Expression(code, tokenizer).parse());
+                arrayIdentifiers.add(new Expression(code, tokenizer, ssaCode).parse());
                 handleCloseBoxBracket();
             }
         }

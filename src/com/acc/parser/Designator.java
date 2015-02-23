@@ -2,6 +2,7 @@ package com.acc.parser;
 
 import com.acc.data.Code;
 import com.acc.data.Result;
+import com.acc.data.SSACode;
 import com.acc.util.Tokenizer;
 
 /**
@@ -9,8 +10,8 @@ import com.acc.util.Tokenizer;
  */
 public class Designator extends Parser {
 
-    public Designator(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public Designator(Code code, Tokenizer tokenizer, SSACode ssaCode) {
+        super(code, tokenizer, ssaCode);
     }
 
     @Override

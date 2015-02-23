@@ -1,12 +1,15 @@
 package com.acc.constants;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by prabhuk on 1/25/2015.
  */
 public class OperationCode {
+
     public static final int ADD = 0;
     public static final int SUB = 1;
     public static final int MUL = 2;
@@ -64,6 +67,7 @@ public class OperationCode {
      */
     public static final int MOV = 15; //This is not part of the opcodes supported by DLX architecture.
     public static final int PHI = 64; //And 64 is never converted to Integer instruction
+    public static final int KILL = 65; //And 64 is never converted to Integer instruction
 
     public static final int MOV_CONSTANT = 0;
     public static final int MOV_VARIABLE = 1;
@@ -115,7 +119,7 @@ public class OperationCode {
         opcodeAndNames.put(48, "JSR");
         opcodeAndNames.put(49, "RET");
 
-        opcodeAndNames.put(50, "RDI");
+        opcodeAndNames.put(50, "RDD");
         opcodeAndNames.put(51, "WRD");
         opcodeAndNames.put(52, "WRH");
         opcodeAndNames.put(53, "WRL");
@@ -125,7 +129,36 @@ public class OperationCode {
 
         opcodeAndNames.put(15, "MOV");
         opcodeAndNames.put(64, "PHI");
+        opcodeAndNames.put(65, "KILL");
 
+    }
+
+    public static List<Integer> excludeB = new ArrayList<Integer>();
+    public static List<Integer> excludeA = new ArrayList<Integer>();
+
+    static {
+        excludeA.add(OperationCode.BSR);
+        excludeA.add(OperationCode.JSR);
+        excludeA.add(OperationCode.RET);
+
+        excludeB.add(OperationCode.CHK);
+        excludeB.add(OperationCode.CHKI);
+        excludeB.add(OperationCode.BEQ);
+        excludeB.add(OperationCode.BNE);
+        excludeB.add(OperationCode.BLT);
+        excludeB.add(OperationCode.BGE);
+        excludeB.add(OperationCode.BLE);
+        excludeB.add(OperationCode.BGT);
+        excludeB.add(OperationCode.BSR);
+        excludeB.add(OperationCode.JSR);
+        excludeB.add(OperationCode.RET);
+
+
+
+//    OperationCode.RDD
+//    OperationCode.WRD
+//    OperationCode.WRH
+//    OperationCode.WRL
     }
 
 }

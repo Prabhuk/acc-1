@@ -3,16 +3,12 @@ package com.acc.util;
 import com.acc.constants.Condition;
 import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
-import com.acc.data.Code;
-import com.acc.data.Instruction;
-import com.acc.data.PhiInstruction;
-import com.acc.data.Result;
+import com.acc.data.*;
 import com.acc.memory.RegisterAllocator;
 import com.acc.structure.*;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -21,45 +17,66 @@ import java.util.List;
  */
 public class AuxiliaryFunctions {
 
+
     public static void putF1(Code code, int instructionCode, int a, int b, int c, Symbol symbol) {
         if (c < 0) c ^= 0xFFFF0000;
         final int ins = instructionCode << 26 | a << 21 | b << 16 | c;
-        final Instruction instruction = new Instruction(ins, instructionCode, a, b, c, symbol);
+        final Instruction instruction = new Instruction(ins, instructionCode, a, b, c, symbol, false, false, null, null, code.getPc());
         code.addCode(instruction);
     }
 
     public static void putMOV(Code code, Symbol rhs, Symbol lhs) {
-        code.addCode(new Instruction(rhs, lhs));
+        code.addCode(new Instruction(null, OperationCode.MOV, 0, 0, 0, lhs, false, false, lhs, rhs, code.getPc()));
         putF1(code, OperationCode.STW, 0, 0, 0, lhs);
     }
 
-    public static void putF2(Code code, int instructionCode, int a, int b, int c) {
-
+    public static void putF2(Code code, int instructionCode, int a, int b, int c, Symbol symbol) {
         final int ins = instructionCode << 26 | a << 21 | b << 16 | c;
-        final Instruction instruction = new Instruction(ins, instructionCode, a, b, c, null);
+        final Instruction instruction = new Instruction(ins, instructionCode, a, b, c, symbol, false, false, null, null, code.getPc());
         code.addCode(instruction);
     }
 
     public static void putF3(Code code, int instructionCode, int c) {
         final int ins = instructionCode << 26 | c;
-        final Instruction instruction = new Instruction(ins, instructionCode, null, null, c, null);
+        final Instruction instruction = new Instruction(ins, instructionCode, null, null, c, null, false, false, null, null, code.getPc());
         code.addCode(instruction);
     }
 
     public static void BJ(Code code, int loc, BasicBlock loopBlock) {
-        putF1(code, OperationCode.BEQ, 0, 0, loc, null);
+        final Symbol symbol = new Symbol(String.valueOf(loc), code.getPc(), null, false, loc);
+        symbol.setResult(new Result(Kind.CONSTANT, null, 0, null, null, null));
+        putF1(code, OperationCode.BEQ, 0, 0, loc, symbol);
     }
 
     public static void FJLink(Code code, Result x) {
-        putF1(code, OperationCode.BEQ, 0, 0, x.fixupLoc(), null);
+        final Symbol symbol = new Symbol(String.valueOf(x.fixupLoc()), code.getPc(), null, false, x.fixupLoc());
+        symbol.setResult(x);
+        putF1(code, OperationCode.BEQ, 0, 0, x.fixupLoc(), symbol);
         x.fixupLoc(code.getPc() - 1);
     }
 
     public static void CJF(Code code, Result x) {
-        //OperationCode.BEQ + $TODO$ WTF
-        putF1(code, Condition.getNegatedInstruction(x.condition()), x.regNo(), 0, 0, null);
+        final Symbol symbol = new Symbol(String.valueOf(x.regNo()), code.getPc(), null, false, x.regNo());
+        symbol.setResult(x);
+        putF1(code, Condition.getNegatedInstruction(x.condition()), x.regNo(), 0, 0, symbol);
         RegisterAllocator.deallocate(x.regNo());
         x.fixupLoc(code.getPc() - 1);
+    }
+
+    public static void generateSSA(SSACode ssaCode, String ssaInstruction, Result x, Result y) {
+        String op1 = null;
+        if(x.kind().isVariable()) {
+            op1 = x.getVariableName();
+        } else if(x.kind().isConstant()) {
+            op1 = String.valueOf(x.value());
+        }
+        String op2 = null;
+        if(y.kind().isVariable()) {
+            op2 = y.getVariableName();
+        } else if(y.kind().isConstant()) {
+            op2 = String.valueOf(y.value());
+        }
+        ssaCode.addCode(new SSAInstruction(ssaInstruction, op1, op2, ssaCode.getPc()));
     }
 
     /*
@@ -109,7 +126,9 @@ public class AuxiliaryFunctions {
         } else if (x.kind().isVariable()) {
             //$TODO$ Implement variable space along with Framepointer
             // Offset Hard coded to 0. Should point to the actual Framepointer
-            putF1(code, OperationCode.LDW, regNo, 0, x.address(), new Symbol(x.getVariableName(), code.getPc(), SymbolType.VARIABLE, true, x.address()));
+            final Symbol symbol = new Symbol(x.getVariableName(), code.getPc(), SymbolType.VARIABLE, true, x.address());
+            symbol.setResult(x);
+            putF1(code, OperationCode.LDW, regNo, 0, x.address(), symbol);
             x.kind(Kind.REG);
             x.regNo(regNo);
         }

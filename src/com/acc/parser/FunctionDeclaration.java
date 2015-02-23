@@ -9,8 +9,8 @@ import com.acc.util.Tokenizer;
  */
 public class FunctionDeclaration extends Parser {
 
-    public FunctionDeclaration(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public FunctionDeclaration(Code code, Tokenizer tokenizer, SSACode ssaCode) {
+        super(code, tokenizer, ssaCode);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class FunctionDeclaration extends Parser {
 
         if (!isSemiColonToken(tokenizer.next())) {
             tokenizer.previous();
-            new FormalParam(code, tokenizer).parse();
+            new FormalParam(code, tokenizer, ssaCode).parse();
             next = tokenizer.next();
             if (!isSemiColonToken(next)) {
                 throw new SyntaxErrorException("Expected \";\" keyword. Found [" + next.getToken() + "] instead");
@@ -37,7 +37,7 @@ public class FunctionDeclaration extends Parser {
         }
 
 
-        new FunctionBody(code, tokenizer).parse();
+        new FunctionBody(code, tokenizer, ssaCode).parse();
         next = tokenizer.next();
         if (!isSemiColonToken(next)) {
             throw new SyntaxErrorException("Expected \";\" keyword. Found [" + next.getToken() + "] instead");

@@ -15,6 +15,10 @@ public enum Kind {
         return this == CONSTANT;
     }
 
+    public boolean isFixupDummy() {
+        return this == FIXUP_DUMMY;
+    }
+
     public boolean isVariable() {
         return this == VAR;
     }

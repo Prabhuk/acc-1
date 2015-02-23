@@ -79,7 +79,7 @@ public class PhiInstructionHelper {
     private static PhiInstruction createPhi(BasicBlock join, SymbolTable table, Code code, Symbol symbol) {
         Symbol targetSymbol = getTargetSymbol(table, symbol);
         final Symbol phiSymbol = new Symbol(targetSymbol.getName(), targetSymbol.getSuffix(), targetSymbol.getType(), targetSymbol.isPointerValue(), Symbol.cloneValue(targetSymbol.getValue()));
-        PhiInstruction phi = new PhiInstruction(phiSymbol);
+        PhiInstruction phi = new PhiInstruction(phiSymbol, code.getPc());
         code.addPhiInstruction(phi);//$TODO$ this is not in order but should generate an unique suffix
         join.addPhiInstruction(phi);
         phiSymbol.setSuffix(phi.getLocation());

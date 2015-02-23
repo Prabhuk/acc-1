@@ -10,10 +10,8 @@ public class PhiInstruction extends Instruction {
     private Symbol leftSymbol;
     private Symbol rightSymbol;
 
-    public PhiInstruction(Symbol symbol) {
-        super(OperationCode.PHI, true);
-        this.symbol = symbol;
-
+    public PhiInstruction(Symbol symbol, int pc) {
+        super(null, OperationCode.PHI, null, null, null, symbol, true, false, null, null, pc);
     }
 
     public Symbol getLeftSymbol() {
