@@ -29,7 +29,7 @@ public class CompileInputFile {
             tokenizer = new Tokenizer(filePath);
             Code code = new Code();
             SSACode ssaCode = new SSACode();
-            parser = new Computation(code, tokenizer, ssaCode);
+            parser = new Computation(code, tokenizer);
             parser.parse();
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Input file [" + filePath + "] not found");
@@ -49,15 +49,11 @@ public class CompileInputFile {
             System.out.println("Code:\n");
         }
         for (Instruction instruction : instructions) {
-//            System.out.println(instruction.getLocation() + "  " + instruction.getSSAString());
-//            System.out.println(instruction.getLocation() + "  "+ instruction.getInstructionString());
+            System.out.println(instruction.getLocation() + "  "+ instruction.getInstructionString());
         }
 
-        final SSACode ssaCode = parser.getSsaCode();
-        final List<SSAInstruction> ssaInstructions = ssaCode.getInstructions();
-        for (SSAInstruction ssaInstruction : ssaInstructions) {
-            System.out.println(ssaInstruction.getLocation() + " " + ssaInstruction.getInstruction());
-        }
+
+
 
 
         final SymbolTable symbolTable = parser.getSymbolTable();

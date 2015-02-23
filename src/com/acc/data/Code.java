@@ -19,7 +19,6 @@ public class Code {
      * List of instructions for the input program
      */
     private final List<Instruction> instructions = new ArrayList<Instruction>();
-    private final List<SSAInstruction> ssaInstructions = new ArrayList<SSAInstruction>();
     private static ControlFlowGraph controlFlowGraph = ControlFlowGraph.getCFG();
 
 
@@ -37,7 +36,7 @@ public class Code {
     public int addCode(Instruction instruction) {
         instructions.add(instruction);
         controlFlowGraph.addInstruction(instruction);
-        if(instruction.getOpcode() == OperationCode.STW || instruction.getOpcode() == OperationCode.STX) {
+        if(instruction.getOpcode() == OperationCode.store) {
             if(controlFlowGraph.getCurrentBlock().getJoinBlock() != null) {
                 final KillInstruction kill = new KillInstruction(instruction.getSymbol(), getPc());
                 instructions.add(kill);

@@ -29,7 +29,7 @@ public abstract class Parser {
     private static final SymbolTable globalTable = SymbolTable.getGlobalSymbolTable();
     private final Map<String, List<String>> procedureArguments = new HashMap<String, List<String>>();
 
-    public Parser(Code code, Tokenizer tokenizer, SSACode ssaCode) {
+    public Parser(Code code, Tokenizer tokenizer) {
         this.code = code;
         this.tokenizer = tokenizer;
         this.ssaCode = ssaCode;
@@ -94,42 +94,12 @@ public abstract class Parser {
 
     public abstract Result parse();
 
-    protected void assignSymbol(String symbolName, Symbol recent, Result x, List<Result> arrayIdentifiers) {
-        Symbol rhs;
-        if (x.kind().isConstant()) {
-            rhs = new Symbol();
-            rhs.setValue(x.value());
-            rhs.setPointerValue(false);
-        } else {
-            final Symbol rhsRecent = getSymbolTable().getRecentOccurence(x.getVariableName());
-            //$TODO$ what if not declared in the scope?
-            final int address = getSymbolTable().getSymbols().indexOf(rhsRecent);
-            x.address(address);
-            rhs = new Symbol(rhsRecent.getName(), rhsRecent.getSuffix(), rhsRecent.getType(), true, Symbol.cloneValue(rhsRecent.getValue()));
-        }
-        Symbol lhs = new Symbol(symbolName, this.code.getPc(), recent.getType(), !x.kind().isConstant(), null);
-        if (recent.getType().isArray()) {
-            lhs.setArrayDimension(recent.getArrayDimension());
-            lhs.setArrayIdentifiers(arrayIdentifiers);
-        }
-        rhs.setResult(x);
-        assignToSymbol(this.code, rhs, lhs, getSymbolTable());
-    }
-    public static void assignToSymbol(Code code, Symbol rhs, Symbol lhs, SymbolTable symbolTable) {
-        lhs.setValue(Symbol.cloneValue(rhs.getValue()));
-        final Symbol recent = symbolTable.getRecentOccurence(lhs.getName());
-        final Result result = new Result(Kind.VAR, null, null, symbolTable.getOffset(recent), null, null);
-        result.setVariableName(lhs.getName());
-        lhs.setResult(result);
-        AuxiliaryFunctions.putMOV(code, rhs, lhs);
-        symbolTable.addSymbol(lhs);
-    }
     protected List<Result> accumulateArrayIdentifiers(Symbol recent) {
         List<Result> arrayIdentifiers = new ArrayList<Result>();
         if (recent.getType().isArray()) {
             for (int i = 0; i < recent.getArrayDimension(); i++) {
                 handleOpenBoxBracket();
-                arrayIdentifiers.add(new Expression(code, tokenizer, ssaCode).parse());
+                arrayIdentifiers.add(new Expression(code, tokenizer).parse());
                 handleCloseBoxBracket();
             }
         }

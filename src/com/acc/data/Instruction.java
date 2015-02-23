@@ -1,7 +1,7 @@
 package com.acc.data;
 
+import com.acc.constants.OperationCode;
 import com.acc.structure.Symbol;
-import com.acc.util.InstructionStringBuilder;
 
 /**
  * Created by prabhuk on 2/12/2015.
@@ -10,89 +10,93 @@ public class Instruction {
 
     protected final boolean isPhi;
     protected final boolean isKill;
-    protected final Symbol symbol;
-    protected final Symbol rhs; //MOV specific
-    protected final Symbol lhs; //MOV specific
-    protected final int opcode;
-    protected Integer instruction;
-    protected final Integer a; //if Move instruction, then this is the instruction number
-    protected final Integer b;
-    protected Integer c;
+    protected Symbol symbol;
+    protected final Integer opcode;
     protected final Integer location;
+    private Result x;
+    private Result y;
+    protected String instructionString = "";
 
-    protected String instructionString;
-    private String ssaIntruction;
-
-    public Instruction(Integer instruction, int opcode, Integer a, Integer b, Integer c, Symbol symbol,
-                       boolean isPhi, boolean isKill, Symbol lhs, Symbol rhs, int location) {
-        this.instruction = instruction;
-        this.a = a;
-        this.b = b;
-        this.c = c;
-        this.opcode = opcode;
-        this.symbol = symbol;
+    public Instruction(boolean isPhi, boolean isKill, Symbol symbol, Integer opcode, Integer location) {
         this.isPhi = isPhi;
         this.isKill = isKill;
-        this.lhs = lhs;
-        this.rhs = rhs;
+        this.symbol = symbol;
+        this.opcode = opcode;
         this.location = location;
-        this.ssaIntruction = InstructionStringBuilder.getSSA(opcode, a, b, c, symbol, lhs, rhs, this);
-        this.instructionString = InstructionStringBuilder.getDLXInstruction(opcode, a, b, c, symbol, lhs, rhs);
     }
 
-    public boolean isKill() {
-        return isKill;
+    public Instruction(int op, Result x, Result y, int location) {
+        this.opcode = op;
+        this.x = x;
+        this.y = y;
+        this.location = location;
+        this.isPhi = OperationCode.phi == op;
+        this.isKill = OperationCode.kill == op;
+    }
+
+    public Result getX() {
+        return x;
+    }
+
+    public Result getY() {
+        return y;
     }
 
     public boolean isPhi() {
         return isPhi;
     }
 
-    public int getOpcode() {
-        return opcode;
-    }
-
-
-
-    /*
-     * Returns the integer form of the instruction
-     */
-    public Integer getInstruction() {
-        return instruction;
-    }
-
-
-    public void FixUp(int c) {
-        instruction = instruction & 0xffff0000 + c;
-        this.c = c;
-        this.ssaIntruction = InstructionStringBuilder.getSSA(opcode, a, b, c, symbol, lhs, rhs, this);
-        this.instructionString = InstructionStringBuilder.getDLXInstruction(opcode, a, b, c, symbol, lhs, rhs);
+    public boolean isKill() {
+        return isKill;
     }
 
     public Symbol getSymbol() {
         return symbol;
     }
 
+    public void setSymbol(Symbol symbol) {
+        this.symbol = symbol;
+    }
+
+    public Integer getOpcode() {
+        return opcode;
+    }
+
     public Integer getLocation() {
         return location;
     }
 
-    @Override
-    public String toString() {
-        return getInstructionString();
-    }
-
-    public String getNewIdentifierForSymbol() {
-        return symbol.getName() + ":" + location;
-    }
-
-    public String getSSAString() {
-        return ssaIntruction;
-    }
-
-
-
     public String getInstructionString() {
-        return instructionString;
+
+        StringBuilder sb = new StringBuilder(OperationCode.getOperationName(opcode));
+        final Integer operandCount = OperationCode.getOperandCount(opcode);
+        if(operandCount > 0) {
+            sb.append(" ").append(getOperand(x));
+        }
+        if(operandCount > 1) {
+            sb.append(" ").append(getOperand(y));
+        }
+
+        return sb.toString();
+
+    }
+
+    private String getOperand(Result x) {
+        if(x.kind().isIntermediate()) {
+            return "(" + x.getIntermediateLoation() +")";
+        } else if(x.kind().isConstant()) {
+            return "#" + String.valueOf(x.value());
+        } else if(x.kind().isVariable()) {
+            return x.getVariableName() + ":" + symbol.getSuffix();
+        } else if (x.kind().isArray()) {
+            return x.getVariableName();
+        }
+        return "";
+    }
+
+    public void FixUp(int c) {
+//        this.instructionString = InstructionStringBuilder.getDLXInstruction(opcode, a, b, c, symbol, lhs, rhs);
     }
 }
+
+

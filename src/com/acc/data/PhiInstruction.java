@@ -11,7 +11,7 @@ public class PhiInstruction extends Instruction {
     private Symbol rightSymbol;
 
     public PhiInstruction(Symbol symbol, int pc) {
-        super(null, OperationCode.PHI, null, null, null, symbol, true, false, null, null, pc);
+        super(true, false, symbol, OperationCode.phi, pc);
     }
 
     public Symbol getLeftSymbol() {
@@ -43,20 +43,14 @@ public class PhiInstruction extends Instruction {
 //            return "";
 //        }
         StringBuilder sb = new StringBuilder("phi ");
-        if(leftSymbol != null) {
+        if (leftSymbol != null) {
             sb.append(leftSymbol.getUniqueIdentifier()).append(" ");
         }
-        if(rightSymbol != null) {
+        if (rightSymbol != null) {
             sb.append(rightSymbol.getUniqueIdentifier());
         }
         instructionString = sb.toString();
         return instructionString;
     }
 
-    public String getSSAString() {
-//        if(canIgnore()) {
-//            return "";
-//        }
-        return getInstructionString();
-    }
 }

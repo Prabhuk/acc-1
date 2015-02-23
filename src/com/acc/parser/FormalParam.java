@@ -12,8 +12,8 @@ import com.acc.util.Tokenizer;
  */
 public class FormalParam extends Parser {
 
-    public FormalParam(Code code, Tokenizer tokenizer, SSACode ssaCode) {
-        super(code, tokenizer, ssaCode);
+    public FormalParam(Code code, Tokenizer tokenizer) {
+        super(code, tokenizer);
     }
 
     @Override

@@ -14,11 +14,13 @@ public class Result {
     private Integer regno;
     private Integer value;   //if constant
     private Integer address; //if variable
-    private String variableName; //if variable. This might be merged with address later. $TODO$
     private Condition cond;   //Conditions: ET, LT, LE, GE, NE, EQ
     private Integer fixupLoc;  //Contains information on where I branch off from. ie: pcBranch
     private List<Integer> dimensions; //Contains the dimensions for array initialization $TODO$ Add array initialization to the symbol table
     private BasicBlock join;
+    private Integer intermediateLoation;
+    private String variableName;
+    private Integer location;
 
     public Result(){
     }
@@ -37,13 +39,6 @@ public class Result {
         this(kind, regno, value, address, cond, fixupLoc, null);
     }
 
-    public String getVariableName() {
-        return variableName;
-    }
-
-    public void setVariableName(String variableName) {
-        this.variableName = variableName;
-    }
 
     public Kind kind() {
         return kind;
@@ -107,5 +102,29 @@ public class Result {
 
     public void setJoin(BasicBlock join) {
         this.join = join;
+    }
+
+    public Integer getIntermediateLoation() {
+        return intermediateLoation;
+    }
+
+    public void setIntermediateLoation(Integer intermediateLoation) {
+        this.intermediateLoation = intermediateLoation;
+    }
+
+    public void setVariableName(String variableName) {
+        this.variableName = variableName;
+    }
+
+    public String getVariableName() {
+        return variableName;
+    }
+
+    public Integer getLocation() {
+        return location;
+    }
+
+    public void setLocation(Integer location) {
+        this.location = location;
     }
 }

@@ -10,8 +10,8 @@ import com.acc.util.Tokenizer;
  */
 public class Designator extends Parser {
 
-    public Designator(Code code, Tokenizer tokenizer, SSACode ssaCode) {
-        super(code, tokenizer, ssaCode);
+    public Designator(Code code, Tokenizer tokenizer) {
+        super(code, tokenizer);
     }
 
     @Override

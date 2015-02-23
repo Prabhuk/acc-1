@@ -14,8 +14,8 @@ import java.util.List;
  */
 public class VariableDeclaration extends Parser {
 
-    public VariableDeclaration(Code code, Tokenizer tokenizer, SSACode ssaCode) {
-        super(code, tokenizer, ssaCode);
+    public VariableDeclaration(Code code, Tokenizer tokenizer) {
+        super(code, tokenizer);
     }
 
 
@@ -23,7 +23,7 @@ public class VariableDeclaration extends Parser {
     @Override
     public Result parse() {
         //$TODO$ extract TypeDeclaration. Handle multidimensional arrays => In progress
-        Result x = new TypeDeclaration(code, tokenizer, ssaCode).parse();
+        Result x = new TypeDeclaration(code, tokenizer).parse();
         Kind _type = x.kind();
         final SymbolType symbolType = _type.isArray() ? SymbolType.ARRAY : SymbolType.VARIABLE;
         declareSymbol(symbolType, x.dimensions());

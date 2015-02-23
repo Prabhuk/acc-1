@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class TypeDeclaration extends Parser {
 
-    public TypeDeclaration(Code code, Tokenizer tokenizer, SSACode ssaCode) {
-        super(code, tokenizer, ssaCode);
+    public TypeDeclaration(Code code, Tokenizer tokenizer) {
+        super(code, tokenizer);
     }
 
     @Override

@@ -45,7 +45,7 @@ public class PhiInstructionHelper {
         final BasicBlock right = join.getRight();
         final List<Instruction> rightInstructions = right.getInstructions();
         for (Instruction instruction : rightInstructions) {
-            if (instruction.getOpcode() == OperationCode.MOV || instruction.getOpcode() == OperationCode.PHI) {
+            if (instruction.getOpcode() == OperationCode.move || instruction.getOpcode() == OperationCode.phi) {
                 final Symbol symbol = instruction.getSymbol();
                 if (join.getPhiInstruction(symbol.getName()) == null) {
                     //Processed left so expecting the symbol to be present in the currentSymbolTable
@@ -62,7 +62,7 @@ public class PhiInstructionHelper {
         final BasicBlock left = join.getLeft();
         final List<Instruction> leftInstructions = left.getInstructions();
         for (Instruction instruction : leftInstructions) {
-            if (instruction.getOpcode() == OperationCode.MOV || instruction.getOpcode() == OperationCode.PHI) {
+            if (instruction.getOpcode() == OperationCode.move || instruction.getOpcode() == OperationCode.phi) {
                 final Symbol symbol = instruction.getSymbol();
                 PhiInstruction phi;
                 if (join.getPhiInstruction(symbol.getName()) != null) {
@@ -78,7 +78,12 @@ public class PhiInstructionHelper {
 
     private static PhiInstruction createPhi(BasicBlock join, SymbolTable table, Code code, Symbol symbol) {
         Symbol targetSymbol = getTargetSymbol(table, symbol);
-        final Symbol phiSymbol = new Symbol(targetSymbol.getName(), targetSymbol.getSuffix(), targetSymbol.getType(), targetSymbol.isPointerValue(), Symbol.cloneValue(targetSymbol.getValue()));
+        final Symbol phiSymbol;
+        if(targetSymbol.getType().isArray()) {
+            phiSymbol = new Symbol(targetSymbol.getName(), targetSymbol.getSuffix(), symbol.getArrayDimension(), symbol.getArrayValue());
+        } else {
+            phiSymbol = new Symbol(targetSymbol.getName(), targetSymbol.getSuffix(), targetSymbol.getValue());
+        }
         PhiInstruction phi = new PhiInstruction(phiSymbol, code.getPc());
         code.addPhiInstruction(phi);//$TODO$ this is not in order but should generate an unique suffix
         join.addPhiInstruction(phi);

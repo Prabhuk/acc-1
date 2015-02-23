@@ -12,18 +12,18 @@ import com.acc.util.Tokenizer;
  */
 public class FunctionBody extends Parser {
 
-    public FunctionBody(Code code, Tokenizer tokenizer, SSACode ssaCode) {
-        super(code, tokenizer, ssaCode);
+    public FunctionBody(Code code, Tokenizer tokenizer) {
+        super(code, tokenizer);
     }
 
     @Override
     public Result parse() {
-        new VariableDeclaration(code, tokenizer, ssaCode).parse();
+        new VariableDeclaration(code, tokenizer).parse();
         Token next = tokenizer.next();
         if (!next.getToken().equals("{")) {
             throw new SyntaxErrorException("Expected \"{\". Found [" + next + "] instead");
         }
-        final Result y = new StatSequence(code, tokenizer, ssaCode).parse();
+        final Result y = new StatSequence(code, tokenizer).parse();
         next = tokenizer.next();
         if (!next.getToken().equals("{")) {
             throw new SyntaxErrorException("Expected \"}\". Found [" + next + "] instead");

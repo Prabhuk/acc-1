@@ -1,7 +1,7 @@
 package com.acc.parser;
 
+import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
-import com.acc.constants.SSAOpCodes;
 import com.acc.data.*;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
@@ -11,30 +11,39 @@ import com.acc.util.Tokenizer;
  */
 public class Expression extends Parser {
 
-    public Expression(Code code, Tokenizer tokenizer, SSACode ssaCode) {
-        super(code, tokenizer, ssaCode);
+    public Expression(Code code, Tokenizer tokenizer) {
+        super(code, tokenizer);
     }
 
     @Override
     public Result parse() {
         Result x, y;
-        x = new Term(code, tokenizer, ssaCode).parse();
+        x = new Term(code, tokenizer).parse();
         Token next = tokenizer.next();
         Operator nextOperator;
         while (next.isOperator() && (((Operator) next).value().isPlus() || ((Operator) next).value().isMinus())) {
             nextOperator = ((Operator) next);
-            int instructionCode;
-            String ssaInstruction;
+            int op;
             if (nextOperator.value().isPlus()) {
-                instructionCode = OperationCode.ADD;
-                ssaInstruction = SSAOpCodes.add;
+                op = OperationCode.add;
             } else { //Minus
-                instructionCode = OperationCode.SUB;
-                ssaInstruction = SSAOpCodes.sub;
+                op = OperationCode.sub;
             }
-            y = new Term(code, tokenizer, ssaCode).parse();
-            AuxiliaryFunctions.generateSSA(ssaCode, ssaInstruction, x, y);
-            AuxiliaryFunctions.combine(code, instructionCode, x, y);
+            y = new Term(code, tokenizer).parse();
+            if (x.kind().isConstant() && y.kind().isConstant()) {
+                if (op == OperationCode.add) {
+                    x.value(x.value() + y.value());
+                } else if (op == OperationCode.sub) {
+                    x.value(x.value() - y.value());
+                } else {
+                    throw new UnsupportedOperationException("Combine cannot process Operation code [" + op + "]");
+                }
+            } else {
+                x.setIntermediateLoation(code.getPc() - 1);
+                AuxiliaryFunctions.addInstruction(op, code, x, y, getSymbolTable());
+                x.kind(Kind.INTERMEDIATE);
+            }
+
             next = tokenizer.next();
         }
 //        if(x.kind().isVariable()) {

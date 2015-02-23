@@ -8,8 +8,8 @@ import com.acc.util.Tokenizer;
  */
 public class Statement extends Parser {
 
-    public Statement(Code code, Tokenizer tokenizer, SSACode ssaCode) {
-        super(code, tokenizer, ssaCode);
+    public Statement(Code code, Tokenizer tokenizer) {
+        super(code, tokenizer);
     }
 
     @Override
@@ -20,21 +20,21 @@ public class Statement extends Parser {
             Keyword nextKeyword = (Keyword) next;
             if (nextKeyword.isStatementBeginKeyword()) {
                 if (nextKeyword.isLet()) {
-                    x = new AssignmentParser(code, tokenizer, ssaCode).parse();
+                    x = new AssignmentParser(code, tokenizer).parse();
                 } else if (nextKeyword.isCall()) {
-                    x = new CallParser(code, tokenizer, ssaCode).parse();
+                    x = new CallParser(code, tokenizer).parse();
                 } else if (nextKeyword.isWhile()) {
-                    x = new WhileParser(code, tokenizer, ssaCode).parse();
+                    x = new WhileParser(code, tokenizer).parse();
                 } else if (nextKeyword.isReturn()) {
-                    x = new ReturnParser(code, tokenizer, ssaCode).parse();
+                    x = new ReturnParser(code, tokenizer).parse();
                 } else if (nextKeyword.isIf()) {
-                    x = new IfParser(code, tokenizer, ssaCode).parse();
+                    x = new IfParser(code, tokenizer).parse();
                 }
             }
 //            tokenizer.previous(); // Statements breakout on semicolon or end curly brace.
         } else {
             tokenizer.previous(); //moving back to reread the symbolName
-            x = new AssignmentParser(code, tokenizer, ssaCode).parse();
+            x = new AssignmentParser(code, tokenizer).parse();
         }
         // Rolling back to those tokens for statSequence to stay sane.
         return x;

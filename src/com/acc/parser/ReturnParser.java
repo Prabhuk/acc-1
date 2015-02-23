@@ -10,8 +10,8 @@ import com.acc.util.Tokenizer;
  */
 public class ReturnParser extends Parser {
 
-    public ReturnParser(Code code, Tokenizer tokenizer, SSACode ssaCode) {
-        super(code, tokenizer, ssaCode);
+    public ReturnParser(Code code, Tokenizer tokenizer) {
+        super(code, tokenizer);
     }
 
     @Override

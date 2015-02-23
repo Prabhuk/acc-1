@@ -9,6 +9,7 @@ public enum Kind {
     ARRAY,
     REG,
     CONDITION,
+    INTERMEDIATE,
     FIXUP_DUMMY;
 
     public boolean isConstant() {
@@ -33,6 +34,10 @@ public enum Kind {
 
     public boolean isArray() {
         return this == ARRAY;
+    }
+
+    public boolean isIntermediate() {
+        return this == INTERMEDIATE;
     }
 
 }

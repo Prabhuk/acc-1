@@ -1,7 +1,7 @@
 package com.acc.parser;
 
+import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
-import com.acc.constants.SSAOpCodes;
 import com.acc.data.*;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
@@ -11,32 +11,41 @@ import com.acc.util.Tokenizer;
  */
 public class Term extends Parser {
 
-    public Term(Code code, Tokenizer tokenizer, SSACode ssaCode) {
-        super(code, tokenizer, ssaCode);
+    public Term(Code code, Tokenizer tokenizer) {
+        super(code, tokenizer);
     }
 
     public Result parse() {
         Result x, y;
-        x = new Factor(code, tokenizer, ssaCode).parse();
+        x = new Factor(code, tokenizer).parse();
 
         final Token next = tokenizer.next();
         Operator nextOperator;
         while (next.tokenType() == TokenType.OPERATOR) {
             nextOperator = (Operator) next;
-            int instructionCode;
-            String ssaIns;
+            int op;
             if (nextOperator.value().isMultiplication()) {
-                instructionCode = OperationCode.MUL;
-                ssaIns = SSAOpCodes.mul;
+                op = OperationCode.mul;
             } else if (nextOperator.value().isDivision()) {
-                instructionCode = OperationCode.DIV;
-                ssaIns = SSAOpCodes.div;
+                op = OperationCode.div;
             } else {
                 break;
             }
-            y = new Factor(code, tokenizer, ssaCode).parse();
-            AuxiliaryFunctions.generateSSA(ssaCode, ssaIns, x, y);
-            AuxiliaryFunctions.combine(code, instructionCode, x, y);
+            y = new Factor(code, tokenizer).parse();
+
+            if (x.kind().isConstant() && y.kind().isConstant()) {
+                if (op == OperationCode.mul) {
+                    x.value(x.value() * y.value());
+                } else if (op == OperationCode.div) {
+                    x.value(x.value() / y.value());
+                } else {
+                    throw new UnsupportedOperationException("Combine cannot process Operation code [" + op + "]");
+                }
+            } else {
+                x.setIntermediateLoation(code.getPc() - 1);
+                AuxiliaryFunctions.addInstruction(op, code, x, y, getSymbolTable());
+                x.kind(Kind.INTERMEDIATE);
+            }
         }
         tokenizer.previous();
         return x;
