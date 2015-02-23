@@ -1,8 +1,10 @@
 package com.acc.parser;
 
 import com.acc.constants.KeywordType;
-import com.acc.constants.Kind;
-import com.acc.data.*;
+import com.acc.data.Code;
+import com.acc.data.Keyword;
+import com.acc.data.Result;
+import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.BasicBlock;
 import com.acc.util.AuxiliaryFunctions;

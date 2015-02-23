@@ -1,7 +1,6 @@
 package com.acc.parser;
 
 import com.acc.constants.Kind;
-import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Result;
 import com.acc.data.Token;

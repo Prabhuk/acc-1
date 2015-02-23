@@ -10,47 +10,18 @@ import java.util.Map;
  */
 public class SymbolTable {
 
-    private final boolean isGlobalTable;
-    private final String ownerProcedure; //Will be set for procedures which will have their own symbol table.
     private final List<Symbol> symbols;
-    private final Map<String, Symbol> symbolsByName = new HashMap<String, Symbol>();
-    private static volatile SymbolTable globalTable;
+    private final Map<String, Symbol> symbolsByName;
 
-    private SymbolTable() {
-        this.isGlobalTable = true;
-        this.ownerProcedure = null;
+    public SymbolTable() {
         symbols = new ArrayList<Symbol>();
+        symbolsByName = new HashMap<String, Symbol>();
     }
 
     public int getFramePointer() {
         return this.symbols.size();
     }
 
-    public static SymbolTable getGlobalSymbolTable() {
-        synchronized (SymbolTable.class) {
-            if (globalTable == null) {
-                globalTable = new SymbolTable();
-            }
-        }
-        return globalTable;
-    }
-
-    public SymbolTable(String ownerProcedure) {
-        this.isGlobalTable = false;
-        if (ownerProcedure == null) {
-            throw new RuntimeException("You must associate the SymbolTable with a procedure.");
-        }
-        this.ownerProcedure = ownerProcedure;
-        symbols = new ArrayList<Symbol>();
-    }
-
-    public boolean isGlobalTable() {
-        return isGlobalTable;
-    }
-
-    public String getOwnerProcedure() {
-        return ownerProcedure;
-    }
 
     public List<Symbol> getSymbols() {
         return symbols;

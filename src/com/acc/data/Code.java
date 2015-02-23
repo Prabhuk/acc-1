@@ -5,8 +5,6 @@ import com.acc.structure.BasicBlock;
 import com.acc.structure.ControlFlowGraph;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -77,7 +75,8 @@ public class Code {
 
 
     public void Fixup(int location) {
-        instructions.get(location).FixUp(getPc() - location);
+//        instructions.get(location).FixUp(getPc() - location);
+        instructions.get(location).FixUp(getPc());
         //$TODO$ this is not updated within the basicblock. Need to fix it in the basic block as well. Use instr number range?
     }
 

@@ -88,7 +88,7 @@ public class Instruction {
         } else if(x.kind().isConstant()) {
             return "#" + String.valueOf(x.value());
         } else if(x.kind().isVariable()) {
-            if(opcode >= OperationCode.bra && opcode <= OperationCode.bgt) {
+            if(opcode >= OperationCode.bra && opcode <= OperationCode.bgt || opcode == OperationCode.cmp) {
                 return x.getVariableName();
             }
             return x.getVariableName() + ":" + symbol.getSuffix();

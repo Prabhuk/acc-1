@@ -1,9 +1,7 @@
 package com.acc.parser;
 
-import com.acc.constants.Kind;
 import com.acc.data.Code;
 import com.acc.data.Result;
-import com.acc.data.SSACode;
 import com.acc.util.Tokenizer;
 
 /**

@@ -15,16 +15,18 @@ import java.util.Set;
  */
 public class VCGWorker extends Worker {
 
+    private final String outputFileName;
     private BufferedWriter bufferedWriter;
 
-    public VCGWorker() {
+    public VCGWorker(String outputFileName) {
+        this.outputFileName = outputFileName;
     }
 
     @Override
     public void begin() {
         final long l = System.currentTimeMillis();
 //        String fileName = "output_"+ String.valueOf(l) +".vcg";
-        String fileName = "output.vcg";
+        String fileName = outputFileName;
         final File file = new File(fileName);
         System.out.println(file.getAbsolutePath());
         try {

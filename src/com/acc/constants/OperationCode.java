@@ -1,8 +1,6 @@
 package com.acc.constants;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,6 +31,7 @@ public class OperationCode {
     public static int write = 20;
     public static int writenl = 21;
     public static int kill = 22;
+    public static int call = 23;
 
     public static final Map<Integer, Integer> intermediatesOperandCount = new HashMap<Integer, Integer>();
     public static final Map<Integer, String> opcodeNames = new HashMap<Integer, String>();
@@ -61,6 +60,7 @@ public class OperationCode {
         intermediatesOperandCount.put(write, 1);
         intermediatesOperandCount.put(writenl, 0);
         intermediatesOperandCount.put(kill, 1);
+        intermediatesOperandCount.put(call, 1);
 
         opcodeNames.put(neg,"neg");
         opcodeNames.put(add,"add");
@@ -85,7 +85,8 @@ public class OperationCode {
         opcodeNames.put(write, "write");
         opcodeNames.put(writenl, "writenl");
         opcodeNames.put(kill, "kill");
-        
+        opcodeNames.put(call, "call");
+
         
     }
     

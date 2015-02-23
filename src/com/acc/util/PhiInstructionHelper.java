@@ -8,7 +8,6 @@ import com.acc.structure.BasicBlock;
 import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 

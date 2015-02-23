@@ -3,9 +3,14 @@ package com.acc.util;
 import com.acc.constants.Condition;
 import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
-import com.acc.data.*;
-import com.acc.memory.RegisterAllocator;
-import com.acc.structure.*;
+import com.acc.data.Code;
+import com.acc.data.Instruction;
+import com.acc.data.PhiInstruction;
+import com.acc.data.Result;
+import com.acc.structure.BasicBlock;
+import com.acc.structure.Symbol;
+import com.acc.structure.SymbolTable;
+import com.acc.structure.SymbolType;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -102,7 +107,7 @@ public class AuxiliaryFunctions {
 
     public static void addInstruction(int op, Code code, Result x, Result y, SymbolTable symbolTable) {
         final Instruction instruction = new Instruction(op, x, y, code.getPc());
-        if(x.kind().isVariable() || x.kind().isArray()) {
+        if(symbolTable != null && (x.kind().isVariable() || x.kind().isArray())) {
             final Symbol recentOccurence = symbolTable.getRecentOccurence(x.getVariableName());
             instruction.setSymbol(recentOccurence);
         }

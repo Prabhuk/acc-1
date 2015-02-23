@@ -1,12 +1,10 @@
 package com.acc.ui;
 
-import com.acc.data.*;
+import com.acc.data.Code;
+import com.acc.data.Instruction;
 import com.acc.graph.GraphHelper;
 import com.acc.graph.VCGWorker;
 import com.acc.parser.Computation;
-import com.acc.structure.BasicBlock;
-import com.acc.structure.Symbol;
-import com.acc.structure.SymbolTable;
 import com.acc.util.Tokenizer;
 
 import java.io.IOException;
@@ -28,8 +26,7 @@ public class CompileInputFile {
         try {
             tokenizer = new Tokenizer(filePath);
             Code code = new Code();
-            SSACode ssaCode = new SSACode();
-            parser = new Computation(code, tokenizer);
+            parser = new Computation(code, tokenizer, "main");
             parser.parse();
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Input file [" + filePath + "] not found");
@@ -37,38 +34,25 @@ public class CompileInputFile {
         }
     }
 
-    public Computation getParser() {
-        return parser;
-    }
+
 
     public static void main(String[] args) {
-        final Computation parser = new CompileInputFile("C:\\work\\acc\\test\\accsimple.txt").getParser();
-        final Code code = parser.getCode();
-        final List<Instruction> instructions = code.getInstructions();
-        if (instructions.size() > 0) {
-            System.out.println("Code:\n");
-        }
-        for (Instruction instruction : instructions) {
-            System.out.println(instruction.getLocation() + "  "+ instruction.getInstructionString());
-        }
 
 
+        new CompileInputFile("C:\\work\\acc\\test\\accsimple.txt");
 
-
-
-        final SymbolTable symbolTable = parser.getSymbolTable();
-        final List<Symbol> symbols = symbolTable.getSymbols();
-        if (symbols.size() > 0) {
-            System.out.println("\n\nGlobal Symbol Table: \n");
-        }
-        for (Symbol symbol : symbols) {
-            Object value = symbol.getValue();
-            if (symbol.getType().isArray()) {
-                value = "Array dimensions: " + symbol.getArrayDimension();
+        final List<Computation> parsers = OutputContents.getPrograms();
+        for (Computation parser : parsers) {
+            final Code code = parser.getCode();
+            final List<Instruction> instructions = code.getInstructions();
+            if (instructions.size() > 0) {
+                System.out.println("Code:\n");
             }
-            System.out.println(symbol.getUniqueIdentifier() + " : " + value);
+            for (Instruction instruction : instructions) {
+                System.out.println(instruction.getLocation() + "  "+ instruction.getInstructionString());
+            }
+            new GraphHelper(new VCGWorker(parser.getProgramName() + ".vcg"), code.getControlFlowGraph().getRootBlock());
         }
-        new GraphHelper(new VCGWorker(), code.getControlFlowGraph().getRootBlock());
 
 
 //        BasicBlock bb0= new BasicBlock();
