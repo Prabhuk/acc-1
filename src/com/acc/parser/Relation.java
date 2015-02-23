@@ -1,5 +1,6 @@
 package com.acc.parser;
 
+import com.acc.constants.OperationCode;
 import com.acc.data.*;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
@@ -19,7 +20,7 @@ public class Relation extends Parser {
         Token next = tokenizer.next();
         x.setCondition(new RelationalOperator(next.getToken()).value());
         Result y = new Expression(code, tokenizer).parse();
-        AuxiliaryFunctions.addInstruction(x.condition().getOp(), code, x, y, getSymbolTable());
+        AuxiliaryFunctions.addInstruction(OperationCode.cmp, code, x, y, getSymbolTable());
         return x;
     }
 }

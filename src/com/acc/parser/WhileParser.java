@@ -35,7 +35,7 @@ public class WhileParser extends Parser {
         final BasicBlock currentBlock = code.getCurrentBlock();
         BasicBlock loopBlock = code.getCurrentBlock();
         Result x = new Relation(code, tokenizer).parse();
-        AuxiliaryFunctions.CJF(code, x);
+        AuxiliaryFunctions.CJF(code, x, getSymbolTable());
 
         parents = currentBlock.getParents();
         BasicBlock parent = null;
@@ -67,7 +67,7 @@ public class WhileParser extends Parser {
             right.addChild(loopBlock);
         }
 
-        AuxiliaryFunctions.BJ(code, loop, loopBlock); //Backward Jump to the loop beginning.
+        AuxiliaryFunctions.BJ(code, loop); //Backward Jump to the loop beginning.
         PhiInstructionHelper.createPhiInstructions(getSymbolTable(), join, code);
 
         final BasicBlock nextBlock = new BasicBlock();

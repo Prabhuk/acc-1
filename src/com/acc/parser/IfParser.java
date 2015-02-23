@@ -24,7 +24,8 @@ public class IfParser extends Parser {
     @Override
     public Result parse() {
         Result x = new Relation(code, tokenizer).parse();  //Statement eats the first word for all statements except assignment
-        AuxiliaryFunctions.CJF(code, x);
+        AuxiliaryFunctions.CJF(code, x, getSymbolTable());
+
         final BasicBlock currentBlock = code.getCurrentBlock();
 
         BasicBlock join = new BasicBlock();
@@ -46,7 +47,7 @@ public class IfParser extends Parser {
             join.setLeft(leftTree.getJoin());
         }
 
-        Result follow = new Result(Kind.FIXUP_DUMMY, 0, 0, 0, null, ZERO);
+//        Result follow = new Result(Kind.FIXUP_DUMMY, 0, 0, 0, null, ZERO);
         Token incoming = tokenizer.next();
         if (isElse(incoming)) {
             final BasicBlock right = new BasicBlock();
@@ -55,9 +56,8 @@ public class IfParser extends Parser {
             currentBlock.addChild(right, true);
 
             code.setCurrentBlock(right);
-            AuxiliaryFunctions.FJLink(code, follow);
-            code.Fixup(0);
-//            code.Fixup(x.fixupLoc());
+//            AuxiliaryFunctions.FJLink(code, follow);
+            code.Fixup(x.fixupLoc());
             final Result rightTree = new StatSequence(code, tokenizer).parse();
             if (rightTree.getJoin() != null && !rightTree.getJoin().equals(join)) {
                 join.setRight(rightTree.getJoin());
@@ -65,10 +65,9 @@ public class IfParser extends Parser {
         } else {
             tokenizer.previous();
             join.setRight(currentBlock);
-            code.Fixup(0);
-//            code.Fixup(x.fixupLoc());
+            code.Fixup(x.fixupLoc());
         }
-        code.Fixlink(follow);
+//        code.Fixlink(follow);
         PhiInstructionHelper.createPhiInstructions(getSymbolTable(), join, code);
         handleFiToken();
         if(join.getLeft() != null) {

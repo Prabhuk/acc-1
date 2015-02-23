@@ -24,6 +24,9 @@ public class Result {
 
     public Result(){
     }
+    public Result(Kind kind){
+        this.kind = kind;
+    }
 
     public Result(Kind kind, Integer regno, Integer value, Integer address, Condition cond, Integer fixupLoc, List<Integer> dimensions) {
         this.kind = kind;

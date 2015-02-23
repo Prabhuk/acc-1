@@ -17,25 +17,30 @@ import java.util.List;
  */
 public class AuxiliaryFunctions {
 
-    public static void BJ(Code code, int loc, BasicBlock loopBlock) {
-//        final Symbol symbol = new Symbol(String.valueOf(loc), code.getPc(), null, false, loc);
-//        symbol.setResult(new Result(Kind.CONSTANT, null, 0, null, null, null));
-//        addInstruction(OperationCode.beq, code, 0, 0, loc, symbol);
+    public static void BJ(Code code, int loc) {
+        final Result x = new Result(Kind.CONSTANT);
+        x.value(loc);
+        addInstruction(OperationCode.bra, code, x, null, null);
     }
 
-    public static void FJLink(Code code, Result x) {
+    public static void FJLink(Code code, Result follow) {
 //        final Symbol symbol = new Symbol(String.valueOf(x.fixupLoc()), code.getPc(), null, false, x.fixupLoc());
 //        symbol.setResult(x);
-//        addInstruction(code, OperationCode.BEQ, 0, 0, x.fixupLoc(), symbol);
-//        x.fixupLoc(code.getPc() - 1);
+        Result equal = new Result(Kind.CONSTANT);
+        equal.value(0);
+        Result branchLocation = new Result(Kind.CONSTANT);
+        branchLocation.value(0);
+        addInstruction(OperationCode.beq, code, equal, branchLocation, null);
+        follow.fixupLoc(code.getPc() - 1);
     }
 
-    public static void CJF(Code code, Result x) {
-//        final Symbol symbol = new Symbol(String.valueOf(x.regNo()), code.getPc(), null, false, x.regNo());
-//        symbol.setResult(x);
-//        addInstruction(code, Condition.getNegatedInstruction(x.condition()), x.regNo(), 0, 0, symbol);
-//        RegisterAllocator.deallocate(x.regNo());
-//        x.fixupLoc(code.getPc() - 1);
+    public static void CJF(Code code, Result currentState, SymbolTable symbolTable) {
+        Result x = new Result(Kind.INTERMEDIATE);
+        x.setIntermediateLoation(code.getPc() - 1);
+        Result y = new Result(Kind.CONSTANT);
+        y.value(0);
+        AuxiliaryFunctions.addInstruction(Condition.getNegatedInstruction(currentState.condition()), code, x, y, symbolTable);
+        currentState.fixupLoc(code.getPc() - 1);
     }
     
 

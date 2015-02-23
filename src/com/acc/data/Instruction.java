@@ -1,5 +1,6 @@
 package com.acc.data;
 
+import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
 import com.acc.structure.Symbol;
 
@@ -87,6 +88,9 @@ public class Instruction {
         } else if(x.kind().isConstant()) {
             return "#" + String.valueOf(x.value());
         } else if(x.kind().isVariable()) {
+            if(opcode >= OperationCode.bra && opcode <= OperationCode.bgt) {
+                return x.getVariableName();
+            }
             return x.getVariableName() + ":" + symbol.getSuffix();
         } else if (x.kind().isArray()) {
             return x.getVariableName();
@@ -95,6 +99,10 @@ public class Instruction {
     }
 
     public void FixUp(int c) {
+        if(y == null) {
+            y = new Result(Kind.CONSTANT);
+        }
+        y.value(c);
 //        this.instructionString = InstructionStringBuilder.getDLXInstruction(opcode, a, b, c, symbol, lhs, rhs);
     }
 }
