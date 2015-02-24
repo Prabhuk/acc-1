@@ -51,7 +51,7 @@ public class CompileInputFile {
             for (Instruction instruction : instructions) {
                 System.out.println(instruction.getLocation() + "  "+ instruction.getInstructionString());
             }
-            new GraphHelper(new VCGWorker(parser.getProgramName() + ".vcg"), code.getControlFlowGraph().getRootBlock());
+            new GraphHelper(new VCGWorker(parser.getProgramName() + ".vcg", parser.getSymbolTable()), code.getControlFlowGraph().getRootBlock());
         }
 
 

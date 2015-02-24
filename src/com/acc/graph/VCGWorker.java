@@ -2,6 +2,7 @@ package com.acc.graph;
 
 import com.acc.data.Instruction;
 import com.acc.structure.BasicBlock;
+import com.acc.structure.SymbolTable;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,7 +19,8 @@ public class VCGWorker extends Worker {
     private final String outputFileName;
     private BufferedWriter bufferedWriter;
 
-    public VCGWorker(String outputFileName) {
+    public VCGWorker(String outputFileName, SymbolTable symbolTable) {
+        super(symbolTable);
         this.outputFileName = outputFileName;
     }
 
