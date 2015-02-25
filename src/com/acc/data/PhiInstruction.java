@@ -49,8 +49,7 @@ public class PhiInstruction extends Instruction {
         if (rightSymbol != null) {
             sb.append(rightSymbol.getUniqueIdentifier());
         }
-        instructionString = sb.toString();
-        return instructionString;
+        return sb.toString();
     }
 
 }

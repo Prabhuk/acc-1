@@ -16,7 +16,9 @@ public class Instruction {
     protected final Integer location;
     private Result x;
     private Result y;
-    protected String instructionString = "";
+
+    private String deletePurpose;
+    private boolean isDeleted;
 
     public Instruction(boolean isPhi, boolean isKill, Symbol symbol, Integer opcode, Integer location) {
         this.isPhi = isPhi;
@@ -100,10 +102,34 @@ public class Instruction {
 
     public void FixUp(int c) {
         if(y == null) {
-            y = new Result(Kind.CONSTANT);
+            setY(new Result(Kind.CONSTANT));
         }
         y.value(c);
-//        this.instructionString = InstructionStringBuilder.getDLXInstruction(opcode, a, b, c, symbol, lhs, rhs);
+    }
+
+    public void setX(Result x) {
+        this.x = x;
+    }
+
+    public void setY(Result y) {
+        this.y = y;
+    }
+
+    public String getDeletePurpose() {
+        return deletePurpose;
+    }
+
+    public void setDeletePurpose(String deletePurpose) {
+        this.deletePurpose = deletePurpose;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean isDeleted, String deletePurpose) {
+        this.isDeleted = isDeleted;
+        this.deletePurpose = deletePurpose;
     }
 }
 

@@ -2,9 +2,11 @@ package com.acc.ui;
 
 import com.acc.data.Code;
 import com.acc.data.Instruction;
+import com.acc.graph.CopyPropogationWorker;
 import com.acc.graph.GraphHelper;
 import com.acc.graph.VCGWorker;
 import com.acc.parser.Computation;
+import com.acc.structure.BasicBlock;
 import com.acc.util.Tokenizer;
 
 import java.io.IOException;
@@ -44,14 +46,11 @@ public class CompileInputFile {
         final List<Computation> parsers = OutputContents.getPrograms();
         for (Computation parser : parsers) {
             final Code code = parser.getCode();
-            final List<Instruction> instructions = code.getInstructions();
-            if (instructions.size() > 0) {
-                System.out.println("Code:\n");
-            }
-            for (Instruction instruction : instructions) {
-                System.out.println(instruction.getLocation() + "  "+ instruction.getInstructionString());
-            }
-            new GraphHelper(new VCGWorker(parser.getProgramName() + ".vcg", parser.getSymbolTable()), code.getControlFlowGraph().getRootBlock());
+            printInstructions(parser, code);
+            final BasicBlock rootNode = code.getControlFlowGraph().getRootBlock();
+            new GraphHelper(new VCGWorker(parser.getProgramName() + ".vcg", parser.getSymbolTable()), rootNode);
+            new GraphHelper(new CopyPropogationWorker(parser.getSymbolTable()), rootNode);
+            printInstructions(parser, code);
         }
 
 
@@ -65,6 +64,16 @@ public class CompileInputFile {
 //        bb1.addChild(bb3);
 //        bb2.addChild(bb1);
 //        GraphHelper v = new GraphHelper(new VCGWorker(), bb0);
+    }
+
+    private static void printInstructions(Computation parser, Code code) {
+        final List<Instruction> instructions = code.getInstructions();
+        if (instructions.size() > 0) {
+            System.out.println("Code for:["+parser.getProgramName()+"] \n");
+        }
+        for (Instruction instruction : instructions) {
+            System.out.println(instruction.getLocation() + "  "+ instruction.getInstructionString());
+        }
     }
 
 }
