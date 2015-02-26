@@ -1,9 +1,6 @@
 package com.acc.structure;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by prabhuk on 2/9/2015.
@@ -46,6 +43,16 @@ public class SymbolTable {
         } else {
             //targetSymbol.setValue(s.getValue());
             throw new RuntimeException("Duplicate Symbol addition for [" + symbolKey + "]");
+        }
+    }
+
+    public void removeSymbol(String symbolName, int suffix) {
+        final Iterator<Symbol> iterator = symbols.iterator();
+        while (iterator.hasNext()) {
+            final Symbol next = iterator.next();
+            if(next.getName().equals(symbolName) && next.getSuffix() == suffix) {
+                iterator.remove();
+            }
         }
     }
 

@@ -11,18 +11,12 @@ public class Instruction {
 
     protected Symbol symbol;
     protected final Integer opcode;
-    protected final Integer location;
+    protected Integer location;
     protected Result x;
     protected Result y;
 
     private String deletePurpose;
     private boolean isDeleted;
-
-    public Instruction(Symbol symbol, Integer opcode, Integer location) {
-        this.symbol = symbol;
-        this.opcode = opcode;
-        this.location = location;
-    }
 
     public Instruction(int op, Result x, Result y, int location) {
         this.opcode = op;
@@ -93,7 +87,7 @@ public class Instruction {
         } else if(x.kind().isConstant()) {
             return "#" + String.valueOf(x.value());
         } else if(x.kind().isVariable()) {
-            if(opcode >= OperationCode.bra && opcode <= OperationCode.bgt || opcode == OperationCode.cmp || opcode == OperationCode.kill) {
+            if(opcode == OperationCode.cmp || opcode == OperationCode.kill) {
                 return x.getVariableName();
             }
             return x.getVariableName() + ":" + x.getLocation();
@@ -151,9 +145,12 @@ public class Instruction {
         if(opcode != OperationCode.phi) {
             throw new UnsupportedOperationException("This operation is only for PHI instructions");
         }
-        return (x.getVariableName().equals(y.getVariableName()) && x.getLocation().equals(y.getLocation())) || !isComplete();
+        return Result.isSameVariable(x, y) || !isComplete();
     }
 
+    public void setLocation(Integer location) {
+        this.location = location;
+    }
 }
 
 

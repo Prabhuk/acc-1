@@ -1,6 +1,5 @@
 package com.acc.util;
 
-import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
@@ -84,8 +83,13 @@ public class PhiInstructionHelper {
         Instruction phi = new Instruction(OperationCode.phi, null, null, code.getPc());
         phi.setSymbol(phiSymbol);
 
-        code.addCode(phi);//$TODO$ this is not in order but should generate an unique suffix
-        join.addPhiInstruction(phi);
+        final Instruction instruction = join.addPhiInstruction(phi);
+        if(instruction != null) {
+            code.addCode(phi, instruction);
+            //this is make sure the order of instructions are maintained in the flat list of instructions within Code
+        } else {
+            code.addCode(phi);
+        }
         phiSymbol.setSuffix(phi.getLocation());
         return phi;
     }

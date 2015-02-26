@@ -30,10 +30,9 @@ public class IfParser extends Parser {
 
         final BasicBlock currentBlock = code.getCurrentBlock();
 
-        BasicBlock join = new BasicBlock();
+        final BasicBlock join = new BasicBlock();
         x.setJoin(join);
         currentBlock.setJoinBlock(join);
-        currentBlock.addDominatedOverBlock(join);
 
 
         final BasicBlock left = new BasicBlock();
@@ -71,6 +70,8 @@ public class IfParser extends Parser {
         }
 //        code.Fixlink(follow);
         PhiInstructionHelper.createPhiInstructions(getSymbolTable(), join, code);
+        currentBlock.addDominatedOverBlock(join);
+
         handleFiToken();
         if(join.getLeft() != null) {
             join.getLeft().addChild(join);

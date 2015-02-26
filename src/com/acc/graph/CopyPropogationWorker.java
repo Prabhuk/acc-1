@@ -1,5 +1,6 @@
 package com.acc.graph;
 
+import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
 import com.acc.data.Instruction;
 import com.acc.data.Result;
@@ -16,6 +17,7 @@ import java.util.*;
 public class CopyPropogationWorker extends Worker {
 
     private Map<String, Result> valueMap = new HashMap<String, Result>();
+    private List<Instruction> phiInstructions = new ArrayList<Instruction>();
 //    private List<Instruction> copiedInstructions = new ArrayList<Instruction>();
 
     public CopyPropogationWorker(SymbolTable symbolTable) {
@@ -29,21 +31,40 @@ public class CopyPropogationWorker extends Worker {
 
     @Override
     public void visit(BasicBlock node) {
-
         final List<Instruction> instructions = node.getInstructions();
-        final Set<BasicBlock> dominatesOver = node.getDominatesOver();
+        final List<BasicBlock> dominatesOver = node.getDominatesOver();
         processInstructions(instructions);
         for (BasicBlock basicBlock : dominatesOver) {
             updateDominatedBy(basicBlock.getInstructions());
         }
+        for (Instruction instruction : phiInstructions) {
+            if (instruction.isPhi()) {
+                updatePhiInstruction(instruction);
+            }
+        }
         valueMap = new HashMap<String, Result>();
+    }
+
+    private void updatePhiInstruction(Instruction instruction) {
+        Result result = valueMap.get(instruction.getX().getUniqueIdentifier());
+        if (result != null) {
+            instruction.setX(result);
+            valueMap.remove(instruction.getX().getUniqueIdentifier());
+            valueMap.put(instruction.getSymbol().getName(), new Result(instruction.getSymbol()));
+        }
+
+        Result resulty = valueMap.get(instruction.getY().getUniqueIdentifier());
+        if (resulty != null) {
+            instruction.setY(resulty);
+            valueMap.remove(instruction.getY().getUniqueIdentifier());
+            valueMap.put(instruction.getSymbol().getName(), new Result(instruction.getSymbol()));
+        }
     }
 
     private void processInstructions(List<Instruction> instructions) {
         for (Instruction instruction : instructions) {
             final Integer opcode = instruction.getOpcode();
             if(instruction.isPhi()) {
-
                 valueMap.remove(instruction.getSymbol().getName());
                 continue;
             }
@@ -55,7 +76,7 @@ public class CopyPropogationWorker extends Worker {
                 final Result x = instruction.getX();
                 final Result y = instruction.getY();
                 if(opcode == OperationCode.move) {
-                    updateValueMap(instruction, variableName, y);
+                    updateValueMap(instruction, variableName, instruction.getX().getUniqueIdentifier(), y);
                 } else {
                     if (x != null) {
                         final Result result = valueMap.get(x.getVariableName());
@@ -80,6 +101,8 @@ public class CopyPropogationWorker extends Worker {
             final Integer opcode = instruction.getOpcode();
             if(instruction.isPhi()) {
                 valueMap.remove(instruction.getSymbol().getName());
+                phiInstructions.add(instruction);
+//                updatePhiInstruction(instruction);
                 continue;
             }
             final String variableName = instruction.getX().getVariableName();
@@ -108,25 +131,24 @@ public class CopyPropogationWorker extends Worker {
         }
     }
 
-    private void updateValueMap(Instruction instruction, String variableName, Result y) {
+    private void updateValueMap(Instruction instruction, String variableName, String uniqueIdentifier, Result y) {
         if(y.kind().isVariable()) {
             final Result yValue = valueMap.get(y.getVariableName());
             if(yValue != null) {
                 if(yValue.kind().isVariable()) {
-                    updateValueMap(instruction, variableName, yValue);
+                    updateValueMap(instruction, variableName, uniqueIdentifier, yValue);
                     return;
                 }
-                valueMap.put(variableName, yValue);
-                instruction.setY(yValue);
-                Printer.debugMessage("Copying for " + variableName + " in instruction number [" + instruction.getLocation() + "]");
+                y = yValue;
             }
-        } else if(y.kind().isConstant() || y.kind().isIntermediate()) {
-            valueMap.put(variableName, y);
-            instruction.setY(y);
-            Printer.debugMessage("Copying for " + variableName + " in instruction number["+instruction.getLocation()+"]");
-        } else {
-            Printer.debugMessage(instruction);
         }
+        valueMap.put(variableName, y);
+        valueMap.put(uniqueIdentifier, y);
+        instruction.setY(y);
+        instruction.setDeleted(true, "CP");
+        symbolTable.removeSymbol(variableName, instruction.getLocation());
+        Printer.debugMessage("Copying for " + variableName + " in instruction number[" + instruction.getLocation() + "]");
+
     }
 
     @Override

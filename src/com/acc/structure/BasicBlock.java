@@ -15,7 +15,7 @@ public class BasicBlock {
     private final List<Instruction> instructions = new ArrayList<Instruction>();
 
     private final Map<String, Instruction> phiMap = new HashMap<String, Instruction>();
-    private final Set<BasicBlock> dominatesOver = new HashSet<BasicBlock>();
+    private final List<BasicBlock> dominatesOver = new ArrayList<BasicBlock>();
     private final Set<BasicBlock> children = new HashSet<BasicBlock>();
     private final Set<BasicBlock> parents = new HashSet<BasicBlock>();
 
@@ -33,7 +33,7 @@ public class BasicBlock {
         allBlocks.add(this);
     }
 
-    public Set<BasicBlock> getDominatesOver() {
+    public List<BasicBlock> getDominatesOver() {
         return dominatesOver;
     }
 
@@ -49,16 +49,19 @@ public class BasicBlock {
      * Caller of this method is responsible for adding it to Code in the right place
      * @param instruction
      */
-    public void addPhiInstruction(Instruction instruction) {
+    public Instruction addPhiInstruction(Instruction instruction) {
         int index = 0;
+        Instruction nonPhi = null;
         for (Instruction instruction1 : instructions) {
             if(!instruction1.isPhi()) {
+                nonPhi = instruction1;
                 break;
             }
             index++;
         }
         instructions.add(index, instruction); //PHI should always be added to the top
         phiMap.put(instruction.getSymbol().getName(), instruction);
+        return nonPhi;
     }
 
     public Instruction getPhiInstruction(String symbolName) {

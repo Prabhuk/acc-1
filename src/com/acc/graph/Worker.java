@@ -19,15 +19,18 @@ public abstract class Worker {
 
     public void begin() {}
 
-    public void visit(BasicBlock node) {
-           allNodes.add(node);
+    public abstract void visit(BasicBlock node);
+
+    public void addToNodes(BasicBlock node) {
+        allNodes.add(node);
     }
 
-    public void finish() {
+    public void finish() {}
+
+    public void unMarkVisited() {
         for (BasicBlock allNode : allNodes) {
             allNode.setVisited(false);
         }
-
     }
 
     public SymbolTable getSymbolTable() {

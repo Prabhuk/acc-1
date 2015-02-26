@@ -14,6 +14,7 @@ public class GraphHelper {
         worker.begin();
         processGraph(root);
         worker.finish();
+        worker.unMarkVisited();
     }
 
     public void processGraph(BasicBlock node)
@@ -23,6 +24,7 @@ public class GraphHelper {
         }
         if(!node.isVisited()) {
             worker.visit(node);
+            worker.addToNodes(node);
             node.setVisited(true);
         }
 

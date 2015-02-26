@@ -130,11 +130,23 @@ public class Result {
         return variableName;
     }
 
+    public String getUniqueIdentifier() {
+        return variableName + ":" + location;
+    }
+
     public Integer getLocation() {
         return location;
     }
 
     public void setLocation(Integer location) {
         this.location = location;
+    }
+
+    public static boolean isSameVariable(Result x, Result y) {
+
+        return (x != null && y!= null &&
+                x.kind().isVariable() && y.kind().isVariable() &&
+                x.getVariableName().equals(y.getVariableName()) &&
+                x.getLocation().equals(y.getLocation()));
     }
 }

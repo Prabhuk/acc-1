@@ -3,10 +3,14 @@ package com.acc.ui;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
 import com.acc.graph.CopyPropogationWorker;
+import com.acc.graph.DeleteInstructions;
 import com.acc.graph.GraphHelper;
 import com.acc.graph.VCGWorker;
 import com.acc.parser.Computation;
 import com.acc.structure.BasicBlock;
+import com.acc.structure.Symbol;
+import com.acc.structure.SymbolTable;
+import com.acc.util.Printer;
 import com.acc.util.Tokenizer;
 
 import java.io.IOException;
@@ -48,8 +52,9 @@ public class CompileInputFile {
             final Code code = parser.getCode();
             printInstructions(parser, code);
             final BasicBlock rootNode = code.getControlFlowGraph().getRootBlock();
-            new GraphHelper(new VCGWorker(parser.getProgramName() + ".vcg", parser.getSymbolTable()), rootNode);
             new GraphHelper(new CopyPropogationWorker(parser.getSymbolTable()), rootNode);
+            new GraphHelper(new DeleteInstructions(code, parser.getSymbolTable()), rootNode);
+            new GraphHelper(new VCGWorker(parser.getProgramName() + ".vcg", parser.getSymbolTable()), rootNode);
             printInstructions(parser, code);
         }
 
@@ -73,6 +78,12 @@ public class CompileInputFile {
         }
         for (Instruction instruction : instructions) {
             System.out.println(instruction.getLocation() + "  "+ instruction.getInstructionString());
+        }
+
+        final SymbolTable symbolTable = parser.getSymbolTable();
+        final List<Symbol> symbols = symbolTable.getSymbols();
+        for (Symbol symbol : symbols) {
+            Printer.print(symbol.getName() + " " + symbol.getSuffix());
         }
     }
 

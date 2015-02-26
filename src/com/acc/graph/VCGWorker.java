@@ -60,7 +60,6 @@ public class VCGWorker extends Worker {
 
     @Override
     public void visit(BasicBlock node) {
-        super.visit(node);
         final String name = String.valueOf(node.getLabel());
         StringBuilder instructionString = getInstructionString(node);
 

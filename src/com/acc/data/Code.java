@@ -1,6 +1,5 @@
 package com.acc.data;
 
-import com.acc.constants.OperationCode;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.ControlFlowGraph;
 
@@ -32,17 +31,26 @@ public class Code {
      * @return Returns the current program counter value
      */
     public int addCode(Instruction instruction) {
+        return addCode(instruction, -1);
+    }
+
+    public int addCode(Instruction instruction, int targetIndex) {
         if(instruction.isKill()) {
             final BasicBlock joinBlock = controlFlowGraph.getCurrentBlock().getJoinBlock();
             if (joinBlock != null) {
-                instructions.add(instruction);
+                if(targetIndex != -1) {
+                    instructions.add(targetIndex, instruction);
+                } else {
+                    instructions.add(instruction);
+                }
                 joinBlock.addInstruction(instruction);
             }
-//            else {
-//                currentBlock.addInstruction(instruction);
-//            }
         } else {
-            instructions.add(instruction);
+            if(targetIndex != -1) {
+                instructions.add(targetIndex, instruction);
+            } else {
+                instructions.add(instruction);
+            }
             if(!instruction.isPhi()) {
                 controlFlowGraph.addInstruction(instruction);
             }
@@ -86,4 +94,7 @@ public class Code {
         return instructions;
     }
 
+    public int addCode(Instruction phi, Instruction instruction) {
+        return addCode(phi, instructions.indexOf(instruction));
+    }
 }
