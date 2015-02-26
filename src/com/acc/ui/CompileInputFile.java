@@ -50,6 +50,7 @@ public class CompileInputFile {
 
 
         final String inputFile = "C:\\work\\acc\\test\\accsimple.txt";
+        currentFileName = "accsimple.txt";
         processFile(inputFile);
 //        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test"), new String[]{"txt"}, false);
 //        for (File inputFile : files) {
