@@ -43,6 +43,7 @@ public class CopyPropogationWorker extends Worker {
         for (Instruction instruction : instructions) {
             final Integer opcode = instruction.getOpcode();
             if(instruction.isPhi()) {
+
                 valueMap.remove(instruction.getSymbol().getName());
                 continue;
             }

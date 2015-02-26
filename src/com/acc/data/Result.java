@@ -3,6 +3,7 @@ package com.acc.data;
 import com.acc.constants.Condition;
 import com.acc.constants.Kind;
 import com.acc.structure.BasicBlock;
+import com.acc.structure.Symbol;
 
 import java.util.List;
 
@@ -26,6 +27,12 @@ public class Result {
     }
     public Result(Kind kind){
         this.kind = kind;
+    }
+
+    public Result(Symbol variable){
+        this.kind = Kind.VAR;
+        this.variableName = variable.getName();
+        this.location = variable.getSuffix();
     }
 
     public Result(Kind kind, Integer regno, Integer value, Integer address, Condition cond, Integer fixupLoc, List<Integer> dimensions) {

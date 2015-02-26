@@ -94,7 +94,7 @@ public class AuxiliaryFunctions {
         final List<Instruction> remove = new ArrayList<Instruction>();
         for (Instruction instruction : instructions) {
             if(instruction.isPhi()) {
-                PhiInstruction phi = (PhiInstruction) instruction;
+                Instruction phi = instruction;
                 if(phi.canIgnore()) {
                     remove.add(instruction);
                 }
@@ -126,6 +126,7 @@ public class AuxiliaryFunctions {
 
     public static void addMoveInstruction(Code code, Result x, Result y, SymbolTable symbolTable) {
         addToSymbolTable(code, symbolTable, x);
+        x.setLocation(code.getPc());
         addInstruction(OperationCode.move, code, x, y, symbolTable);
     }
 
@@ -148,6 +149,6 @@ public class AuxiliaryFunctions {
      * @return Program Counter
      */
     public static int addKillInstruction(Code code, Symbol recent) {
-        return code.addCode(new KillInstruction(recent, code.getPc()));
+        return code.addCode(new Instruction(OperationCode.kill, new Result(recent), null, code.getPc()));
     }
 }

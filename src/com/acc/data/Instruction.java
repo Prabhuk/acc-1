@@ -9,8 +9,6 @@ import com.acc.structure.Symbol;
  */
 public class Instruction {
 
-    protected final boolean isPhi;
-    protected final boolean isKill;
     protected Symbol symbol;
     protected final Integer opcode;
     protected final Integer location;
@@ -20,9 +18,7 @@ public class Instruction {
     private String deletePurpose;
     private boolean isDeleted;
 
-    public Instruction(boolean isPhi, boolean isKill, Symbol symbol, Integer opcode, Integer location) {
-        this.isPhi = isPhi;
-        this.isKill = isKill;
+    public Instruction(Symbol symbol, Integer opcode, Integer location) {
         this.symbol = symbol;
         this.opcode = opcode;
         this.location = location;
@@ -33,8 +29,6 @@ public class Instruction {
         this.x = x;
         this.y = y;
         this.location = location;
-        this.isPhi = OperationCode.phi == op;
-        this.isKill = OperationCode.kill == op;
     }
 
     public Result getX() {
@@ -46,11 +40,11 @@ public class Instruction {
     }
 
     public boolean isPhi() {
-        return isPhi;
+        return OperationCode.phi == opcode;
     }
 
     public boolean isKill() {
-        return isKill;
+        return OperationCode.kill == opcode;
     }
 
     public Symbol getSymbol() {
@@ -99,10 +93,10 @@ public class Instruction {
         } else if(x.kind().isConstant()) {
             return "#" + String.valueOf(x.value());
         } else if(x.kind().isVariable()) {
-            if(opcode >= OperationCode.bra && opcode <= OperationCode.bgt || opcode == OperationCode.cmp) {
+            if(opcode >= OperationCode.bra && opcode <= OperationCode.bgt || opcode == OperationCode.cmp || opcode == OperationCode.kill) {
                 return x.getVariableName();
             }
-            return x.getVariableName() + ":" + symbol.getSuffix();
+            return x.getVariableName() + ":" + x.getLocation();
         } else if (x.kind().isArray()) {
             return x.getVariableName();
         } else if (x.kind().isFramePointer()) {
@@ -144,6 +138,22 @@ public class Instruction {
         this.isDeleted = isDeleted;
         this.deletePurpose = deletePurpose;
     }
+
+
+    public boolean isComplete() {
+        if(opcode != OperationCode.phi) {
+            throw new UnsupportedOperationException("This operation is only for PHI instructions");
+        }
+        return y != null && x != null;
+    }
+
+    public boolean canIgnore() {
+        if(opcode != OperationCode.phi) {
+            throw new UnsupportedOperationException("This operation is only for PHI instructions");
+        }
+        return (x.getVariableName().equals(y.getVariableName()) && x.getLocation().equals(y.getLocation())) || !isComplete();
+    }
+
 }
 
 

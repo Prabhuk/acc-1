@@ -47,7 +47,7 @@ public class OperationCode {
         intermediatesOperandCount.put(load, 1);
         intermediatesOperandCount.put(store, 2);
         intermediatesOperandCount.put(move, 2);
-        intermediatesOperandCount.put(phi, -1);
+        intermediatesOperandCount.put(phi, 2);
         intermediatesOperandCount.put(end, 0);
         intermediatesOperandCount.put(bra, 1);
         intermediatesOperandCount.put(bne, 2);

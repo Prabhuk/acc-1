@@ -43,7 +43,9 @@ public class Code {
 //            }
         } else {
             instructions.add(instruction);
-            controlFlowGraph.addInstruction(instruction);
+            if(!instruction.isPhi()) {
+                controlFlowGraph.addInstruction(instruction);
+            }
         }
         return instructions.size();
     }
@@ -54,15 +56,6 @@ public class Code {
      */
     public int removeCode(Instruction instruction) {
         instructions.remove(instruction);
-        return instructions.size();
-    }
-
-    /**
-     * @param instruction - Takes an instruction and appends to the output code
-     * @return Returns the current program counter value
-     */
-    public int addPhiInstruction(PhiInstruction instruction) {
-        instructions.add(instruction);
         return instructions.size();
     }
 
