@@ -12,8 +12,11 @@ import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
 import com.acc.util.Printer;
 import com.acc.util.Tokenizer;
+import org.apache.commons.io.FileUtils;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,6 +27,7 @@ import java.util.logging.Logger;
 public class CompileInputFile {
     private String filePath;
     private Tokenizer tokenizer;
+    public static String currentFileName;
     Computation parser;
     private static Logger logger = Logger.getLogger(CompileInputFile.class.getName());
 
@@ -45,18 +49,13 @@ public class CompileInputFile {
     public static void main(String[] args) {
 
 
-        new CompileInputFile("C:\\work\\acc\\test\\accsimple.txt");
-
-        final List<Computation> parsers = OutputContents.getPrograms();
-        for (Computation parser : parsers) {
-            final Code code = parser.getCode();
-            printInstructions(parser, code);
-            final BasicBlock rootNode = code.getControlFlowGraph().getRootBlock();
-            new GraphHelper(new CopyPropogationWorker(parser.getSymbolTable()), rootNode);
-            new GraphHelper(new DeleteInstructions(code, parser.getSymbolTable()), rootNode);
-            new GraphHelper(new VCGWorker(parser.getProgramName() + ".vcg", parser.getSymbolTable()), rootNode);
-            printInstructions(parser, code);
-        }
+        final String inputFile = "C:\\work\\acc\\test\\accsimple.txt";
+        processFile(inputFile);
+//        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test"), new String[]{"txt"}, false);
+//        for (File inputFile : files) {
+//            currentFileName = inputFile.getName();
+//            processFile(inputFile.getAbsolutePath());
+//        }
 
 
 //        BasicBlock bb0= new BasicBlock();
@@ -69,6 +68,20 @@ public class CompileInputFile {
 //        bb1.addChild(bb3);
 //        bb2.addChild(bb1);
 //        GraphHelper v = new GraphHelper(new VCGWorker(), bb0);
+    }
+
+    private static void processFile(String inputFile) {
+        new CompileInputFile(inputFile);
+        final List<Computation> parsers = OutputContents.getPrograms();
+        for (Computation parser : parsers) {
+            final Code code = parser.getCode();
+            printInstructions(parser, code);
+            final BasicBlock rootNode = code.getControlFlowGraph().getRootBlock();
+            new GraphHelper(new CopyPropogationWorker(parser.getSymbolTable()), rootNode);
+            new GraphHelper(new DeleteInstructions(code, parser.getSymbolTable()), rootNode);
+            new GraphHelper(new VCGWorker(parser.getProgramName() + ".vcg", parser.getSymbolTable()), rootNode);
+            printInstructions(parser, code);
+        }
     }
 
     private static void printInstructions(Computation parser, Code code) {

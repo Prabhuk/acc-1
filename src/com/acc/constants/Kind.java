@@ -6,6 +6,7 @@ package com.acc.constants;
 public enum Kind {
     CONSTANT,
     VAR,
+    PROCEDURE,
     ARRAY,
     REG,
     CONDITION,
@@ -45,5 +46,10 @@ public enum Kind {
     public boolean isIntermediate() {
         return this == INTERMEDIATE;
     }
+
+    public boolean isProcedure() {
+        return this == PROCEDURE;
+    }
+
 
 }

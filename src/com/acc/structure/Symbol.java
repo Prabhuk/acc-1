@@ -23,9 +23,14 @@ public class Symbol {
      * @param value          - value to be assigned.
      */
     public Symbol(String name, int suffix, Integer value) {
+        this(name, suffix, value, SymbolType.VARIABLE);
+
+    }
+
+    public Symbol(String name, int suffix, Integer value, SymbolType type) {
         this.name = name;
         this.suffix = suffix;
-        this.type = SymbolType.VARIABLE;
+        this.type = type;
         this.value = value;
     }
 

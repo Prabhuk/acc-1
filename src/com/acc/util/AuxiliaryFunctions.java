@@ -84,7 +84,7 @@ public class AuxiliaryFunctions {
             s.setArrayIdentifiers(originalArrayIdentifiers);
             s.setArrayValue(Array.newInstance(Integer.class, dimensionsArray));
         } else {
-            s = new Symbol(symbolName, -1,null);
+            s = new Symbol(symbolName, -1,null, type);
         }
         symbolTable.addSymbol(s);
     }

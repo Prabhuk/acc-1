@@ -49,6 +49,8 @@ public class TypeDeclaration extends Parser {
                 throw new SyntaxErrorException("Symbol \"[\" expected for array declaration. Found [" + next.getToken() + "] instead");
             }
             tokenizer.previous(); // fixing the tokenizer to refer back to the previous variable
+        } else if (next.isKeyword() && (((Keyword) next).isProcedure() || ((Keyword) next).isFunction())) {
+            kind = Kind.PROCEDURE;
         } else {
             throw new SyntaxErrorException("Keyword \"var\" or \"array\" expected for type declaration. Found [" + next.getToken() + "] instead");
         }
