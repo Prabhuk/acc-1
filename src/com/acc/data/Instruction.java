@@ -14,8 +14,8 @@ public class Instruction {
     protected Symbol symbol;
     protected final Integer opcode;
     protected final Integer location;
-    private Result x;
-    private Result y;
+    protected Result x;
+    protected Result y;
 
     private String deletePurpose;
     private boolean isDeleted;
@@ -73,11 +73,20 @@ public class Instruction {
 
         StringBuilder sb = new StringBuilder(OperationCode.getOperationName(opcode));
         final Integer operandCount = OperationCode.getOperandCount(opcode);
+
         if(operandCount > 0) {
-            sb.append(" ").append(getOperand(x));
+            if(opcode == OperationCode.move || opcode == OperationCode.store) {
+                sb.append(" ").append(getOperand(y));
+            } else {
+                sb.append(" ").append(getOperand(x));
+            }
         }
         if(operandCount > 1) {
-            sb.append(" ").append(getOperand(y));
+            if(opcode == OperationCode.move || opcode == OperationCode.store) {
+                sb.append(" ").append(getOperand(x));
+            } else {
+                sb.append(" ").append(getOperand(y));
+            }
         }
 
         return sb.toString();
@@ -96,6 +105,10 @@ public class Instruction {
             return x.getVariableName() + ":" + symbol.getSuffix();
         } else if (x.kind().isArray()) {
             return x.getVariableName();
+        } else if (x.kind().isFramePointer()) {
+            return "FP:0";
+        } else if (x.kind().isBaseAddress()) {
+            return x.getVariableName() + ":baseaddress";
         }
         return "";
     }

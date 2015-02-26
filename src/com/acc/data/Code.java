@@ -32,17 +32,18 @@ public class Code {
      * @return Returns the current program counter value
      */
     public int addCode(Instruction instruction) {
-        instructions.add(instruction);
-        controlFlowGraph.addInstruction(instruction);
-        if(instruction.getOpcode() == OperationCode.store) {
-            if(controlFlowGraph.getCurrentBlock().getJoinBlock() != null) {
-                final KillInstruction kill = new KillInstruction(instruction.getSymbol(), getPc());
-                instructions.add(kill);
-                controlFlowGraph.getCurrentBlock().getJoinBlock().addInstruction(kill);
+        if(instruction.isKill()) {
+            final BasicBlock joinBlock = controlFlowGraph.getCurrentBlock().getJoinBlock();
+            if (joinBlock != null) {
+                instructions.add(instruction);
+                joinBlock.addInstruction(instruction);
             }
 //            else {
-//                controlFlowGraph.getCurrentBlock().addInstruction(kill);
+//                currentBlock.addInstruction(instruction);
 //            }
+        } else {
+            instructions.add(instruction);
+            controlFlowGraph.addInstruction(instruction);
         }
         return instructions.size();
     }

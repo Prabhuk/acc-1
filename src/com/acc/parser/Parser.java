@@ -1,5 +1,6 @@
 package com.acc.parser;
 
+import com.acc.constants.Kind;
 import com.acc.data.Code;
 import com.acc.data.Result;
 import com.acc.data.Token;
@@ -21,6 +22,11 @@ public abstract class Parser {
     protected Tokenizer tokenizer;
     private static final SymbolTable symbolTable = new SymbolTable();
     private final Map<String, List<String>> procedureArguments = new HashMap<String, List<String>>();
+    protected static final Result FP = new Result(Kind.FRAME_POINTER);
+    static {
+        FP.value(100); //FRAME POINTER ADDRESS
+        //$TODO$ Cannot hardcode to 100. Needs fixing $Fixme$
+    }
 
     public Parser(Code code, Tokenizer tokenizer) {
         this.code = code;
@@ -72,6 +78,7 @@ public abstract class Parser {
         List<Result> arrayIdentifiers = new ArrayList<Result>();
         if (recent.getType().isArray()) {
             for (int i = 0; i < recent.getArrayDimension(); i++) {
+                //$TODO$ Not necessary but can handle complete assignments of arrays here
                 handleOpenBoxBracket();
                 arrayIdentifiers.add(new Expression(code, tokenizer).parse());
                 handleCloseBoxBracket();
@@ -79,6 +86,8 @@ public abstract class Parser {
         }
         return arrayIdentifiers;
     }
+
+
 
     private void handleOpenBoxBracket() {
         final Token openBoxBracket = tokenizer.next();

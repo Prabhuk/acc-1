@@ -92,7 +92,7 @@ public class Symbol {
     }
 
     public String getUniqueIdentifier() {
-        return name + ":" + suffix;
+        return type == SymbolType.VARIABLE ? (name + ":" + suffix) : name;
     }
 
     public List<Result> getArrayIdentifiers() {

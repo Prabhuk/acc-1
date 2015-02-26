@@ -45,7 +45,7 @@ public class OperationCode {
         intermediatesOperandCount.put(cmp, 2);
         intermediatesOperandCount.put(adda, 2);
         intermediatesOperandCount.put(load, 1);
-        intermediatesOperandCount.put(store, 1);
+        intermediatesOperandCount.put(store, 2);
         intermediatesOperandCount.put(move, 2);
         intermediatesOperandCount.put(phi, -1);
         intermediatesOperandCount.put(end, 0);

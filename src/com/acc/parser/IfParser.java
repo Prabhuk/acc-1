@@ -49,7 +49,7 @@ public class IfParser extends Parser {
             join.setLeft(leftTree.getJoin());
         }
 
-//        Result follow = new Result(Kind.FIXUP_DUMMY, 0, 0, 0, null, ZERO);
+//        Result follow = new Result(Kind.FRAME_POINTER, 0, 0, 0, null, ZERO);
         Token incoming = tokenizer.next();
         if (isElse(incoming)) {
             final BasicBlock right = new BasicBlock();

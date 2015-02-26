@@ -73,6 +73,16 @@ public class SymbolTable {
         return s;
     }
 
+    public Symbol getDeclaration(String symbolName) {
+        Symbol s = null;
+        for (Symbol symbol : symbols) {
+            if(symbol.getName().equals(symbolName) && symbol.getSuffix() == -1) {
+                return symbol;
+            }
+        }
+        return s;
+    }
+
     private String getSymbolKey(Symbol s) {
         return s.getName() + s.getSuffix();
     }

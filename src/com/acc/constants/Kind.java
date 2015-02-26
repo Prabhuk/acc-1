@@ -10,15 +10,21 @@ public enum Kind {
     REG,
     CONDITION,
     INTERMEDIATE,
-    FIXUP_DUMMY;
+    BASE_ADDRESS,
+    FRAME_POINTER;
 
     public boolean isConstant() {
         return this == CONSTANT;
     }
 
-    public boolean isFixupDummy() {
-        return this == FIXUP_DUMMY;
+    public boolean isFramePointer() {
+        return this == FRAME_POINTER;
     }
+
+    public boolean isBaseAddress() {
+        return this == BASE_ADDRESS;
+    }
+
 
     public boolean isVariable() {
         return this == VAR;

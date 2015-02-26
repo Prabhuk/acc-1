@@ -2,6 +2,7 @@ package com.acc.parser;
 
 import com.acc.constants.Kind;
 import com.acc.data.*;
+import com.acc.structure.Symbol;
 import com.acc.util.Tokenizer;
 
 /**
@@ -24,7 +25,12 @@ public class Factor extends Parser {
             x = new Result(Kind.CONSTANT, null, nextConstant.value(), null, null, null);
         } else if (next.isDesignator()) {
             //$TODO$ implement lookup and set the address instead of 0
-            x = new Result(Kind.VAR, null, null, 0, null, null);
+            final Symbol recentOccurence = getSymbolTable().getRecentOccurence(next.getToken());
+            if(recentOccurence.getType().isArray()) {
+                x = new Result(Kind.ARRAY);
+            } else {
+                x = new Result(Kind.VAR);
+            }
             x.setVariableName(next.getToken());
         } else if (next.isKeyword() && ((Keyword) next).isCall()) {
             x = new FunctionCall(code, tokenizer).parse();
