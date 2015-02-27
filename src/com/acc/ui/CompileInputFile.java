@@ -2,7 +2,7 @@ package com.acc.ui;
 
 import com.acc.data.Code;
 import com.acc.data.Instruction;
-import com.acc.graph.CopyPropogationWorker;
+import com.acc.graph.CPWorker;
 import com.acc.graph.DeleteInstructions;
 import com.acc.graph.GraphHelper;
 import com.acc.graph.VCGWorker;
@@ -12,11 +12,8 @@ import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
 import com.acc.util.Printer;
 import com.acc.util.Tokenizer;
-import org.apache.commons.io.FileUtils;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,9 +75,9 @@ public class CompileInputFile {
             final Code code = parser.getCode();
             printInstructions(parser, code);
             final BasicBlock rootNode = code.getControlFlowGraph().getRootBlock();
-            new GraphHelper(new CopyPropogationWorker(parser.getSymbolTable()), rootNode);
-            printInstructions(parser, code);
+            new GraphHelper(new CPWorker(parser.getSymbolTable()), rootNode);
             new GraphHelper(new DeleteInstructions(code, parser.getSymbolTable()), rootNode);
+            printInstructions(parser, code);
             new GraphHelper(new VCGWorker(parser.getProgramName() + ".vcg", parser.getSymbolTable()), rootNode);
             printInstructions(parser, code);
         }

@@ -78,8 +78,12 @@ public class Code {
 
     public void Fixup(int location) {
 //        instructions.get(location).FixUp(getPc() - location);
-        instructions.get(location).FixUp(getPc());
-        //$TODO$ this is not updated within the basicblock. Need to fix it in the basic block as well. Use instr number range?
+        for (Instruction instruction : instructions) {
+            if(instruction.getLocation() == location) {
+                instruction.FixUp(getPc());
+                break;
+            }
+        }
     }
 
     public void Fixlink(Result follow) {

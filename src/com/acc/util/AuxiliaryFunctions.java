@@ -109,18 +109,19 @@ public class AuxiliaryFunctions {
 
     public static void addInstruction(int op, Code code, Result x, Result y, SymbolTable symbolTable) {
         final Instruction instruction = new Instruction(op, x, y, code.getPc());
-        if(symbolTable != null && (x.kind().isVariable() || x.kind().isArray())) {
-            final Symbol recentOccurence = symbolTable.getRecentOccurence(x.getVariableName());
-            if(x.kind().isArray()) {
-                if(recentOccurence.getSuffix() == -1) {
+        if(OperationCode.getOperandCount(op) > 0) {
+            if (symbolTable != null && (x.kind().isVariable() || x.kind().isArray())) {
+                final Symbol recentOccurence = symbolTable.getRecentOccurence(x.getVariableName());
+                if (x.kind().isArray()) {
+                    if (recentOccurence.getSuffix() == -1) {
+                        instruction.setSymbol(recentOccurence);
+                        //Making sure arrays have only one entry in symbol table besides the declaration
+                    }
+                } else {
                     instruction.setSymbol(recentOccurence);
-                    //Making sure arrays have only one entry in symbol table besides the declaration
                 }
-            } else {
-                instruction.setSymbol(recentOccurence);
             }
         }
-
         code.addCode(instruction);
     }
 

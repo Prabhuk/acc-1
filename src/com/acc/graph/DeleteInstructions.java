@@ -15,11 +15,26 @@ import java.util.*;
 public class DeleteInstructions extends Worker {
 
     private final Code code;
-    private Map<Integer, Instruction> destinationSource = new HashMap<Integer, Instruction>();
     private static int instructionNumber = 0;
+    private Map<Integer, Integer> oldNewLocations = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> deletedLocations = new HashMap<Integer, Integer>();
+
     public DeleteInstructions(Code code, SymbolTable table) {
         super(table);
         this.code = code;
+    }
+
+    @Override
+    public void begin() {
+        final List<Instruction> instructions = code.getInstructions();
+        for (Instruction instruction : instructions) {
+            if(!instruction.isDeleted()) {
+                oldNewLocations.put(instruction.getLocation(), instructionNumber);
+                instructionNumber++;
+            } else {
+                deletedLocations.put(instruction.getLocation(), instructionNumber);
+            }
+        }
     }
 
     @Override
@@ -28,58 +43,101 @@ public class DeleteInstructions extends Worker {
         final Iterator<Instruction> iterator = instructions.iterator();
         while (iterator.hasNext()) {
             final Instruction instruction = iterator.next();
-            if(instruction.isDeleted()) {
-                iterator.remove();
-                code.removeCode(instruction);
+            final Integer opcode = instruction.getOpcode();
+            if(!instruction.isDeleted()) {
+                if(opcode == OperationCode.bra) {
+                    updateBranchDestinationTargets(instruction.getX());
+                } else if(opcode >= OperationCode.bne && opcode <= OperationCode.bgt) {
+                    updateIntermediates(instruction.getX());
+                    updateBranchDestinationTargets(instruction.getY());
+                }  else {
+                    updateIntermediates(instruction.getX());
+                    updateIntermediates(instruction.getY());
+                }
             } else {
-                updateDestinationsForOperand(instruction, instruction.getX());
-                updateDestinationsForOperand(instruction, instruction.getY());
+                iterator.remove();
             }
         }
     }
 
-    private void updateDestinationsForOperand(Instruction instruction, Result result) {
+    private void updateBranchDestinationTargets(Result result) {
         if(result == null) {
             return;
         }
-        if(result.kind().isVariable()) {
-            destinationSource.put(result.getLocation(), instruction);
-        } else if(result.kind().isIntermediate()) {
-            destinationSource.put(result.getIntermediateLoation(), instruction);
+        if(result.kind().isConstant()) {
+            if(oldNewLocations.get(result.value()) != null) {
+                result.value(oldNewLocations.get(result.value()));
+            } else {
+                int target = getNextAvailableLocation(result.value());
+                result.value(target);
+            }
         }
+    }
+
+    private int getNextAvailableLocation(Integer deletedInstruction) {
+        Integer target = deletedLocations.get(deletedInstruction);
+        if(target == null) {
+            throw new RuntimeException("deletedInstruction [" + deletedInstruction + "] is not mapped to any other potential instructions");
+        }
+        while (!oldNewLocations.containsValue(target) && target < oldNewLocations.size()) {
+            target++;
+        }
+        return target;
+    }
+
+
+    private void updateIntermediates(Result result) {
+        if(result == null) {
+            return;
+        }
+        if(result.kind().isIntermediate()) {
+            if(oldNewLocations.get(result.getIntermediateLoation()) != null) {
+                result.setIntermediateLoation(oldNewLocations.get(result.getIntermediateLoation()));
+            }
+        }
+    }
+
+
+    private Set<Instruction> getSet(Map<Integer, Set<Instruction>> map, Integer key) {
+        if(map.get(key) == null) {
+            Set<Instruction> instructions = new HashSet<Instruction>();
+            map.put(key, instructions);
+            return instructions;
+        }
+        return map.get(key);
     }
 
     @Override
     public void finish() {
         final List<Instruction> instructions = code.getInstructions();
-        final Collection<Integer> targets = destinationSource.keySet();
-        for (Instruction instruction : instructions) {
-            final Integer oldLocation = instruction.getLocation();
-            if(targets.contains(oldLocation)) {
-                final Instruction instruction1 = destinationSource.get(oldLocation);
-
-                    handlePhiInstructionOperand(oldLocation, instruction1.getX());
-                    handlePhiInstructionOperand(oldLocation, instruction1.getY());
+        final Iterator<Instruction> iterator = instructions.iterator();
+        instructionNumber = 0;
+        while(iterator.hasNext()) {
+            Instruction instruction = iterator.next();
+            if(instruction.isDeleted()) {
+                iterator.remove();
+            } else {
+                if (instruction.isPhi()) {
+                    handlePhiInstructionOperand(instruction.getX());
+                    handlePhiInstructionOperand(instruction.getY());
+                }
+                instruction.setLocation(instructionNumber++);
             }
-            instruction.setLocation(instructionNumber);
-            instructionNumber++;
-            targets.contains(oldLocation);
         }
-
     }
 
-    private void handlePhiInstructionOperand(Integer oldLocation, Result result) {
+    private void handlePhiInstructionOperand(Result result) {
         if(result == null) {
             return;
         }
         if(result.kind().isVariable()) {
-            if (oldLocation.equals(result.getLocation())) {
-                result.setLocation(instructionNumber);
-            }
-        } else if(result.kind().isIntermediate()) {
-            if (oldLocation.equals(result.getIntermediateLoation())) {
-                result.setIntermediateLoation(instructionNumber);
+            final Integer targetOldLocation = result.getLocation();
+            if(oldNewLocations.get(targetOldLocation) != null) {
+                result.setLocation(oldNewLocations.get(targetOldLocation));
             }
         }
     }
+
+
+
 }

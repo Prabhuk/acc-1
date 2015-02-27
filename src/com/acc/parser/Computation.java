@@ -1,10 +1,12 @@
 package com.acc.parser;
 
+import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.ui.OutputContents;
+import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
 /**
@@ -31,6 +33,7 @@ public class Computation extends Parser {
         if (!end.getToken().equals(".")) {
             throw new SyntaxErrorException("Your program should end with a dot [.] Found [" + end + "] instead");
         }
+        AuxiliaryFunctions.addInstruction(OperationCode.end, code, null, null, getSymbolTable());
         return s;
     }
 

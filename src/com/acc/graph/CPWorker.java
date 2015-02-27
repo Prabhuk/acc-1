@@ -14,12 +14,12 @@ import java.util.*;
 /**
  * Created by prabhuk on 2/23/2015.
  */
-public class CopyPropogationWorker extends Worker {
+public class CPWorker extends Worker {
 
     private Map<String, Result> valueMap = new HashMap<String, Result>();
     private List<Instruction> phiInstructions = new ArrayList<Instruction>();
 
-    public CopyPropogationWorker(SymbolTable symbolTable) {
+    public CPWorker(SymbolTable symbolTable) {
         super(symbolTable);
     }
 
@@ -67,14 +67,15 @@ public class CopyPropogationWorker extends Worker {
                 valueMap.remove(instruction.getSymbol().getName());
                 continue;
             }
-            final String variableName = instruction.getX().getVariableName();
             if(instruction.isKill()) {
+                final String variableName = instruction.getX().getVariableName();
                 valueMap.remove(variableName);
                 continue;
             } else {
                 final Result x = instruction.getX();
                 final Result y = instruction.getY();
                 if(opcode == OperationCode.move) {
+                    final String variableName = instruction.getX().getVariableName();
                     updateValueMap(instruction, variableName, instruction.getX().getUniqueIdentifier(), y);
                 } else {
                     if (x != null) {
@@ -98,17 +99,24 @@ public class CopyPropogationWorker extends Worker {
     private void updateDominatedBy(List<Instruction> instructions) {
         for (Instruction instruction : instructions) {
             final Integer opcode = instruction.getOpcode();
+            if(OperationCode.end == opcode) {
+                return;
+            }
             if(instruction.isPhi()) {
                 valueMap.remove(instruction.getSymbol().getName());
                 phiInstructions.add(instruction);
 //                updatePhiInstruction(instruction);
                 continue;
             }
-            final String variableName = instruction.getX().getVariableName();
+
             if(instruction.isKill()) {
+                final String variableName = instruction.getX().getVariableName();
                 valueMap.remove(variableName);
                 continue;
             } else {
+                if(instruction.getX() == null && instruction.getY()==null) {
+                    return;
+                }
                 final Result x = instruction.getX();
                 final Result y = instruction.getY();
                 if(opcode != OperationCode.move) {
