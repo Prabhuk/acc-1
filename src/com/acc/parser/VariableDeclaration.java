@@ -25,7 +25,6 @@ public class VariableDeclaration extends Parser {
 
     @Override
     public Result parse() {
-        //$TODO$ extract TypeDeclaration. Handle multidimensional arrays => In progress
         Result x = new TypeDeclaration(code, tokenizer).parse();
         Kind _type = x.kind();
         final SymbolType symbolType = _type.isArray() ? SymbolType.ARRAY : SymbolType.VARIABLE;

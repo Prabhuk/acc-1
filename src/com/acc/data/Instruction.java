@@ -87,7 +87,7 @@ public class Instruction {
         } else if(x.kind().isConstant()) {
             return "#" + String.valueOf(x.value());
         } else if(x.kind().isVariable()) {
-            if(opcode == OperationCode.cmp || opcode == OperationCode.kill) {
+            if(opcode == OperationCode.cmp || opcode == OperationCode.kill || x.getLocation() == null) {
                 return x.getVariableName();
             }
             return x.getVariableName() + ":" + x.getLocation();

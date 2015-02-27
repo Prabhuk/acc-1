@@ -3,7 +3,7 @@ package com.acc.graph;
 import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
-import com.acc.parser.Parser;
+import com.acc.data.Result;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.SymbolTable;
 
@@ -32,13 +32,20 @@ public class DeleteInstructions extends Worker {
                 iterator.remove();
                 code.removeCode(instruction);
             } else {
-                final Integer opcode = instruction.getOpcode();
-                if (opcode >= OperationCode.bne && opcode <= OperationCode.bgt) {
-                    destinationSource.put(instruction.getY().value(), instruction);
-                } else if (opcode == OperationCode.bra) {
-                    destinationSource.put(instruction.getX().value(), instruction);
-                }
+                updateDestinationsForOperand(instruction, instruction.getX());
+                updateDestinationsForOperand(instruction, instruction.getY());
             }
+        }
+    }
+
+    private void updateDestinationsForOperand(Instruction instruction, Result result) {
+        if(result == null) {
+            return;
+        }
+        if(result.kind().isVariable()) {
+            destinationSource.put(result.getLocation(), instruction);
+        } else if(result.kind().isIntermediate()) {
+            destinationSource.put(result.getIntermediateLoation(), instruction);
         }
     }
 
@@ -50,16 +57,29 @@ public class DeleteInstructions extends Worker {
             final Integer oldLocation = instruction.getLocation();
             if(targets.contains(oldLocation)) {
                 final Instruction instruction1 = destinationSource.get(oldLocation);
-                if(instruction1.getOpcode() == OperationCode.bra) {
-                    instruction1.getX().value(instructionNumber);
-                } else {
-                    instruction1.getY().value(instructionNumber);
-                }
+
+                    handlePhiInstructionOperand(oldLocation, instruction1.getX());
+                    handlePhiInstructionOperand(oldLocation, instruction1.getY());
             }
             instruction.setLocation(instructionNumber);
             instructionNumber++;
             targets.contains(oldLocation);
         }
 
+    }
+
+    private void handlePhiInstructionOperand(Integer oldLocation, Result result) {
+        if(result == null) {
+            return;
+        }
+        if(result.kind().isVariable()) {
+            if (oldLocation.equals(result.getLocation())) {
+                result.setLocation(instructionNumber);
+            }
+        } else if(result.kind().isIntermediate()) {
+            if (oldLocation.equals(result.getIntermediateLoation())) {
+                result.setIntermediateLoation(instructionNumber);
+            }
+        }
     }
 }

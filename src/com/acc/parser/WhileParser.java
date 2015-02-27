@@ -64,7 +64,7 @@ public class WhileParser extends Parser {
 
         final Result rightTree = new StatSequence(code, tokenizer).parse();
         if(rightTree.getJoin() != null) {
-            x.setJoin(rightTree.getJoin());
+            join.setRight(rightTree.getJoin());
             rightTree.getJoin().addChild(loopBlock); //Does loop body dominate loop condition block?
         } else {
             right.addChild(loopBlock);
@@ -72,7 +72,7 @@ public class WhileParser extends Parser {
 
         AuxiliaryFunctions.BJ(code, loop); //Backward Jump to the loop beginning.
         PhiInstructionHelper.createPhiInstructions(getSymbolTable(), join, code);
-
+        code.Fixup(x.fixupLoc());
         final BasicBlock nextBlock = new BasicBlock();
         join.addChild(nextBlock, true);
 

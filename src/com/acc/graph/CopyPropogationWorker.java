@@ -18,7 +18,6 @@ public class CopyPropogationWorker extends Worker {
 
     private Map<String, Result> valueMap = new HashMap<String, Result>();
     private List<Instruction> phiInstructions = new ArrayList<Instruction>();
-//    private List<Instruction> copiedInstructions = new ArrayList<Instruction>();
 
     public CopyPropogationWorker(SymbolTable symbolTable) {
         super(symbolTable);

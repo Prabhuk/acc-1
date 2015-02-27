@@ -79,6 +79,7 @@ public class CompileInputFile {
             printInstructions(parser, code);
             final BasicBlock rootNode = code.getControlFlowGraph().getRootBlock();
             new GraphHelper(new CopyPropogationWorker(parser.getSymbolTable()), rootNode);
+            printInstructions(parser, code);
             new GraphHelper(new DeleteInstructions(code, parser.getSymbolTable()), rootNode);
             new GraphHelper(new VCGWorker(parser.getProgramName() + ".vcg", parser.getSymbolTable()), rootNode);
             printInstructions(parser, code);

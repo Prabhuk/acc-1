@@ -42,9 +42,9 @@ public class Term extends Parser {
                     throw new UnsupportedOperationException("Combine cannot process Operation code [" + op + "]");
                 }
             } else {
-                x.setIntermediateLoation(code.getPc() - 1);
                 AuxiliaryFunctions.addInstruction(op, code, x, y, getSymbolTable());
-                x.kind(Kind.INTERMEDIATE);
+                x = new Result(Kind.INTERMEDIATE);
+                x.setIntermediateLoation(code.getPc() - 1);
             }
         }
         tokenizer.previous();

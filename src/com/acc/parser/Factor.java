@@ -28,8 +28,10 @@ public class Factor extends Parser {
             final Symbol recentOccurence = getSymbolTable().getRecentOccurence(next.getToken());
             if(recentOccurence.getType().isArray()) {
                 x = new Result(Kind.ARRAY);
-            } else {
+            } else if(recentOccurence.getType().isVariable()) {
                 x = new Result(Kind.VAR);
+            } else if(recentOccurence.getType().isProcedure()) {
+                x = new Result(Kind.PROCEDURE);
             }
             x.setVariableName(next.getToken());
         } else if (next.isKeyword() && ((Keyword) next).isCall()) {
