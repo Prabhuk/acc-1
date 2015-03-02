@@ -150,7 +150,7 @@ public class Result {
     public static boolean isSameVariable(Result x, Result y) {
 
         return (x != null && y!= null &&
-                x.kind().isVariable() && y.kind().isVariable() &&
+                x.isVariable() && y.isVariable() &&
                 x.getVariableName().equals(y.getVariableName()) &&
                 x.getLocation().equals(y.getLocation()));
     }

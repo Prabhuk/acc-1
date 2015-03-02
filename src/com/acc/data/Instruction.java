@@ -82,20 +82,20 @@ public class Instruction {
     }
 
     private String getOperand(Result x) {
-        if(x.kind().isIntermediate()) {
+        if(x.isIntermediate()) {
             return "(" + x.getIntermediateLoation() +")";
-        } else if(x.kind().isConstant()) {
+        } else if(x.isConstant()) {
             return "#" + String.valueOf(x.value());
-        } else if(x.kind().isVariable() || x.kind().isProcedure()) {
+        } else if(x.isVariable() || x.isProcedure()) {
             if(opcode == OperationCode.cmp || opcode == OperationCode.kill || x.getLocation() == null) {
                 return x.getVariableName();
             }
             return x.getVariableName() + ":" + x.getLocation();
-        } else if (x.kind().isArray()) {
+        } else if (x.isArray()) {
             return x.getVariableName();
-        } else if (x.kind().isFramePointer()) {
+        } else if (x.isFramePointer()) {
             return "FP:0";
-        } else if (x.kind().isBaseAddress()) {
+        } else if (x.isBaseAddress()) {
             return x.getVariableName() + ":baseaddress";
         }
         return "";

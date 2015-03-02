@@ -34,7 +34,7 @@ public class Expression extends Parser {
                 op = OperationCode.sub;
             }
             y = new Term(code, tokenizer, symbolTable).parse();
-            if (x.kind().isConstant() && y.kind().isConstant()) {
+            if (x.isConstant() && y.isConstant()) {
                 if (op == OperationCode.add) {
                     x.value(x.value() + y.value());
                 } else if (op == OperationCode.sub) {
@@ -50,7 +50,7 @@ public class Expression extends Parser {
 
             next = tokenizer.next();
         }
-//        if(x.kind().isVariable()) {
+//        if(x.isVariable()) {
 //            x.address(getSymbolTable().getRecentOccurence(x.getVariableName())
 //        }
         tokenizer.previous(); //Rolling back the token which broke the while loop

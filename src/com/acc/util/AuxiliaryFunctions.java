@@ -51,7 +51,7 @@ public class AuxiliaryFunctions {
      * Combines x & y and resultant result obj is maintained in x.
      */
     public static void combine(Code code, String op, Result x, Result y) {
-        if (x.kind().isConstant() && y.kind().isConstant()) {
+        if (x.isConstant() && y.isConstant()) {
             if (op.equals(OperationCode.add)) {
                 x.value(x.value() + y.value());
             } else if (op.equals(OperationCode.sub)) {
@@ -110,12 +110,12 @@ public class AuxiliaryFunctions {
     public static void addInstruction(int op, Code code, Result x, Result y, SymbolTable symbolTable) {
         final Instruction instruction = new Instruction(op, x, y, code.getPc());
         if(OperationCode.getOperandCount(op) > 0) {
-            if (symbolTable != null && (x.kind().isVariable() || x.kind().isArray())) {
+            if (symbolTable != null && (x.isVariable() || x.isArray())) {
                 Symbol recent = symbolTable.getRecentOccurence(x.getVariableName());
                 if(recent == null && code.getGlobalSymbolTable() != null) {
                     recent = code.getGlobalSymbolTable().getRecentOccurence(x.getVariableName());
                 }
-                if (x.kind().isArray()) {
+                if (x.isArray()) {
                     if (recent.getSuffix() == -1) {
                         instruction.setSymbol(recent);
                         //Making sure arrays have only one entry in symbol table besides the declaration

@@ -24,7 +24,7 @@ public class AssignmentParser extends Parser {
     @Override
     public Result parse() {
         final Result lhs = new Expression(code, tokenizer, symbolTable).parse();
-        if (!lhs.kind().isArray() && !lhs.kind().isVariable()) {
+        if (!lhs.isArray() && !lhs.isVariable()) {
             throw new SyntaxErrorException("Designator expected. Found[" + lhs.kind().name() + "] instead");
         }
         //$TODO$ well do something with the identifiers
@@ -32,14 +32,14 @@ public class AssignmentParser extends Parser {
         Result y = new Expression(code, tokenizer, symbolTable).parse();
 
 
-        if(!lhs.kind().isArray() && !y.kind().isArray()) {
+        if(!lhs.isArray() && !y.isArray()) {
             final Result x = new Result(Kind.VAR);
             x.setVariableName(lhs.getVariableName());
             AuxiliaryFunctions.addMoveInstruction(code, x, y, getSymbolTable());
             return x;
         }
 
-        if(lhs.kind().isArray() && y.kind().isArray() && lhs.getArrayIdentifiers().size() == 0) {
+        if(lhs.isArray() && y.isArray() && lhs.getArrayIdentifiers().size() == 0) {
             //This case will never be reached due to accumulateArrayIdentifiers throwing error on missing [
             // $TODO$ do we need to check a <- b case where a and b both are arrays?
             //Handle this case gracefully
@@ -49,12 +49,12 @@ public class AssignmentParser extends Parser {
         }
 
         Result x;
-        if (lhs.kind().isArray()) {
+        if (lhs.isArray()) {
             createAddA(lhs.getVariableName(), lhs.getArrayIdentifiers());
             x = new Result(Kind.INTERMEDIATE);
             x.setIntermediateLoation(code.getPc() - 1);
             Result storeInstruction;
-            if(y.kind().isArray()) {
+            if(y.isArray()) {
                 loadYarray(y);
                 storeInstruction = new Result(Kind.INTERMEDIATE);
                 storeInstruction.setIntermediateLoation(code.getPc() - 1);
@@ -71,7 +71,7 @@ public class AssignmentParser extends Parser {
             x = new Result(Kind.VAR);
             x.setVariableName(lhs.getVariableName());
             Result moveInstruction;
-            if(y.kind().isArray()) {
+            if(y.isArray()) {
                 loadYarray(y);
                 moveInstruction = new Result(Kind.INTERMEDIATE);
                 moveInstruction.setIntermediateLoation(code.getPc() - 1);

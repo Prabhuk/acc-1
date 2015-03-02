@@ -65,7 +65,7 @@ public class DeleteInstructions extends Worker {
         if(result == null) {
             return;
         }
-        if(result.kind().isConstant()) {
+        if(result.isConstant()) {
             if(oldNewLocations.get(result.value()) != null) {
                 result.value(oldNewLocations.get(result.value()));
             } else {
@@ -91,7 +91,7 @@ public class DeleteInstructions extends Worker {
         if(result == null) {
             return;
         }
-        if(result.kind().isIntermediate()) {
+        if(result.isIntermediate()) {
             if(oldNewLocations.get(result.getIntermediateLoation()) != null) {
                 result.setIntermediateLoation(oldNewLocations.get(result.getIntermediateLoation()));
             }
@@ -131,7 +131,7 @@ public class DeleteInstructions extends Worker {
         if(result == null) {
             return;
         }
-        if(result.kind().isVariable()) {
+        if(result.isVariable()) {
             final Integer targetOldLocation = result.getLocation();
             if(oldNewLocations.get(targetOldLocation) != null) {
                 result.setLocation(oldNewLocations.get(targetOldLocation));

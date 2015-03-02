@@ -147,10 +147,10 @@ public class CPWorker extends Worker {
     }
 
     private void updateValueMap(Instruction instruction, String variableName, String uniqueIdentifier, Result y) {
-        if(y.kind().isVariable()) {
+        if(y.isVariable()) {
             final Result yValue = valueMap.get(y.getVariableName());
             if(yValue != null) {
-                if(yValue.kind().isVariable()) {
+                if(yValue.isVariable()) {
                     updateValueMap(instruction, variableName, uniqueIdentifier, yValue);
                     return;
                 }

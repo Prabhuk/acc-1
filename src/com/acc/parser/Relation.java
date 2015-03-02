@@ -26,7 +26,7 @@ public class Relation extends Parser {
     public Result parse() {
         Result x = new Expression(code, tokenizer, symbolTable).parse();
         List<Result> arrayIdentifiers = new ArrayList<Result>();
-        if(x.kind().isArray()) {
+        if(x.isArray()) {
             arrayIdentifiers = x.getArrayIdentifiers();
             //$TODO$ what to do with it?
         }
@@ -34,7 +34,7 @@ public class Relation extends Parser {
         x.setCondition(new RelationalOperator(next.getToken()).value());
         Result y = new Expression(code, tokenizer, symbolTable).parse();
         List<Result> arrayIdentifiers2 = new ArrayList<Result>();
-        if(y.kind().isArray()) {
+        if(y.isArray()) {
             arrayIdentifiers2 = y.getArrayIdentifiers();
             //$TODO$ what to do with it?
         }

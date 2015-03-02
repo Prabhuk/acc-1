@@ -61,7 +61,7 @@ public class FunctionCall extends Parser {
             Result parameter = parameters.get(i);
             //$TODO$ somehow pass the parameters to the procdeure program
 //            String argumentName = args.get(i);
-            if (parameter.kind().isVariable()) {
+            if (parameter.isVariable()) {
                 Symbol recent = getSymbolTable().getRecentOccurence(parameter.getVariableName());
                 if (recent == null && code.getGlobalSymbolTable() != null) {
                     recent = code.getGlobalSymbolTable().getRecentOccurence(parameter.getVariableName());

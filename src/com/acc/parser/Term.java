@@ -34,7 +34,7 @@ public class Term extends Parser {
             }
             y = new Factor(code, tokenizer, symbolTable).parse();
 
-            if (x.kind().isConstant() && y.kind().isConstant()) {
+            if (x.isConstant() && y.isConstant()) {
                 if (op == OperationCode.mul) {
                     x.value(x.value() * y.value());
                 } else if (op == OperationCode.div) {
