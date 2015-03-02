@@ -5,6 +5,7 @@ import com.acc.data.Code;
 import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
+import com.acc.structure.SymbolTable;
 import com.acc.ui.OutputContents;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
@@ -16,9 +17,13 @@ public class Computation extends Parser {
 
     private String programName;
 
-    public Computation(Code code, Tokenizer tokenizer, String programName) {
-        super(code, tokenizer);
+    public Computation(Code code, Tokenizer tokenizer, SymbolTable symbolTable, String programName) {
+        super(code, tokenizer, symbolTable);
         this.programName = programName;
+        System.out.println("CURRENT PROGRAM: " + this.programName);
+//        if(programName.equals("main")) {
+//            code.setGlobalSymbolTable();
+//        }
         OutputContents.addProgram(this);
     }
 
@@ -39,14 +44,13 @@ public class Computation extends Parser {
 
     public Result programBody() {
 
-        new VariableDeclaration(code, tokenizer).parse();
-        new FunctionDeclaration(code, tokenizer).parse();
+        new VariableDeclaration(code, tokenizer, symbolTable).parse();
 
         Token next = tokenizer.next();
         if (!next.getToken().equals("{")) {
             throw new SyntaxErrorException("Expected \"{\". Found [" + next + "] instead");
         }
-        final Result s = new StatSequence(code, tokenizer).parse();
+        final Result s = new StatSequence(code, tokenizer, symbolTable).parse();
 
         next = tokenizer.next();
         if (!next.getToken().equals("}")) {

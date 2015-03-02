@@ -8,18 +8,8 @@ import com.acc.data.Instruction;
 public class ControlFlowGraph {
     private BasicBlock currentBlock;
     private final BasicBlock rootBlock;
-    private static volatile ControlFlowGraph tree;
 
-    public static ControlFlowGraph getCFG() {
-        synchronized (ControlFlowGraph.class) {
-            if (tree == null) {
-                tree = new ControlFlowGraph();
-            }
-        }
-        return tree;
-    }
-
-    private ControlFlowGraph() {
+    public ControlFlowGraph() {
         rootBlock = new BasicBlock();
         currentBlock = rootBlock;
     }

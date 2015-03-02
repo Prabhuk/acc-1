@@ -7,6 +7,7 @@ import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.Symbol;
+import com.acc.structure.SymbolTable;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
@@ -16,33 +17,31 @@ import java.util.List;
  * Created by prabhuk on 1/26/2015.
  */
 public class AssignmentParser extends Parser {
-    public AssignmentParser(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public AssignmentParser(Code code, Tokenizer tokenizer, SymbolTable symbolTable) {
+        super(code, tokenizer, symbolTable);
     }
 
     @Override
     public Result parse() {
-        final Token lhs = tokenizer.next();
-
-        if (!lhs.isDesignator()) {
-            throw new SyntaxErrorException("Designator expected. Found[" + lhs.getToken() + "] instead");
+        final Result lhs = new Expression(code, tokenizer, symbolTable).parse();
+        if (!lhs.kind().isArray() && !lhs.kind().isVariable()) {
+            throw new SyntaxErrorException("Designator expected. Found[" + lhs.kind().name() + "] instead");
         }
-        final Symbol recent = getSymbolTable().getRecentOccurence(lhs.getToken());
-        List<Result> arrayIdentifiers = accumulateArrayIdentifiers(recent);
-        boolean lhsIsArrayIdentifier = !arrayIdentifiers.isEmpty();
         //$TODO$ well do something with the identifiers
         handleAssignmentOperator();
-        Result y = new Expression(code, tokenizer).parse();
+        Result y = new Expression(code, tokenizer, symbolTable).parse();
 
-        if(!lhsIsArrayIdentifier && !y.kind().isArray()) {
+
+        if(!lhs.kind().isArray() && !y.kind().isArray()) {
             final Result x = new Result(Kind.VAR);
-            x.setVariableName(lhs.getToken());
+            x.setVariableName(lhs.getVariableName());
             AuxiliaryFunctions.addMoveInstruction(code, x, y, getSymbolTable());
             return x;
         }
 
-        if(lhsIsArrayIdentifier && y.kind().isArray() && arrayIdentifiers.size() == 0) {
+        if(lhs.kind().isArray() && y.kind().isArray() && lhs.getArrayIdentifiers().size() == 0) {
             //This case will never be reached due to accumulateArrayIdentifiers throwing error on missing [
+            // $TODO$ do we need to check a <- b case where a and b both are arrays?
             //Handle this case gracefully
             throw new SyntaxErrorException("Assignment rhs unhandled type ["+ y.kind().name() +"]");
 //            return x;
@@ -50,26 +49,30 @@ public class AssignmentParser extends Parser {
         }
 
         Result x;
-        if (lhsIsArrayIdentifier) {
-            createAddA(lhs.getToken(), arrayIdentifiers);
+        if (lhs.kind().isArray()) {
+            createAddA(lhs.getVariableName(), lhs.getArrayIdentifiers());
             x = new Result(Kind.INTERMEDIATE);
             x.setIntermediateLoation(code.getPc() - 1);
             Result storeInstruction;
             if(y.kind().isArray()) {
-                loadYarray(y.getVariableName());
+                loadYarray(y);
                 storeInstruction = new Result(Kind.INTERMEDIATE);
                 storeInstruction.setIntermediateLoation(code.getPc() - 1);
             } else {
                 storeInstruction = y;
             }
             AuxiliaryFunctions.addInstruction(OperationCode.store, code, x, storeInstruction, getSymbolTable());
+            Symbol recent = getSymbolTable().getRecentOccurence(lhs.getVariableName());
+            if(recent == null && code.getGlobalSymbolTable() != null) {
+                recent = code.getGlobalSymbolTable().getRecentOccurence(lhs.getVariableName());
+            }
             AuxiliaryFunctions.addKillInstruction(code, recent);
         } else {
             x = new Result(Kind.VAR);
-            x.setVariableName(lhs.getToken());
+            x.setVariableName(lhs.getVariableName());
             Result moveInstruction;
             if(y.kind().isArray()) {
-                loadYarray(y.getVariableName());
+                loadYarray(y);
                 moveInstruction = new Result(Kind.INTERMEDIATE);
                 moveInstruction.setIntermediateLoation(code.getPc() - 1);
             } else {
@@ -81,10 +84,14 @@ public class AssignmentParser extends Parser {
         return x;
     }
 
-    private void loadYarray(String tokenName) {
-        final Symbol recent = getSymbolTable().getRecentOccurence(tokenName);
-        List<Result> arrayIdentifiers = accumulateArrayIdentifiers(recent);
-        if(arrayIdentifiers.size() > 0) {
+    private void loadYarray(Result y) {
+        String tokenName = y.getVariableName();
+        Symbol recent = getSymbolTable().getRecentOccurence(tokenName);
+        if(recent == null && code.getGlobalSymbolTable() != null) {
+            recent = code.getGlobalSymbolTable().getRecentOccurence(tokenName);
+        }
+        List<Result> arrayIdentifiers = y.getArrayIdentifiers();
+        if(arrayIdentifiers != null && arrayIdentifiers.size() > 0) {
             createAddA(tokenName, arrayIdentifiers);
             final Result loadInstruction = new Result(Kind.INTERMEDIATE);
             loadInstruction.setIntermediateLoation(code.getPc() - 1);
@@ -109,7 +116,7 @@ public class AssignmentParser extends Parser {
         Result previous = null;
         Result previousSumComponent = null;
 
-        final Symbol declaration = getSymbolTable().getDeclaration(tokenName);
+        final Symbol declaration = getSymbolTable().getDeclaration(tokenName, code.getGlobalSymbolTable());
         final List<Result> originalIdentifiers = declaration.getArrayIdentifiers();
 
         for (int i=0; i<arrayIdentifiers.size(); i++) {

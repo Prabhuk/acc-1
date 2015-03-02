@@ -6,6 +6,7 @@ import com.acc.data.Code;
 import com.acc.data.Operator;
 import com.acc.data.Result;
 import com.acc.data.Token;
+import com.acc.structure.SymbolTable;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
@@ -14,14 +15,14 @@ import com.acc.util.Tokenizer;
  */
 public class Expression extends Parser {
 
-    public Expression(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public Expression(Code code, Tokenizer tokenizer, SymbolTable symbolTable) {
+        super(code, tokenizer, symbolTable);
     }
 
     @Override
     public Result parse() {
         Result x, y;
-        x = new Term(code, tokenizer).parse();
+        x = new Term(code, tokenizer, symbolTable).parse();
         Token next = tokenizer.next();
         Operator nextOperator;
         while (next.isOperator() && (((Operator) next).value().isPlus() || ((Operator) next).value().isMinus())) {
@@ -32,7 +33,7 @@ public class Expression extends Parser {
             } else { //Minus
                 op = OperationCode.sub;
             }
-            y = new Term(code, tokenizer).parse();
+            y = new Term(code, tokenizer, symbolTable).parse();
             if (x.kind().isConstant() && y.kind().isConstant()) {
                 if (op == OperationCode.add) {
                     x.value(x.value() + y.value());

@@ -25,7 +25,15 @@ public class CPWorker extends Worker {
 
     @Override
     public void begin() {
-        super.begin();
+        final List<Symbol> symbols = symbolTable.getSymbols();
+        for (Symbol symbol : symbols) {
+            if(symbol.getType().isVariable()) {
+                final Result zero = new Result(Kind.CONSTANT);
+                zero.value(0);
+                valueMap.put(symbol.getName(), zero);
+            }
+        }
+
     }
 
     @Override

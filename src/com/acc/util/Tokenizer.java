@@ -178,9 +178,18 @@ public class Tokenizer {
             tokenSet.put(++tokenCounter, k);
             return k;
         } else {
-            Identifier i = new Identifier(value);
-            tokenSet.put(++tokenCounter, i);
-            return i;
+            int m = currentPointer;
+            currentChar = eliminateEmptySpaces(); //Peeping ahead once
+            currentPointer = m;
+            if(currentChar == '[') {
+                ArrayIdentifier i = new ArrayIdentifier(value);
+                tokenSet.put(++tokenCounter, i);
+                return i;
+            } else {
+                Identifier i = new Identifier(value);
+                tokenSet.put(++tokenCounter, i);
+                return i;
+            }
         }
     }
 

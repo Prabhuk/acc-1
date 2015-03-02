@@ -1,7 +1,10 @@
 package com.acc.parser;
 
+import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Result;
+import com.acc.structure.SymbolTable;
+import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
 /**
@@ -9,13 +12,16 @@ import com.acc.util.Tokenizer;
  */
 public class ReturnParser extends Parser {
 
-    public ReturnParser(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public ReturnParser(Code code, Tokenizer tokenizer, SymbolTable symbolTable) {
+        super(code, tokenizer, symbolTable);
     }
 
     @Override
     public Result parse() {
         //$TODO Pending implementation
-        return null;
+        final Result x = new Expression(code, tokenizer, symbolTable).parse();
+        //$TODO$ watch out for returning array cases
+//        AuxiliaryFunctions.addInstruction(OperationCode.move, ); $TODO$ x is intermediate value - move it to return register
+        return x;
     }
 }

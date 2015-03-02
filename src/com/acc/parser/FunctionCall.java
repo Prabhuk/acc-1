@@ -20,8 +20,8 @@ import java.util.List;
  */
 public class FunctionCall extends Parser {
 
-    public FunctionCall(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public FunctionCall(Code code, Tokenizer tokenizer, SymbolTable symbolTable) {
+        super(code, tokenizer, symbolTable);
     }
 
     @Override
@@ -31,51 +31,61 @@ public class FunctionCall extends Parser {
             throw new SyntaxErrorException(procedureName.tokenType(), TokenType.IDENTIFIER);
         }
         final Token openBracket = tokenizer.next();
-        if (!openBracket.getToken().equals("(")) {
-            throw new SyntaxErrorException("Excpected \"(\" after procedure name [" + procedureName.getToken() + "]. Found [" + openBracket.getToken() + "] instead");
-        }
-        Token lookAhead = tokenizer.next();
         List<Result> parameters = new ArrayList<Result>();
-        if (!lookAhead.getToken().equals(")")) {
-            tokenizer.previous(); //Allowing expression to process the first parameter value
-            parameters.add(new Expression(code, tokenizer).parse());
-            lookAhead = tokenizer.next();
-            while (lookAhead.getToken().equals(",")) {
-                parameters.add(new Expression(code, tokenizer).parse());
+        if (openBracket.getToken().equals("(")) {
+            //throw new SyntaxErrorException("Excpected \"(\" after procedure name [" + procedureName.getToken() + "]. Found [" + openBracket.getToken() + "] instead");
+            //$TODO$ not supported according to the Grammar but call foo; is present in test
+            Token lookAhead = tokenizer.next();
+            if (!lookAhead.getToken().equals(")")) {
+                tokenizer.previous(); //Allowing expression to process the first parameter value
+                parameters.add(new Expression(code, tokenizer, symbolTable).parse());
+                //$TODO$ parameter could be an array identifier
+                lookAhead = tokenizer.next();
+                while (lookAhead.getToken().equals(",")) {
+                    parameters.add(new Expression(code, tokenizer, symbolTable).parse());
+                    lookAhead = tokenizer.next();
+                }
+                if (!lookAhead.getToken().equals(")")) { //End brackets should've broken the while loop. Otherwise syntax error
+                    throw new SyntaxErrorException("Expected [\")\"]. Found [" + lookAhead.getToken() + "] instead");
+                }
             }
-            if (!lookAhead.getToken().equals(")")) { //End brackets should've broken the while loop. Otherwise syntax error
-                throw new SyntaxErrorException("Expected [\")\"]. Found [" + lookAhead.getToken() + "] instead");
-            }
+        } else {
+            tokenizer.previous();
         }
-
-        final Computation computation = new Computation(code, tokenizer, procedureName.getToken());
-        final SymbolTable procedureSymbolTable = computation.getSymbolTable();
-
         final List<String> args = getArgumentNamesForProcedure(procedureName.getToken());
         if (args.size() != parameters.size()) {
-            throw new SyntaxErrorException("Argument list mismatch in the procedure call for the procedure [" + procedureName.getToken() + "]");
+//            throw new SyntaxErrorException("Argument list mismatch in the procedure call for the procedure [" + procedureName.getToken() + "]");
         }
 
         for (int i = 0; i < parameters.size(); i++) {
             Result parameter = parameters.get(i);
             //$TODO$ somehow pass the parameters to the procdeure program
-            String argumentName = args.get(i);
-            final Symbol recent = getSymbolTable().getRecentOccurence(argumentName);
-            Result x = new Result(recent.getType().isArray() ? Kind.ARRAY : Kind.VAR, null, null, null, null, null, null);
-            List<Result> arrayIdentifiers = accumulateArrayIdentifiers(recent);
+//            String argumentName = args.get(i);
+            if (parameter.kind().isVariable()) {
+                Symbol recent = getSymbolTable().getRecentOccurence(parameter.getVariableName());
+                if (recent == null && code.getGlobalSymbolTable() != null) {
+                    recent = code.getGlobalSymbolTable().getRecentOccurence(parameter.getVariableName());
+                }
+            }
+//            Result x = new Result(recent.getType().isArray() ? Kind.ARRAY : Kind.VAR, null, null, null, null, null, null);
+//            List<Result> arrayIdentifiers = accumulateArrayIdentifiers(recent);
             //$TODO$ well do something with the identifiers
 
 //            AuxiliaryFunctions.addInstruction(OperationCode.move, code, x, parameter, getSymbolTable());
         }
 
-        computation.programBody();
-        final Result x = new Result(Kind.VAR);
-        x.setVariableName(procedureName.getToken());
-        AuxiliaryFunctions.addInstruction(OperationCode.call, code, x, null, procedureSymbolTable);
-        //$TODO$ Add code to execute the functionBody.
-        new FunctionBody(code, tokenizer).parse();
+
+//        final Result x = new Result(Kind.PROCEDURE);
+//        x.setVariableName(procedureName.getToken());
+//        AuxiliaryFunctions.addInstruction(OperationCode.call, code, x, null, symbolTable);
+
+        final Result x = new Result(Kind.INTERMEDIATE);
+        x.setIntermediateLoation(code.getPc());
+        Result y = new Result(Kind.PROCEDURE);
+        y.setVariableName(procedureName.getToken());
+        AuxiliaryFunctions.addInstruction(OperationCode.call, code, y, null, symbolTable);
 
 
-        return null; //$TODO$ return relevant value
+        return x; //$TODO$ return relevant value
     }
 }

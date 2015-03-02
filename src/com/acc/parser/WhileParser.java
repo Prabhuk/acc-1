@@ -7,6 +7,7 @@ import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.BasicBlock;
+import com.acc.structure.SymbolTable;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.PhiInstructionHelper;
 import com.acc.util.Tokenizer;
@@ -18,8 +19,8 @@ import java.util.Set;
  */
 public class WhileParser extends Parser {
 
-    public WhileParser(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public WhileParser(Code code, Tokenizer tokenizer, SymbolTable symbolTable) {
+        super(code, tokenizer, symbolTable);
 
     }
 
@@ -37,7 +38,7 @@ public class WhileParser extends Parser {
 
         final BasicBlock currentBlock = code.getCurrentBlock();
         BasicBlock loopBlock = code.getCurrentBlock();
-        Result x = new Relation(code, tokenizer).parse();
+        Result x = new Relation(code, tokenizer, symbolTable).parse();
         AuxiliaryFunctions.CJF(code, x, getSymbolTable());
 
         parents = currentBlock.getParents();
@@ -45,6 +46,10 @@ public class WhileParser extends Parser {
         for (BasicBlock p : parents) {
             parent = p;
             break;
+        }
+
+        if(parent == null) {
+            parent = new BasicBlock(); //For the root node
         }
 
         BasicBlock join = currentBlock; //Distinction is necessary to maintain readability of code
@@ -62,7 +67,7 @@ public class WhileParser extends Parser {
         join.setRight(right);
         code.setCurrentBlock(right);
 
-        final Result rightTree = new StatSequence(code, tokenizer).parse();
+        final Result rightTree = new StatSequence(code, tokenizer, symbolTable).parse();
         if(rightTree.getJoin() != null) {
             join.setRight(rightTree.getJoin());
             rightTree.getJoin().addChild(loopBlock); //Does loop body dominate loop condition block?

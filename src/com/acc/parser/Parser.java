@@ -9,10 +9,7 @@ import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
 import com.acc.util.Tokenizer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by prabhuk on 1/24/2015.
@@ -20,17 +17,23 @@ import java.util.Map;
 public abstract class Parser {
     protected Code code;
     protected Tokenizer tokenizer;
-    private static final SymbolTable symbolTable = new SymbolTable();
-    private final Map<String, List<String>> procedureArguments = new HashMap<String, List<String>>();
+    protected final SymbolTable symbolTable;
+    private static final Map<String, List<String>> procedureArguments = new HashMap<String, List<String>>();
     protected static final Result FP = new Result(Kind.FRAME_POINTER);
+
     static {
         FP.value(100); //FRAME POINTER ADDRESS
         //$TODO$ Cannot hardcode to 100. Needs fixing $Fixme$
+        procedureArguments.put("InputNum", Collections.EMPTY_LIST);
+        final ArrayList<String> strings = new ArrayList<String>();
+        strings.add("out");
+        procedureArguments.put("OutputNum", strings);
     }
 
-    public Parser(Code code, Tokenizer tokenizer) {
+    public Parser(Code code, Tokenizer tokenizer, SymbolTable symbolTable) {
         this.code = code;
         this.tokenizer = tokenizer;
+        this.symbolTable = symbolTable;
     }
 
     public Code getCode() {
@@ -47,7 +50,8 @@ public abstract class Parser {
     }
 
     public List<String> getArgumentNamesForProcedure(String procedureName) {
-        return procedureArguments.get(procedureName);
+        final List<String> strings = procedureArguments.get(procedureName);
+        return strings == null ? Collections.EMPTY_LIST : strings;
     }
 
     /**
@@ -80,7 +84,7 @@ public abstract class Parser {
             for (int i = 0; i < recent.getArrayDimension(); i++) {
                 //$TODO$ Not necessary but can handle complete assignments of arrays here
                 handleOpenBoxBracket();
-                arrayIdentifiers.add(new Expression(code, tokenizer).parse());
+                arrayIdentifiers.add(new Expression(code, tokenizer, symbolTable).parse());
                 handleCloseBoxBracket();
             }
         }
@@ -89,14 +93,14 @@ public abstract class Parser {
 
 
 
-    private void handleOpenBoxBracket() {
+    protected void handleOpenBoxBracket() {
         final Token openBoxBracket = tokenizer.next();
         if (!openBoxBracket.getToken().equals("[")) {
             throw new SyntaxErrorException("Expected '['. Found[" + openBoxBracket.getToken() + "] instead");
         }
     }
 
-    private void handleCloseBoxBracket() {
+    protected void handleCloseBoxBracket() {
         final Token closeBoxBracket = tokenizer.next();
         if (!closeBoxBracket.getToken().equals("]")) {
             throw new SyntaxErrorException("Expected ']'. Found[" + closeBoxBracket.getToken() + "] instead");

@@ -18,4 +18,8 @@ public class OutputContents {
     public static List<Computation> getPrograms() {
         return programs;
     }
+
+    public static void clear() {
+        programs = new ArrayList<Computation>();
+    }
 }

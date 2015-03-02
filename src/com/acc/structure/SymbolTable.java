@@ -80,12 +80,15 @@ public class SymbolTable {
         return s;
     }
 
-    public Symbol getDeclaration(String symbolName) {
+    public Symbol getDeclaration(String symbolName, SymbolTable globalTable) {
         Symbol s = null;
         for (Symbol symbol : symbols) {
             if(symbol.getName().equals(symbolName) && symbol.getSuffix() == -1) {
                 return symbol;
             }
+        }
+        if(s == null && !globalTable.equals(this) && globalTable != null) {
+            s = globalTable.getDeclaration(symbolName, null);
         }
         return s;
     }

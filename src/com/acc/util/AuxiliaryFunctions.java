@@ -111,14 +111,17 @@ public class AuxiliaryFunctions {
         final Instruction instruction = new Instruction(op, x, y, code.getPc());
         if(OperationCode.getOperandCount(op) > 0) {
             if (symbolTable != null && (x.kind().isVariable() || x.kind().isArray())) {
-                final Symbol recentOccurence = symbolTable.getRecentOccurence(x.getVariableName());
+                Symbol recent = symbolTable.getRecentOccurence(x.getVariableName());
+                if(recent == null && code.getGlobalSymbolTable() != null) {
+                    recent = code.getGlobalSymbolTable().getRecentOccurence(x.getVariableName());
+                }
                 if (x.kind().isArray()) {
-                    if (recentOccurence.getSuffix() == -1) {
-                        instruction.setSymbol(recentOccurence);
+                    if (recent.getSuffix() == -1) {
+                        instruction.setSymbol(recent);
                         //Making sure arrays have only one entry in symbol table besides the declaration
                     }
                 } else {
-                    instruction.setSymbol(recentOccurence);
+                    instruction.setSymbol(recent);
                 }
             }
         }
@@ -132,7 +135,10 @@ public class AuxiliaryFunctions {
     }
 
     private static void addToSymbolTable(Code code, SymbolTable symbolTable, Result x) {
-        final Symbol recent = symbolTable.getRecentOccurence(x.getVariableName());
+        Symbol recent = symbolTable.getRecentOccurence(x.getVariableName());
+        if(recent == null && code.getGlobalSymbolTable() != null) {
+            recent = code.getGlobalSymbolTable().getRecentOccurence(x.getVariableName());
+        }
         final Symbol symbol;
         if(recent.getType().isArray()) {
             symbol = new Symbol(recent.getName(), code.getPc(), recent.getArrayDimension(), Symbol.cloneValue(recent.getValue()));

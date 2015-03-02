@@ -4,6 +4,7 @@ import com.acc.data.Code;
 import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
+import com.acc.structure.SymbolTable;
 import com.acc.util.Tokenizer;
 
 /**
@@ -11,18 +12,18 @@ import com.acc.util.Tokenizer;
  */
 public class FunctionBody extends Parser {
 
-    public FunctionBody(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public FunctionBody(Code code, Tokenizer tokenizer, SymbolTable symbolTable) {
+        super(code, tokenizer, symbolTable);
     }
 
     @Override
     public Result parse() {
-        new VariableDeclaration(code, tokenizer).parse();
+        new VariableDeclaration(code, tokenizer, symbolTable).parse();
         Token next = tokenizer.next();
         if (!next.getToken().equals("{")) {
             throw new SyntaxErrorException("Expected \"{\". Found [" + next + "] instead");
         }
-        final Result y = new StatSequence(code, tokenizer).parse();
+        final Result y = new StatSequence(code, tokenizer, symbolTable).parse();
         next = tokenizer.next();
         if (!next.getToken().equals("{")) {
             throw new SyntaxErrorException("Expected \"}\". Found [" + next + "] instead");

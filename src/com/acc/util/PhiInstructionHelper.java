@@ -79,6 +79,9 @@ public class PhiInstructionHelper {
 
     private static Instruction createPhi(BasicBlock join, SymbolTable table, Code code, Symbol symbol) {
         Symbol targetSymbol = getTargetSymbol(table, symbol);
+        if(targetSymbol == null && code.getGlobalSymbolTable() != null) {
+            targetSymbol = getTargetSymbol(code.getGlobalSymbolTable(), symbol);
+        }
         final Symbol phiSymbol = new Symbol(targetSymbol.getName(), targetSymbol.getSuffix(), targetSymbol.getValue());
         Instruction phi = new Instruction(OperationCode.phi, null, null, code.getPc());
         phi.setSymbol(phiSymbol);

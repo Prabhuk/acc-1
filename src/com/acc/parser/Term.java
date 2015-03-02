@@ -3,6 +3,7 @@ package com.acc.parser;
 import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
 import com.acc.data.*;
+import com.acc.structure.SymbolTable;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
@@ -11,15 +12,15 @@ import com.acc.util.Tokenizer;
  */
 public class Term extends Parser {
 
-    public Term(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public Term(Code code, Tokenizer tokenizer, SymbolTable symbolTable) {
+        super(code, tokenizer, symbolTable);
     }
 
     public Result parse() {
         Result x, y;
-        x = new Factor(code, tokenizer).parse();
+        x = new Factor(code, tokenizer, symbolTable).parse();
 
-        final Token next = tokenizer.next();
+        Token next = tokenizer.next();
         Operator nextOperator;
         while (next.tokenType() == TokenType.OPERATOR) {
             nextOperator = (Operator) next;
@@ -31,7 +32,7 @@ public class Term extends Parser {
             } else {
                 break;
             }
-            y = new Factor(code, tokenizer).parse();
+            y = new Factor(code, tokenizer, symbolTable).parse();
 
             if (x.kind().isConstant() && y.kind().isConstant()) {
                 if (op == OperationCode.mul) {
@@ -46,6 +47,7 @@ public class Term extends Parser {
                 x = new Result(Kind.INTERMEDIATE);
                 x.setIntermediateLoation(code.getPc() - 1);
             }
+            next = tokenizer.next();
         }
         tokenizer.previous();
         return x;

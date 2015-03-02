@@ -22,6 +22,7 @@ public class Result {
     private Integer intermediateLoation;
     private String variableName;
     private Integer location;
+    private List<Result> arrayIdentifiers;
 
     public Result(){
     }
@@ -106,6 +107,10 @@ public class Result {
         return dimensions;
     }
 
+    public void setDimensions(List<Integer> dimensions) {
+        this.dimensions = dimensions;
+    }
+
     public BasicBlock getJoin() {
         return join;
     }
@@ -149,4 +154,53 @@ public class Result {
                 x.getVariableName().equals(y.getVariableName()) &&
                 x.getLocation().equals(y.getLocation()));
     }
+
+    public List<Result> getArrayIdentifiers() {
+        return arrayIdentifiers;
+    }
+
+    public void setArrayIdentifiers(List<Result> arrayIdentifiers) {
+        this.arrayIdentifiers = arrayIdentifiers;
+    }
+
+
+
+
+    public boolean isConstant() {
+        return kind.isConstant();
+    }
+
+    public boolean isFramePointer() {
+        return kind.isFramePointer();
+    }
+
+    public boolean isBaseAddress() {
+        return kind.isBaseAddress();
+    }
+
+
+    public boolean isVariable() {
+        return kind.isVariable();
+    }
+
+    public boolean isRegister() {
+        return kind.isRegister();
+    }
+
+    public boolean isCondition() {
+        return kind.isCondition();
+    }
+
+    public boolean isArray() {
+        return kind.isArray();
+    }
+
+    public boolean isIntermediate() {
+        return kind.isIntermediate();
+    }
+
+    public boolean isProcedure() {
+        return kind.isProcedure();
+    }
+
 }

@@ -1,9 +1,11 @@
 package com.acc.parser;
 
+import com.acc.constants.Kind;
 import com.acc.data.Code;
 import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
+import com.acc.structure.SymbolTable;
 import com.acc.util.Tokenizer;
 
 /**
@@ -11,34 +13,20 @@ import com.acc.util.Tokenizer;
  */
 public class FormalParam extends Parser {
 
-    public FormalParam(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public FormalParam(Code code, Tokenizer tokenizer, SymbolTable symbolTable) {
+        super(code, tokenizer, symbolTable);
     }
 
     @Override
     public Result parse() {
         Token next = tokenizer.next();
-        if (!isOpenParanthesis(next)) {
-            throw new SyntaxErrorException("Expected \"(\". Found [" + next.getToken() + "] instead");
-        }
-        next = tokenizer.next();
-        while (!isClosedParanthesis(next)) {
-            if (next.getToken().equals(",")) {
-                next = tokenizer.next();
-            }
-            //$TODO$ next is identifier at this point of time. Set symbol table and Use assign symbol to populate.
-            //do something for: ident{"," ident}
+        if (next.getToken().equals(",")) {
             next = tokenizer.next();
         }
-
-        return null;
+        Result x = new Result(Kind.VAR);
+        x.setVariableName(next.getToken());
+        return x;
     }
 
-    private boolean isClosedParanthesis(Token next) {
-        return next.getToken().equals(")");
-    }
 
-    private boolean isOpenParanthesis(Token next) {
-        return next.getToken().equals("(");
-    }
 }

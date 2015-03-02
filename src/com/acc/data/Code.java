@@ -2,6 +2,7 @@ package com.acc.data;
 
 import com.acc.structure.BasicBlock;
 import com.acc.structure.ControlFlowGraph;
+import com.acc.structure.SymbolTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +17,13 @@ public class Code {
      * List of instructions for the input program
      */
     private final List<Instruction> instructions = new ArrayList<Instruction>();
-    private static ControlFlowGraph controlFlowGraph = ControlFlowGraph.getCFG();
+    private final ControlFlowGraph controlFlowGraph;
+    private SymbolTable globalSymbolTable;
+    private String programName;
 
+    public Code() {
+        this.controlFlowGraph = new ControlFlowGraph();
+    }
 
     /**
      * @return Returns the current program counter value
@@ -100,5 +106,21 @@ public class Code {
 
     public int addCode(Instruction phi, Instruction instruction) {
         return addCode(phi, instructions.indexOf(instruction));
+    }
+
+    public void setGlobalSymbolTable(SymbolTable globalSymbolTable) {
+        this.globalSymbolTable = globalSymbolTable;
+    }
+
+    public SymbolTable getGlobalSymbolTable() {
+        return globalSymbolTable;
+    }
+
+    public String getProgramName() {
+        return programName;
+    }
+
+    public void setProgramName(String programName) {
+        this.programName = programName;
     }
 }

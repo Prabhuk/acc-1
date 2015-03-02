@@ -6,10 +6,13 @@ import com.acc.data.Keyword;
 import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
+import com.acc.structure.Symbol;
+import com.acc.structure.SymbolTable;
 import com.acc.structure.SymbolType;
-import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,28 +20,35 @@ import java.util.List;
  */
 public class VariableDeclaration extends Parser {
 
-    public VariableDeclaration(Code code, Tokenizer tokenizer) {
-        super(code, tokenizer);
+    public VariableDeclaration(Code code, Tokenizer tokenizer, SymbolTable symbolTable) {
+        super(code, tokenizer, symbolTable);
     }
 
 
 
     @Override
     public Result parse() {
-        Result x = new TypeDeclaration(code, tokenizer).parse();
+        Result x = new TypeDeclaration(code, tokenizer, symbolTable).parse();
         Kind _type = x.kind();
-        final SymbolType symbolType = _type.isArray() ? SymbolType.ARRAY : SymbolType.VARIABLE;
-        declareSymbol(symbolType, x.dimensions());
-        Token next = tokenizer.next();
-        while (next.getToken().equals(",")) {
+        if(_type == null) {
+            tokenizer.previous();
+            return x;
+        }
+        if(_type.isProcedure()) {
+            x = new FunctionDeclaration(code, tokenizer, symbolTable).parse();
+        } else {
+            final SymbolType symbolType = _type.isArray() ? SymbolType.ARRAY : SymbolType.VARIABLE;
             declareSymbol(symbolType, x.dimensions());
-            next = tokenizer.next();
-        }
+            Token next = tokenizer.next();
+            while (next.getToken().equals(",")) {
+                declareSymbol(symbolType, x.dimensions());
+                next = tokenizer.next();
+            }
 
-        if (!next.getToken().equals(";")) {
-            throw new SyntaxErrorException("Expected \";\" Found [" + next.getToken() + "] instead");
+            if (!next.getToken().equals(";")) {
+                throw new SyntaxErrorException("Expected \";\" Found [" + next.getToken() + "] instead");
+            }
         }
-
         Token type = tokenizer.next();
         while (isVarOrArrayKeyword(type)) {
             tokenizer.previous();
@@ -46,7 +56,7 @@ public class VariableDeclaration extends Parser {
             type = tokenizer.next();
         }
         tokenizer.previous();
-        return null;
+        return x;
     }
 
     private boolean isVarOrArrayKeyword(Token type) {
@@ -59,6 +69,28 @@ public class VariableDeclaration extends Parser {
             throw new SyntaxErrorException("Identifier expected. Found [" + symbolName.getToken() + "] instead");
         }
         //$TODO$ handle multidimensional array. => In progress
-        AuxiliaryFunctions.declareSymbol(symbolName.getToken(), getSymbolTable(), symbolType, arrayDimensions);
+        declareSymbol(symbolName.getToken(), symbolType, arrayDimensions);
+    }
+
+    public void declareSymbol(String symbolName, SymbolType type, List<Integer> arrayDimensions) {
+        final Symbol s;
+        if (type == SymbolType.ARRAY) {
+            List<Result> originalArrayIdentifiers = new ArrayList<Result>();
+            s = new Symbol(symbolName, -1, arrayDimensions.size(), null);
+            final int dimensionCount = arrayDimensions.size();
+            int[] dimensionsArray = new int[dimensionCount];
+            for (int i = 0; i < arrayDimensions.size(); i++) {
+                dimensionsArray[i] = arrayDimensions.get(i);
+                final Result identifier = new Result(Kind.CONSTANT);
+                identifier.value(arrayDimensions.get(i));
+                originalArrayIdentifiers.add(identifier);
+            }
+            s.setArrayDimension(dimensionCount);
+            s.setArrayIdentifiers(originalArrayIdentifiers);
+            s.setArrayValue(Array.newInstance(Integer.class, dimensionsArray));
+        } else {
+            s = new Symbol(symbolName, -1,null, type);
+        }
+        symbolTable.addSymbol(s);
     }
 }

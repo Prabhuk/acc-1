@@ -86,7 +86,7 @@ public class Instruction {
             return "(" + x.getIntermediateLoation() +")";
         } else if(x.kind().isConstant()) {
             return "#" + String.valueOf(x.value());
-        } else if(x.kind().isVariable()) {
+        } else if(x.kind().isVariable() || x.kind().isProcedure()) {
             if(opcode == OperationCode.cmp || opcode == OperationCode.kill || x.getLocation() == null) {
                 return x.getVariableName();
             }
@@ -150,6 +150,11 @@ public class Instruction {
 
     public void setLocation(Integer location) {
         this.location = location;
+    }
+
+    @Override
+    public String toString() {
+        return getInstructionString();
     }
 }
 

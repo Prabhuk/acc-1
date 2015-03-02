@@ -15,7 +15,7 @@ import java.util.*;
 public class DeleteInstructions extends Worker {
 
     private final Code code;
-    private static int instructionNumber = 0;
+    private int instructionNumber = 0;
     private Map<Integer, Integer> oldNewLocations = new HashMap<Integer, Integer>();
     private Map<Integer, Integer> deletedLocations = new HashMap<Integer, Integer>();
 
@@ -26,6 +26,7 @@ public class DeleteInstructions extends Worker {
 
     @Override
     public void begin() {
+        instructionNumber = 0;
         final List<Instruction> instructions = code.getInstructions();
         for (Instruction instruction : instructions) {
             if(!instruction.isDeleted()) {
