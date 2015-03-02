@@ -63,9 +63,6 @@ public class FunctionCall extends Parser {
 //            String argumentName = args.get(i);
             if (parameter.isVariable()) {
                 Symbol recent = getSymbolTable().getRecentOccurence(parameter.getVariableName());
-                if (recent == null && code.getGlobalSymbolTable() != null) {
-                    recent = code.getGlobalSymbolTable().getRecentOccurence(parameter.getVariableName());
-                }
             }
 //            Result x = new Result(recent.getType().isArray() ? Kind.ARRAY : Kind.VAR, null, null, null, null, null, null);
 //            List<Result> arrayIdentifiers = accumulateArrayIdentifiers(recent);

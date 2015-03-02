@@ -32,9 +32,6 @@ public class Factor extends Parser {
         } else if (next.isDesignator()) {
             //$TODO$ implement lookup and set the address instead of 0
             Symbol recent = getSymbolTable().getRecentOccurence(next.getToken());
-            if(recent == null && code.getGlobalSymbolTable() != null) {
-                recent = code.getGlobalSymbolTable().getRecentOccurence(next.getToken());
-            }
             if(recent.getType().isArray()) {
                 x = new Result(Kind.ARRAY);
                 x.setArrayIdentifiers(accumulateArrayIdentifiers(recent));

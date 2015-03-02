@@ -63,9 +63,6 @@ public class AssignmentParser extends Parser {
             }
             AuxiliaryFunctions.addInstruction(OperationCode.store, code, x, storeInstruction, getSymbolTable());
             Symbol recent = getSymbolTable().getRecentOccurence(lhs.getVariableName());
-            if(recent == null && code.getGlobalSymbolTable() != null) {
-                recent = code.getGlobalSymbolTable().getRecentOccurence(lhs.getVariableName());
-            }
             AuxiliaryFunctions.addKillInstruction(code, recent);
         } else {
             x = new Result(Kind.VAR);
@@ -86,10 +83,6 @@ public class AssignmentParser extends Parser {
 
     private void loadYarray(Result y) {
         String tokenName = y.getVariableName();
-        Symbol recent = getSymbolTable().getRecentOccurence(tokenName);
-        if(recent == null && code.getGlobalSymbolTable() != null) {
-            recent = code.getGlobalSymbolTable().getRecentOccurence(tokenName);
-        }
         List<Result> arrayIdentifiers = y.getArrayIdentifiers();
         if(arrayIdentifiers != null && arrayIdentifiers.size() > 0) {
             createAddA(tokenName, arrayIdentifiers);
@@ -116,7 +109,7 @@ public class AssignmentParser extends Parser {
         Result previous = null;
         Result previousSumComponent = null;
 
-        final Symbol declaration = getSymbolTable().getDeclaration(tokenName, code.getGlobalSymbolTable());
+        final Symbol declaration = getSymbolTable().getDeclaration(tokenName);
         final List<Result> originalIdentifiers = declaration.getArrayIdentifiers();
 
         for (int i=0; i<arrayIdentifiers.size(); i++) {

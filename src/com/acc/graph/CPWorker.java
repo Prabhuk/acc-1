@@ -33,6 +33,18 @@ public class CPWorker extends Worker {
                 valueMap.put(symbol.getName(), zero);
             }
         }
+//        if(symbolTable.getGlobalSymbolTable() != null) {
+//            final List<Symbol> globalSymbols = symbolTable.getGlobalSymbolTable().getSymbols();
+//            for (Symbol symbol : globalSymbols) {
+//                if (symbol.getType().isVariable()) {
+//                    if (valueMap.get(symbol.getName()) == null) {
+//                        final Result zero = new Result(Kind.CONSTANT);
+//                        zero.value(0);
+//                        valueMap.put(symbol.getName(), zero);
+//                    }
+//                }
+//            }
+//        }
 
     }
 

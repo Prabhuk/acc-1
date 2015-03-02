@@ -29,6 +29,7 @@ public class FunctionDeclaration extends Parser {
         }
         //$TODO$ DEAL WITH ident
         final SymbolTable procedureSymbolTable = new SymbolTable();
+        procedureSymbolTable.setGlobalSymbolTable(getSymbolTable());
         Token next = tokenizer.next();
         if (!isSemiColonToken(next)) {
             tokenizer.previous();
@@ -52,7 +53,6 @@ public class FunctionDeclaration extends Parser {
         }
         final Code procedureCode = new Code();
         procedureCode.setProgramName(procedureName.getToken());
-        procedureCode.setGlobalSymbolTable(getSymbolTable());
         final Computation computation = new Computation(procedureCode, tokenizer, procedureSymbolTable, procedureName.getToken());
         computation.programBody();
         AuxiliaryFunctions.addInstruction(OperationCode.end, procedureCode, null, null, procedureSymbolTable);

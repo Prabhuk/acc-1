@@ -22,7 +22,6 @@ public class Computation extends Parser {
         this.programName = programName;
         System.out.println("CURRENT PROGRAM: " + this.programName);
 //        if(programName.equals("main")) {
-//            code.setGlobalSymbolTable();
 //        }
         OutputContents.addProgram(this);
     }

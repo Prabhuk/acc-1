@@ -18,7 +18,6 @@ public class Code {
      */
     private final List<Instruction> instructions = new ArrayList<Instruction>();
     private final ControlFlowGraph controlFlowGraph;
-    private SymbolTable globalSymbolTable;
     private String programName;
 
     public Code() {
@@ -106,14 +105,6 @@ public class Code {
 
     public int addCode(Instruction phi, Instruction instruction) {
         return addCode(phi, instructions.indexOf(instruction));
-    }
-
-    public void setGlobalSymbolTable(SymbolTable globalSymbolTable) {
-        this.globalSymbolTable = globalSymbolTable;
-    }
-
-    public SymbolTable getGlobalSymbolTable() {
-        return globalSymbolTable;
     }
 
     public String getProgramName() {

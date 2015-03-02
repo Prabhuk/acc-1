@@ -50,6 +50,6 @@ public enum TokenType {
 
     public boolean isDesignator() {
         return isArrayIdentifier() || isIdentifier();
-    } //$TODO$ identifier or identifier plus []
+    }
 
 }

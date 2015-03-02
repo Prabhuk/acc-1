@@ -112,9 +112,6 @@ public class AuxiliaryFunctions {
         if(OperationCode.getOperandCount(op) > 0) {
             if (symbolTable != null && (x.isVariable() || x.isArray())) {
                 Symbol recent = symbolTable.getRecentOccurence(x.getVariableName());
-                if(recent == null && code.getGlobalSymbolTable() != null) {
-                    recent = code.getGlobalSymbolTable().getRecentOccurence(x.getVariableName());
-                }
                 if (x.isArray()) {
                     if (recent.getSuffix() == -1) {
                         instruction.setSymbol(recent);
@@ -136,9 +133,6 @@ public class AuxiliaryFunctions {
 
     private static void addToSymbolTable(Code code, SymbolTable symbolTable, Result x) {
         Symbol recent = symbolTable.getRecentOccurence(x.getVariableName());
-        if(recent == null && code.getGlobalSymbolTable() != null) {
-            recent = code.getGlobalSymbolTable().getRecentOccurence(x.getVariableName());
-        }
         final Symbol symbol;
         if(recent.getType().isArray()) {
             symbol = new Symbol(recent.getName(), code.getPc(), recent.getArrayDimension(), Symbol.cloneValue(recent.getValue()));

@@ -9,6 +9,7 @@ public class SymbolTable {
 
     private final List<Symbol> symbols;
     private final Map<String, Symbol> symbolsByName;
+    private SymbolTable globalSymbolTable;
 
     public SymbolTable() {
         symbols = new ArrayList<Symbol>();
@@ -56,20 +57,6 @@ public class SymbolTable {
         }
     }
 
-    public void removeSymbol(Symbol s) {
-        if (s == null) {
-            return; //Fail quietly
-        }
-        final String symbolKey = getSymbolKey(s);
-        final Symbol targetSymbol = symbolsByName.get(symbolKey);
-        if (targetSymbol == null) {
-            return; //Fail quietly
-        } else {
-            symbols.remove(s);
-            symbolsByName.remove(symbolKey);
-        }
-    }
-
     public Symbol getRecentOccurence(String symbolName) {
         Symbol s = null;
         for (Symbol symbol : symbols) {
@@ -77,18 +64,21 @@ public class SymbolTable {
                 s = symbol;
             }
         }
+        if(s == null && globalSymbolTable != null) {
+            s = globalSymbolTable.getRecentOccurence(symbolName);
+        }
         return s;
     }
 
-    public Symbol getDeclaration(String symbolName, SymbolTable globalTable) {
+    public Symbol getDeclaration(String symbolName) {
         Symbol s = null;
         for (Symbol symbol : symbols) {
             if(symbol.getName().equals(symbolName) && symbol.getSuffix() == -1) {
                 return symbol;
             }
         }
-        if(s == null && !globalTable.equals(this) && globalTable != null) {
-            s = globalTable.getDeclaration(symbolName, null);
+        if(!globalSymbolTable.equals(this) && globalSymbolTable != null) {
+            s = globalSymbolTable.getDeclaration(symbolName);
         }
         return s;
     }
@@ -99,5 +89,27 @@ public class SymbolTable {
 
     public int getOffset(Symbol s) {
         return symbols.indexOf(s);
+    }
+
+    public SymbolTable getGlobalSymbolTable() {
+        return globalSymbolTable;
+    }
+
+    public void setGlobalSymbolTable(SymbolTable globalSymbolTable) {
+        this.globalSymbolTable = globalSymbolTable;
+    }
+
+    public Symbol getTargetSymbol(Symbol symbol) {
+        Symbol targetSymbol = null;
+        for (Symbol symbol1 : symbols) {
+            if (symbol1.getName().equals(symbol.getName())) {
+                targetSymbol = symbol1;
+            }
+        }
+        if(targetSymbol == null && globalSymbolTable != null) {
+            targetSymbol = globalSymbolTable.getTargetSymbol(symbol);
+        }
+
+        return targetSymbol;
     }
 }

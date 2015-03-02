@@ -29,7 +29,7 @@ public class PhiInstructionHelper {
         final Collection<Instruction> allPhiInstructions = join.getAllPhiInstructions();
         for (Instruction phi : allPhiInstructions) {
             if (!phi.isComplete()) {
-                Symbol targetSymbol = getTargetSymbol(table, phi.getSymbol());
+                Symbol targetSymbol = table.getTargetSymbol(phi.getSymbol());
                 final Result targetResult = new Result(targetSymbol);
                 if(phi.getX() == null) {
                     phi.setX(targetResult);
@@ -78,10 +78,7 @@ public class PhiInstructionHelper {
     }
 
     private static Instruction createPhi(BasicBlock join, SymbolTable table, Code code, Symbol symbol) {
-        Symbol targetSymbol = getTargetSymbol(table, symbol);
-        if(targetSymbol == null && code.getGlobalSymbolTable() != null) {
-            targetSymbol = getTargetSymbol(code.getGlobalSymbolTable(), symbol);
-        }
+        Symbol targetSymbol = table.getTargetSymbol(symbol);
         final Symbol phiSymbol = new Symbol(targetSymbol.getName(), targetSymbol.getSuffix(), targetSymbol.getValue());
         Instruction phi = new Instruction(OperationCode.phi, null, null, code.getPc());
         phi.setSymbol(phiSymbol);
@@ -95,16 +92,5 @@ public class PhiInstructionHelper {
         }
         phiSymbol.setSuffix(phi.getLocation());
         return phi;
-    }
-
-    private static Symbol getTargetSymbol(SymbolTable table, Symbol symbol) {
-        final List<Symbol> symbols = table.getSymbols();
-        Symbol targetSymbol = null;
-        for (Symbol symbol1 : symbols) {
-            if (symbol1.getName().equals(symbol.getName())) {
-                targetSymbol = symbol1;
-            }
-        }
-        return targetSymbol;
     }
 }
