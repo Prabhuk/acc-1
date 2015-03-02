@@ -10,6 +10,7 @@ public class ControlFlowGraph {
     private final BasicBlock rootBlock;
 
     public ControlFlowGraph() {
+        BasicBlock.resetCount();
         rootBlock = new BasicBlock();
         currentBlock = rootBlock;
     }

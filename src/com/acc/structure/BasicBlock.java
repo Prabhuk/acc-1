@@ -33,6 +33,10 @@ public class BasicBlock {
         allBlocks.add(this);
     }
 
+    public static void resetCount() {
+        count = 0;
+    }
+
     public List<BasicBlock> getDominatesOver() {
         return dominatesOver;
     }
