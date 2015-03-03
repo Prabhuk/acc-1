@@ -7,6 +7,7 @@ import com.acc.data.Token;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
+import com.acc.ui.OutputContents;
 import com.acc.util.Tokenizer;
 
 import java.util.*;
@@ -20,6 +21,8 @@ public abstract class Parser {
     protected final SymbolTable symbolTable;
     private static final Map<String, List<String>> procedureArguments = new HashMap<String, List<String>>();
     protected static final Result FP = new Result(Kind.FRAME_POINTER);
+    protected static OutputContents outputContents;
+
 
     static {
         FP.value(100); //FRAME POINTER ADDRESS
@@ -105,5 +108,13 @@ public abstract class Parser {
         if (!closeBoxBracket.getToken().equals("]")) {
             throw new SyntaxErrorException("Expected ']'. Found[" + closeBoxBracket.getToken() + "] instead");
         }
+    }
+
+    public OutputContents getOutputContents() {
+        return outputContents;
+    }
+
+    public void setOutputContents(OutputContents outputContents) {
+        this.outputContents = outputContents;
     }
 }

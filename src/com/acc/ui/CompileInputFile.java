@@ -28,12 +28,12 @@ public class CompileInputFile {
     Computation parser;
     private static Logger logger = Logger.getLogger(CompileInputFile.class.getName());
 
-    public CompileInputFile(String filePath) {
+    public CompileInputFile(String filePath, OutputContents contents) {
         this.filePath = filePath;
         try {
             tokenizer = new Tokenizer(filePath);
             Code code = new Code();
-            parser = new Computation(code, tokenizer, new SymbolTable(), "main");
+            parser = new Computation(code, tokenizer, new SymbolTable(), "main", contents);
             parser.parse();
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Input file [" + filePath + "] not found");
@@ -69,23 +69,27 @@ public class CompileInputFile {
     }
 
     private static void processFile(String inputFile, String name) {
-        OutputContents.clear();
         final String prefix = name.substring(0, name.indexOf("."));
-        new CompileInputFile(inputFile);
-        final List<Computation> parsers = OutputContents.getPrograms();
+        final OutputContents contents = new OutputContents();
+        new CompileInputFile(inputFile, contents);
+        final List<Computation> parsers = contents.getPrograms();
+
+        final Computation mainProgram = contents.getMainProgram();
+
         for (Computation parser : parsers) {
+
             final Code code = parser.getCode();
             printInstructions(parser, code);
             final BasicBlock rootNode = code.getControlFlowGraph().getRootBlock();
-            new GraphHelper(new CPWorker(parser.getSymbolTable()), rootNode);
-            new GraphHelper(new DeleteInstructions(code, parser.getSymbolTable()), rootNode);
-            new GraphHelper(new CSEWorker(code, new SymbolTable()), rootNode);
-            new GraphHelper(new DeleteInstructions(code, parser.getSymbolTable()), rootNode);
-            final DCEWorker worker = new DCEWorker( parser.getSymbolTable(),code);
+            new GraphHelper(new CPWorker(parser), rootNode);
+            new GraphHelper(new DeleteInstructions(code, parser), rootNode);
+            printInstructions(parser, code);
+            new GraphHelper(new CSEWorker(parser), rootNode);
+            new GraphHelper(new DeleteInstructions(code, parser), rootNode);
+            final DCEWorker worker = new DCEWorker(code);
             worker.visit();
             printInstructions(parser, code);
-            new GraphHelper(new VCGWorker("output\\" + prefix+"_" + parser.getProgramName() + ".vcg", parser.getSymbolTable()), rootNode);
-            printInstructions(parser, code);
+            new GraphHelper(new VCGWorker("output\\" + prefix+"_" + parser.getProgramName() + ".vcg", parser), rootNode);
         }
         Printer.print("Compilation completed for ["+inputFile+"]");
     }

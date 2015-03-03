@@ -89,6 +89,25 @@ public class OperationCode {
 
         
     }
+
+    public static boolean isConditionSatisfied(int branchCode, Integer cmpResult) {
+
+     switch (branchCode) {
+         case 13:
+             return cmpResult != 0;
+         case 14:
+             return cmpResult == 0;
+         case 15:
+             return cmpResult <= 0;
+         case 16:
+             return cmpResult <= 0;
+         case 17:
+             return cmpResult >= 0;
+         case 18:
+             return cmpResult > 0;
+     }
+        return false;
+    }
     
     
 

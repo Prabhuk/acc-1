@@ -4,6 +4,7 @@ import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
 import com.acc.data.Instruction;
 import com.acc.data.Result;
+import com.acc.parser.Parser;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
@@ -17,17 +18,18 @@ import java.util.*;
 public class CPWorker extends Worker {
 
     private Map<String, Result> valueMap = new HashMap<String, Result>();
+    private List<String> exclude = new ArrayList<String>();
     private List<Instruction> phiInstructions = new ArrayList<Instruction>();
 
-    public CPWorker(SymbolTable symbolTable) {
-        super(symbolTable);
+    public CPWorker(Parser parser) {
+        super(parser);
     }
 
     @Override
     public void begin() {
-        final List<Symbol> symbols = symbolTable.getSymbols();
+        final List<Symbol> symbols = getSymbolTable().getSymbols();
         for (Symbol symbol : symbols) {
-            if(symbol.getType().isVariable()) {
+            if (symbol.getType().isVariable()) {
                 final Result zero = new Result(Kind.CONSTANT);
                 zero.value(0);
                 valueMap.put(symbol.getName(), zero);
@@ -83,18 +85,19 @@ public class CPWorker extends Worker {
     private void processInstructions(List<Instruction> instructions) {
         for (Instruction instruction : instructions) {
             final Integer opcode = instruction.getOpcode();
-            if(instruction.isPhi()) {
+            if (instruction.isPhi()) {
                 valueMap.remove(instruction.getSymbol().getName());
+                exclude.add(instruction.getSymbol().getName());
                 continue;
             }
-            if(instruction.isKill()) {
+            if (instruction.isKill()) {
                 final String variableName = instruction.getX().getVariableName();
                 valueMap.remove(variableName);
                 continue;
             } else {
                 final Result x = instruction.getX();
                 final Result y = instruction.getY();
-                if(opcode == OperationCode.move) {
+                if (opcode == OperationCode.move) {
                     final String variableName = instruction.getX().getVariableName();
                     updateValueMap(instruction, variableName, instruction.getX().getUniqueIdentifier(), y);
                 } else {
@@ -105,9 +108,9 @@ public class CPWorker extends Worker {
                         }
                     }
                 }
-                if(y != null) {
+                if (y != null) {
                     final Result result = valueMap.get(y.getVariableName());
-                    if(result != null) {
+                    if (result != null) {
                         instruction.setY(result);
                     }
                 }
@@ -119,27 +122,27 @@ public class CPWorker extends Worker {
     private void updateDominatedBy(List<Instruction> instructions) {
         for (Instruction instruction : instructions) {
             final Integer opcode = instruction.getOpcode();
-            if(OperationCode.end == opcode) {
+            if (OperationCode.end == opcode) {
                 return;
             }
-            if(instruction.isPhi()) {
+            if (instruction.isPhi()) {
                 valueMap.remove(instruction.getSymbol().getName());
                 phiInstructions.add(instruction);
 //                updatePhiInstruction(instruction);
                 continue;
             }
 
-            if(instruction.isKill()) {
+            if (instruction.isKill()) {
                 final String variableName = instruction.getX().getVariableName();
                 valueMap.remove(variableName);
                 continue;
             } else {
-                if(instruction.getX() == null && instruction.getY()==null) {
+                if (instruction.getX() == null && instruction.getY() == null) {
                     return;
                 }
                 final Result x = instruction.getX();
                 final Result y = instruction.getY();
-                if(opcode != OperationCode.move) {
+                if (opcode != OperationCode.move) {
                     if (x != null) {
                         final Result result = valueMap.get(x.getVariableName());
                         if (result != null) {
@@ -147,9 +150,9 @@ public class CPWorker extends Worker {
                         }
                     }
                 }
-                if(y != null) {
+                if (y != null) {
                     final Result result = valueMap.get(y.getVariableName());
-                    if(result != null) {
+                    if (result != null) {
                         instruction.setY(result);
                     }
                 }
@@ -159,23 +162,25 @@ public class CPWorker extends Worker {
     }
 
     private void updateValueMap(Instruction instruction, String variableName, String uniqueIdentifier, Result y) {
-        if(y.isVariable()) {
-            final Result yValue = valueMap.get(y.getVariableName());
-            if(yValue != null) {
-                if(yValue.isVariable()) {
-                    updateValueMap(instruction, variableName, uniqueIdentifier, yValue);
-                    return;
-                }
-                y = yValue;
-            }
-        }
-        valueMap.put(variableName, y);
-        valueMap.put(uniqueIdentifier, y);
-        instruction.setY(y);
-        instruction.setDeleted(true, "CP");
-        symbolTable.removeSymbol(variableName, instruction.getLocation());
-        Printer.debugMessage("Copying for " + variableName + " in instruction number[" + instruction.getLocation() + "]");
+        if (!exclude.contains(variableName)) {
 
+            if (y.isVariable()) {
+                final Result yValue = valueMap.get(y.getVariableName());
+                if (yValue != null) {
+                    if (yValue.isVariable()) {
+                        updateValueMap(instruction, variableName, uniqueIdentifier, yValue);
+                        return;
+                    }
+                    y = yValue;
+                }
+            }
+            valueMap.put(variableName, y);
+            valueMap.put(uniqueIdentifier, y);
+            instruction.setY(y);
+            instruction.setDeleted(true, "CP");
+            getSymbolTable().removeSymbol(variableName, instruction.getLocation());
+            Printer.debugMessage("Copying for " + variableName + " in instruction number[" + instruction.getLocation() + "]");
+        }
     }
 
     @Override

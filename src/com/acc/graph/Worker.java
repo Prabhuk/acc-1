@@ -1,5 +1,6 @@
 package com.acc.graph;
 
+import com.acc.parser.Parser;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.SymbolTable;
 
@@ -10,11 +11,11 @@ import java.util.Set;
  * Created by Rumpy on 14-02-2015.
  */
 public abstract class Worker {
-    protected final SymbolTable symbolTable;
+    protected final Parser parser;
     Set<BasicBlock> allNodes = new HashSet<BasicBlock>();
 
-    public Worker(SymbolTable symbolTable) {
-        this.symbolTable = symbolTable;
+    public Worker(Parser parser) {
+        this.parser = parser;
     }
 
     public void begin() {}
@@ -34,6 +35,6 @@ public abstract class Worker {
     }
 
     public SymbolTable getSymbolTable() {
-        return symbolTable;
+        return parser.getSymbolTable();
     }
 }

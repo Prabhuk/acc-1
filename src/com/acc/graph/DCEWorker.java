@@ -4,6 +4,7 @@ import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
 import com.acc.data.Result;
+import com.acc.parser.Parser;
 import com.acc.structure.SymbolTable;
 import com.acc.util.Printer;
 
@@ -15,10 +16,8 @@ import java.util.*;
 
 public class DCEWorker {
 
-    SymbolTable symbolTable;
-    Code code;
-    public DCEWorker(SymbolTable symbolTable, Code code) {
-        this.symbolTable=symbolTable;
+    private Code code;
+    public DCEWorker(Code code) {
         this.code=code;
     }
 
@@ -30,90 +29,35 @@ public class DCEWorker {
 
         while(instructionIterator.hasNext())
         {
-            ListIterator<Instruction> instructionJumper = allInstructions.listIterator(instructionIterator.nextIndex());
             Instruction currentInstruction = instructionIterator.next();
+            ListIterator<Instruction> instructionJumper = allInstructions.listIterator(instructionIterator.nextIndex());
+
+            Result x = currentInstruction.getX();
+            Result y = currentInstruction.getY();
+
             if(!currentInstruction.isDeleted()) {
                 if (currentInstruction.getOpcode() == OperationCode.cmp) {
-                    Instruction compareInstruction = currentInstruction;
-                    Result x = compareInstruction.getX();
-                    Result y = compareInstruction.getY();
-                    if (isConstant(x) && isConstant(y)) {
+                    if (x.isConstant() && y.isConstant()) {
                         Integer result = x.value() - y.value();
-                        compareResult.put(compareInstruction.getLocation(), result);
-                        compareInstruction.setDeleted(true, "DCE");
-                        Printer.debugMessage("Deleted compare instruction: " + compareInstruction.getInstructionString());
+                        compareResult.put(currentInstruction.getLocation(), result);
+                        currentInstruction.setDeleted(true, "DCE"); //$TODO$ We do not have break statements and so assuming that while loops will not be infinite
+                        Printer.debugMessage("Deleted compare instruction: " + currentInstruction.getInstructionString());
                     }
-
                 } else if (currentInstruction.getOpcode() >= OperationCode.bne && currentInstruction.getOpcode() <= OperationCode.bgt) {
-                    Instruction branchInstruction = currentInstruction;
-                    Integer branchCode = branchInstruction.getOpcode();
-
-                    Result x = branchInstruction.getX();
-                    Result y = branchInstruction.getY();
+                    Integer branchCode = currentInstruction.getOpcode();
                     if (compareResult.containsKey(x.getIntermediateLoation())) {
                         Integer result = compareResult.get(x.getIntermediateLoation());
-                        if (branchCode.equals(OperationCode.beq))  // Branch if equals
+                        if (OperationCode.isConditionSatisfied(branchCode, result))  // Branch if equals
                         {
-                            if (result == 0) {
-                                //eliminate the fall through
-                                Integer deleteTill = branchInstruction.getY().value();
-                                deleteInstructions(instructionIterator, currentInstruction, deleteTill);
-                            } else {
-                                //eliminate the branch code
-                                deleteBranchCode(instructionJumper, currentInstruction, y);
-                            }
-                        } else if (branchCode.equals(OperationCode.bne))  //Branch if not equals
-                        {
-                            if (result != 0) {
-                                //eliminate the fall through
-                                Integer deleteTill = branchInstruction.getY().value();
-                                deleteInstructions(instructionIterator, currentInstruction, deleteTill);
-                            } else {
-                                //eliminate the branch code
-                                deleteBranchCode(instructionJumper, currentInstruction, y);
-                            }
-                        } else if (branchCode.equals(OperationCode.ble))  //Branch if less than equals
-                        {
-                            if (result <= 0) {
-                                //eliminate the fall through
-                                Integer deleteTill = branchInstruction.getY().value();
-                                deleteInstructions(instructionIterator, currentInstruction, deleteTill);
-                            } else {
-                                //eliminate the branch code
-                                deleteBranchCode(instructionJumper, currentInstruction, y);
-                            }
-                        } else if (branchCode.equals(OperationCode.blt))  //Branch if less than
-                        {
-                            if (result < 0) {
-                                //eliminate the fall through
-                                Integer deleteTill = branchInstruction.getY().value();
-                                deleteInstructions(instructionIterator, currentInstruction, deleteTill);
-                            } else {
-                                //eliminate the branch code
-                                deleteBranchCode(instructionJumper, currentInstruction, y);
-                            }
-                        } else if (branchCode.equals(OperationCode.bge))  //Branch if not equals
-                        {
-                            if (result >= 0) {
-                                //eliminate the fall through
-                                Integer deleteTill = branchInstruction.getY().value();
-                                deleteInstructions(instructionIterator, currentInstruction, deleteTill);
-                            } else {
-                                //eliminate the branch code
-                                deleteBranchCode(instructionJumper, currentInstruction, y);
-                            }
-                        } else if (branchCode.equals(OperationCode.bgt)) {
-                            if (result > 0) {
-                                //eliminate the fall through
-                                Integer deleteTill = branchInstruction.getY().value();
-                                deleteInstructions(instructionIterator, currentInstruction, deleteTill);
-                            } else {
-                                //eliminate the branch block
-                                deleteBranchCode(instructionJumper, currentInstruction, y);
-                            }
+                            //eliminate the fall through
+                            Integer deleteTill = currentInstruction.getY().value();
+                            deleteInstructions(instructionIterator, currentInstruction, deleteTill);
+                        } else {
+                            //eliminate the branch code
+                            deleteBranchCode(instructionJumper, currentInstruction, y);
                         }
-                        branchInstruction.setDeleted(true, "DCE");
-                        Printer.debugMessage("Deleted branch instr: " + branchInstruction.getInstructionString());
+                        currentInstruction.setDeleted(true, "DCE");
+                        Printer.debugMessage("Deleted branch instr: " + currentInstruction.getInstructionString());
                     }
                 }
             }
@@ -145,12 +89,6 @@ public class DCEWorker {
     }
 
 
-    public boolean isConstant(Result z)
-    {
-        if(z.kind().isConstant())
-            return true;
-        return false;
-    }
 
 
 

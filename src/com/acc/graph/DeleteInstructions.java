@@ -4,6 +4,7 @@ import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
 import com.acc.data.Result;
+import com.acc.parser.Parser;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.SymbolTable;
 
@@ -19,8 +20,8 @@ public class DeleteInstructions extends Worker {
     private Map<Integer, Integer> oldNewLocations = new HashMap<Integer, Integer>();
     private Map<Integer, Integer> deletedLocations = new HashMap<Integer, Integer>();
 
-    public DeleteInstructions(Code code, SymbolTable table) {
-        super(table);
+    public DeleteInstructions(Code code, Parser parser) {
+        super(parser);
         this.code = code;
     }
 

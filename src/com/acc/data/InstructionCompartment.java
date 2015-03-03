@@ -7,23 +7,17 @@ import com.acc.structure.BasicBlock;
  */
 public class InstructionCompartment {
     private Instruction instruction;
-    private String dominanceFrontier;
     private BasicBlock basicBlock;
 
-    public InstructionCompartment(Instruction instruction, String dominanceFrontier, BasicBlock basicBlock)
+    public InstructionCompartment(Instruction instruction, BasicBlock basicBlock)
     {
         this.instruction=instruction;
-        this.dominanceFrontier=dominanceFrontier;
         this.basicBlock=basicBlock;
     }
 
 
     public Instruction getInstruction() {
         return instruction;
-    }
-
-    public String getDominanceFrontier() {
-        return dominanceFrontier;
     }
 
 

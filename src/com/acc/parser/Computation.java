@@ -17,13 +17,12 @@ public class Computation extends Parser {
 
     private String programName;
 
-    public Computation(Code code, Tokenizer tokenizer, SymbolTable symbolTable, String programName) {
+    public Computation(Code code, Tokenizer tokenizer, SymbolTable symbolTable, String programName, OutputContents outputContents) {
         super(code, tokenizer, symbolTable);
         this.programName = programName;
+        this.setOutputContents(outputContents);
         System.out.println("CURRENT PROGRAM: " + this.programName);
-//        if(programName.equals("main")) {
-//        }
-        OutputContents.addProgram(this);
+        this.outputContents.addProgram(this);
     }
 
     @Override

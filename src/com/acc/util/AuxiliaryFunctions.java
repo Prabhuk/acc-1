@@ -89,24 +89,6 @@ public class AuxiliaryFunctions {
         symbolTable.addSymbol(s);
     }
 
-    public static void removeInstruction(Code code, BasicBlock node) {
-        final List<Instruction> instructions = node.getInstructions();
-        final List<Instruction> remove = new ArrayList<Instruction>();
-        for (Instruction instruction : instructions) {
-            if(instruction.isPhi()) {
-                Instruction phi = instruction;
-                if(phi.canIgnore()) {
-                    remove.add(instruction);
-                }
-            }
-        }
-        for (Instruction instruction : remove) {
-            code.removeCode(instruction);
-            node.getInstructions().remove(instruction);
-            node.removePhiInstruction(instruction.getSymbol().getName());
-        }
-    }
-
     public static void addInstruction(int op, Code code, Result x, Result y, SymbolTable symbolTable) {
         final Instruction instruction = new Instruction(op, x, y, code.getPc());
         if(OperationCode.getOperandCount(op) > 0) {

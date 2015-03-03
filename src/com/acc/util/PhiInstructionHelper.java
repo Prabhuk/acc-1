@@ -21,7 +21,6 @@ public class PhiInstructionHelper {
         handleLeft(join, table, code);
         handleRight(join, table, code);
         fillIncomplete(join, table);
-        AuxiliaryFunctions.removeInstruction(code, join);
     }
 
     private static void fillIncomplete(BasicBlock join, SymbolTable table) {

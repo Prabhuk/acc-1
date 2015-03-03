@@ -9,17 +9,24 @@ import java.util.List;
  * Created by prabhuk on 2/23/2015.
  */
 public class OutputContents {
-    private static List<Computation> programs = new ArrayList<Computation>();
+    private List<Computation> programs = new ArrayList<Computation>();
+    private Computation mainProgram;
 
-    public static void addProgram(Computation program) {
-        programs.add(program);
+    public OutputContents() {
     }
 
-    public static List<Computation> getPrograms() {
+    public void addProgram(Computation program) {
+        programs.add(program);
+        if(program.getProgramName().equals("main")) {
+            mainProgram = program;
+        }
+    }
+
+    public List<Computation> getPrograms() {
         return programs;
     }
 
-    public static void clear() {
-        programs = new ArrayList<Computation>();
+    public Computation getMainProgram() {
+        return mainProgram;
     }
 }

@@ -53,7 +53,7 @@ public class FunctionDeclaration extends Parser {
         }
         final Code procedureCode = new Code();
         procedureCode.setProgramName(procedureName.getToken());
-        final Computation computation = new Computation(procedureCode, tokenizer, procedureSymbolTable, procedureName.getToken());
+        final Computation computation = new Computation(procedureCode, tokenizer, procedureSymbolTable, procedureName.getToken(), outputContents);
         computation.programBody();
         AuxiliaryFunctions.addInstruction(OperationCode.end, procedureCode, null, null, procedureSymbolTable);
 

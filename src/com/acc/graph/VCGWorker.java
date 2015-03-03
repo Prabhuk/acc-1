@@ -1,6 +1,7 @@
 package com.acc.graph;
 
 import com.acc.data.Instruction;
+import com.acc.parser.Parser;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.SymbolTable;
 
@@ -19,15 +20,13 @@ public class VCGWorker extends Worker {
     private final String outputFileName;
     private BufferedWriter bufferedWriter;
 
-    public VCGWorker(String outputFileName, SymbolTable symbolTable) {
-        super(symbolTable);
+    public VCGWorker(String outputFileName, Parser parser) {
+        super(parser);
         this.outputFileName = outputFileName;
     }
 
     @Override
     public void begin() {
-        final long l = System.currentTimeMillis();
-//        String fileName = "output_"+ String.valueOf(l) +".vcg";
         String fileName = outputFileName;
         final File file = new File(fileName);
         System.out.println(file.getAbsolutePath());
