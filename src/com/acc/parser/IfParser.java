@@ -52,6 +52,12 @@ public class IfParser extends Parser {
 //        Result follow = new Result(Kind.FRAME_POINTER, 0, 0, 0, null, ZERO);
         Token incoming = tokenizer.next();
         if (isElse(incoming)) {
+            //insert unconditional jump fwd to x.fixuploc here
+            Result y = new Result();
+            y.fixupLoc(code.getPc());
+            AuxiliaryFunctions.BJ(code, y.fixupLoc());
+
+
             final BasicBlock right = new BasicBlock();
             join.setRight(right);
             right.setJoinBlock(join);
@@ -60,10 +66,12 @@ public class IfParser extends Parser {
             code.setCurrentBlock(right);
 //            AuxiliaryFunctions.FJLink(code, follow);
             code.Fixup(x.fixupLoc());
+
             final Result rightTree = new StatSequence(code, tokenizer, symbolTable).parse();
             if (rightTree.getJoin() != null && !rightTree.getJoin().equals(join)) {
                 join.setRight(rightTree.getJoin());
             }
+            code.Fixup(y.fixupLoc());
         } else {
             tokenizer.previous();
             join.setRight(currentBlock);

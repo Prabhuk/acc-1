@@ -2,10 +2,7 @@ package com.acc.ui;
 
 import com.acc.data.Code;
 import com.acc.data.Instruction;
-import com.acc.graph.CPWorker;
-import com.acc.graph.DeleteInstructions;
-import com.acc.graph.GraphHelper;
-import com.acc.graph.VCGWorker;
+import com.acc.graph.*;
 import com.acc.parser.Computation;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.Symbol;
@@ -52,7 +49,7 @@ public class CompileInputFile {
 //        final String inputFile = "C:\\work\\acc\\test\\accsimple.txt";
         currentFileName = "accsimple.txt";
 //        processFile(inputFile);
-        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test"), new String[]{"txt"}, false);
+        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test2"), new String[]{"txt"}, false);
         for (File inputFile : files) {
             currentFileName = inputFile.getName();
             processFile(inputFile.getAbsolutePath(), inputFile.getName());
@@ -82,6 +79,10 @@ public class CompileInputFile {
             final BasicBlock rootNode = code.getControlFlowGraph().getRootBlock();
             new GraphHelper(new CPWorker(parser.getSymbolTable()), rootNode);
             new GraphHelper(new DeleteInstructions(code, parser.getSymbolTable()), rootNode);
+            new GraphHelper(new CSEWorker(code, new SymbolTable()), rootNode);
+            new GraphHelper(new DeleteInstructions(code, parser.getSymbolTable()), rootNode);
+            final DCEWorker worker = new DCEWorker( parser.getSymbolTable(),code);
+            worker.visit();
             printInstructions(parser, code);
             new GraphHelper(new VCGWorker("output\\" + prefix+"_" + parser.getProgramName() + ".vcg", parser.getSymbolTable()), rootNode);
             printInstructions(parser, code);

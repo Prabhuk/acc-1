@@ -2,7 +2,6 @@ package com.acc.data;
 
 import com.acc.structure.BasicBlock;
 import com.acc.structure.ControlFlowGraph;
-import com.acc.structure.SymbolTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +84,7 @@ public class Code {
 //        instructions.get(location).FixUp(getPc() - location);
         for (Instruction instruction : instructions) {
             if(instruction.getLocation() == location) {
-                instruction.FixUp(getPc());
+                instruction.fixup(getPc());
                 break;
             }
         }

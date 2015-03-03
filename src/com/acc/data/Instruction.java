@@ -101,11 +101,19 @@ public class Instruction {
         return "";
     }
 
-    public void FixUp(int c) {
-        if(y == null) {
-            setY(new Result(Kind.CONSTANT));
+    public void fixup(int c) {
+        if(opcode == OperationCode.bra) {
+            changeResultsTargetValue(x, c);
+        } else {
+            changeResultsTargetValue(y, c);
         }
-        y.value(c);
+    }
+
+    private void changeResultsTargetValue(Result x, int c) {
+        if(x == null) {
+            setX(new Result(Kind.CONSTANT));
+        }
+        x.value(c);
     }
 
     public void setX(Result x) {

@@ -20,6 +20,9 @@ public class SymbolTable {
         return this.symbols.size();
     }
 
+    public Map<String, Symbol> getSymbolsByName() {
+        return symbolsByName;
+    }
 
     public List<Symbol> getSymbols() {
         return symbols;
