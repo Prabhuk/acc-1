@@ -4,6 +4,7 @@ import com.acc.data.Code;
 import com.acc.data.Keyword;
 import com.acc.data.Result;
 import com.acc.data.Token;
+import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.SymbolTable;
 import com.acc.util.Tokenizer;
 
@@ -37,8 +38,8 @@ public class Statement extends Parser {
             }
 //            tokenizer.previous(); // Statements breakout on semicolon or end curly brace.
         } else {
-            tokenizer.previous(); //moving back to reread the symbolName
-            x = new AssignmentParser(code, tokenizer, symbolTable).parse();
+            throw new SyntaxErrorException("Unexpected token ["+next.getToken()+"]");
+//            tokenizer.previous(); //moving back to reread the symbolName
         }
         // Rolling back to those tokens for statSequence to stay sane.
         return x;
