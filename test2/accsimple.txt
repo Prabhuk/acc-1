@@ -4,12 +4,9 @@ array[3][2] b, c;
 {
     let b[0][0] <- 0;
     let i <- b[0][0];
-    if i < 0 then
-       let c[0][0] <- 1
-    else
-       let c[0][0] <- 1;
-       let b[0][0] <- 1
-    fi;
+    while i < 10 do
+      let i <- i + 1
+    od;
     let b[0][0] <- 0;
     let i <- b[0][0]
 }.

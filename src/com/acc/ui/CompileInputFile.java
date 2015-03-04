@@ -22,14 +22,12 @@ import java.util.logging.Logger;
  * Created by prabhuk on 1/14/2015.
  */
 public class CompileInputFile {
-    private String filePath;
     private Tokenizer tokenizer;
     public static String currentFileName;
     Computation parser;
     private static Logger logger = Logger.getLogger(CompileInputFile.class.getName());
 
     public CompileInputFile(String filePath, OutputContents contents) {
-        this.filePath = filePath;
         try {
             tokenizer = new Tokenizer(filePath);
             Code code = new Code();
@@ -46,10 +44,8 @@ public class CompileInputFile {
     public static void main(String[] args) {
 
 
-//        final String inputFile = "C:\\work\\acc\\test\\accsimple.txt";
-        currentFileName = "accsimple.txt";
-//        processFile(inputFile);
-        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test2"), new String[]{"txt"}, false);
+        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test"), new String[]{"txt"}, false);
+//        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test2"), new String[]{"txt"}, false);
         for (File inputFile : files) {
             currentFileName = inputFile.getName();
             processFile(inputFile.getAbsolutePath(), inputFile.getName());

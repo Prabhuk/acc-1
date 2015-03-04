@@ -36,7 +36,10 @@ public class WhileParser extends Parser {
             code.setCurrentBlock(nextBlock);
         }
 
-        final BasicBlock currentBlock = code.getCurrentBlock();
+        final BasicBlock previousBlock = code.getCurrentBlock();
+        final BasicBlock currentBlock = new BasicBlock();
+        previousBlock.addChild(currentBlock);
+        code.setCurrentBlock(currentBlock);
         BasicBlock loopBlock = code.getCurrentBlock();
         Result x = new Relation(code, tokenizer, symbolTable).parse();
         AuxiliaryFunctions.CJF(code, x, getSymbolTable());

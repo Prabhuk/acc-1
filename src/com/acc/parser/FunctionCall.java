@@ -7,6 +7,7 @@ import com.acc.data.Result;
 import com.acc.data.Token;
 import com.acc.data.TokenType;
 import com.acc.exception.SyntaxErrorException;
+import com.acc.structure.BasicBlock;
 import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
 import com.acc.util.AuxiliaryFunctions;
@@ -30,6 +31,9 @@ public class FunctionCall extends Parser {
         if (!procedureName.isIdentifier()) {
             throw new SyntaxErrorException(procedureName.tokenType(), TokenType.IDENTIFIER);
         }
+        final BasicBlock functionBlock = new BasicBlock();
+        code.getCurrentBlock().addChild(functionBlock, false);
+        code.setCurrentBlock(functionBlock);
         final Token openBracket = tokenizer.next();
         List<Result> parameters = new ArrayList<Result>();
         if (openBracket.getToken().equals("(")) {
@@ -66,7 +70,7 @@ public class FunctionCall extends Parser {
             }
 //            Result x = new Result(recent.getType().isArray() ? Kind.ARRAY : Kind.VAR, null, null, null, null, null, null);
 //            List<Result> arrayIdentifiers = accumulateArrayIdentifiers(recent);
-            //$TODO$ well do something with the identifiers
+            //$TODO$ well do something with the identifiers - Should GENERATE CODE FOR CALLEE
 
 //            AuxiliaryFunctions.addInstruction(OperationCode.move, code, x, parameter, getSymbolTable());
         }
@@ -81,7 +85,9 @@ public class FunctionCall extends Parser {
         Result y = new Result(Kind.PROCEDURE);
         y.setVariableName(procedureName.getToken());
         AuxiliaryFunctions.addInstruction(OperationCode.call, code, y, null, symbolTable);
-
+        final BasicBlock newBlock = new BasicBlock();
+        functionBlock.addChild(newBlock, false);
+        code.setCurrentBlock(newBlock);
 
         return x; //$TODO$ return relevant value
     }
