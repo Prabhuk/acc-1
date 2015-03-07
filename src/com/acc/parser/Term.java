@@ -33,20 +33,9 @@ public class Term extends Parser {
                 break;
             }
             y = new Factor(code, tokenizer, symbolTable).parse();
-
-            if (x.isConstant() && y.isConstant()) {
-                if (op == OperationCode.mul) {
-                    x.value(x.value() * y.value());
-                } else if (op == OperationCode.div) {
-                    x.value(x.value() / y.value());
-                } else {
-                    throw new UnsupportedOperationException("Combine cannot process Operation code [" + op + "]");
-                }
-            } else {
-                AuxiliaryFunctions.addInstruction(op, code, x, y, getSymbolTable());
-                x = new Result(Kind.INTERMEDIATE);
-                x.setIntermediateLoation(code.getPc() - 1);
-            }
+            AuxiliaryFunctions.addInstruction(op, code, x, y, getSymbolTable());
+            x = new Result(Kind.INTERMEDIATE);
+            x.setIntermediateLoation(code.getPc() - 1);
             next = tokenizer.next();
         }
         tokenizer.previous();

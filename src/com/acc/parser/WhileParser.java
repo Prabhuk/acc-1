@@ -1,10 +1,7 @@
 package com.acc.parser;
 
 import com.acc.constants.KeywordType;
-import com.acc.data.Code;
-import com.acc.data.Keyword;
-import com.acc.data.Result;
-import com.acc.data.Token;
+import com.acc.data.*;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.SymbolTable;
@@ -38,6 +35,7 @@ public class WhileParser extends Parser {
 
         final BasicBlock previousBlock = code.getCurrentBlock();
         final BasicBlock currentBlock = new BasicBlock();
+        currentBlock.setType(BlockType.WHILE_HEAD);
         previousBlock.addChild(currentBlock);
         code.setCurrentBlock(currentBlock);
         BasicBlock loopBlock = code.getCurrentBlock();
@@ -66,6 +64,7 @@ public class WhileParser extends Parser {
         handleDoToken();
 
         final BasicBlock right = new BasicBlock();
+        right.setType(BlockType.WHILE_BODY);
         currentBlock.addChild(right, true);
         join.setRight(right);
         code.setCurrentBlock(right);
@@ -81,10 +80,11 @@ public class WhileParser extends Parser {
         AuxiliaryFunctions.BJ(code, loop); //Backward Jump to the loop beginning.
         PhiInstructionHelper.createPhiInstructions(getSymbolTable(), join, code);
         code.Fixup(x.fixupLoc());
-        final BasicBlock nextBlock = new BasicBlock();
-        join.addChild(nextBlock, true);
+        final BasicBlock followBlock = new BasicBlock();
+        followBlock.setType(BlockType.WHILE_FOLLOW);
+        join.addChild(followBlock, true);
 
-        code.setCurrentBlock(nextBlock);
+        code.setCurrentBlock(followBlock);
         handleODtoken(tokenizer.next());
 
         return x;

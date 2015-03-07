@@ -93,6 +93,7 @@ public class CPWorker extends Worker {
             if (instruction.isKill()) {
                 final String variableName = instruction.getX().getVariableName();
                 valueMap.remove(variableName);
+                exclude.add(variableName);
                 continue;
             } else {
                 final Result x = instruction.getX();

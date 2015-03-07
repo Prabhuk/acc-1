@@ -4,7 +4,9 @@ import com.acc.structure.BasicBlock;
 import com.acc.structure.ControlFlowGraph;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by prabhuk on 1/14/2015.
@@ -18,6 +20,7 @@ public class Code {
     private final List<Instruction> instructions = new ArrayList<Instruction>();
     private final ControlFlowGraph controlFlowGraph;
     private String programName;
+    private Map<String, Integer> functionCodeLocations = new HashMap<String, Integer>();
 
     public Code() {
         this.controlFlowGraph = new ControlFlowGraph();
@@ -48,6 +51,13 @@ public class Code {
                     instructions.add(instruction);
                 }
                 joinBlock.addInstruction(instruction);
+            } else {
+                if(targetIndex != -1) {
+                    instructions.add(targetIndex, instruction);
+                } else {
+                    instructions.add(instruction);
+                }
+                controlFlowGraph.addInstruction(instruction);
             }
         } else {
             if(targetIndex != -1) {
@@ -73,6 +83,10 @@ public class Code {
 
     public BasicBlock getCurrentBlock() {
         return controlFlowGraph.getCurrentBlock();
+    }
+
+    public void setLastNode() {
+        controlFlowGraph.setLastNode();
     }
 
     public void setCurrentBlock(BasicBlock block) {
@@ -112,5 +126,13 @@ public class Code {
 
     public void setProgramName(String programName) {
         this.programName = programName;
+    }
+
+    public Map<String, Integer> getFunctionCodeLocations() {
+        return functionCodeLocations;
+    }
+
+    public void setFunctionCodeLocations(Map<String, Integer> functionCodeLocations) {
+        this.functionCodeLocations = functionCodeLocations;
     }
 }

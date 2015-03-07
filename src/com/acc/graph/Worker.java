@@ -34,6 +34,10 @@ public abstract class Worker {
         }
     }
 
+    public Set<BasicBlock> getAllNodes() {
+        return allNodes;
+    }
+
     public SymbolTable getSymbolTable() {
         return parser.getSymbolTable();
     }

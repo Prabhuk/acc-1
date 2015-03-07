@@ -26,6 +26,17 @@ public class OutputContents {
         return programs;
     }
 
+    public Computation getProgram(String programName) {
+        for (Computation program : programs) {
+            if(program.getProgramName().equals(programName)) {
+                return program;
+            }
+        }
+        return null;
+    }
+
+
+
     public Computation getMainProgram() {
         return mainProgram;
     }

@@ -87,7 +87,13 @@ public class VCGWorker extends Worker {
         StringBuilder sb = new StringBuilder();
         sb.append("node: {title: \"").append(node.getLabel()).append("\"\n")
                 .append("label: \"").append(node.getLabel()).append("[\n")
-                .append("").append(instructionString.toString()).append(" ]\"\n").append("}");
+                .append("").append(instructionString.toString()).append(" ]\"\n")
+                .append("liveRanges: ");
+        final Set<Integer> liveRanges = node.getLiveRanges();
+        for (Integer liveRange : liveRanges) {
+            sb.append(String.valueOf(liveRange)).append(",");
+        }
+        sb.append("\n}");
         return sb.toString();
     }
 

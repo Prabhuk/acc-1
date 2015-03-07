@@ -1,5 +1,6 @@
 package com.acc.structure;
 
+import com.acc.data.BlockType;
 import com.acc.data.Instruction;
 
 import java.util.*;
@@ -17,7 +18,8 @@ public class BasicBlock {
     private final Map<String, Instruction> phiMap = new HashMap<String, Instruction>();
     private final List<BasicBlock> dominatesOver = new ArrayList<BasicBlock>();
     private final Set<BasicBlock> children = new HashSet<BasicBlock>();
-    private final Set<BasicBlock> parents = new HashSet<BasicBlock>();
+    private Set<BasicBlock> parents = new HashSet<BasicBlock>();
+    private Set<Integer> liveRanges = new HashSet<Integer>();
 
     private static volatile Set<BasicBlock> allBlocks = new HashSet<BasicBlock>();
     private boolean isVisited = false;
@@ -27,6 +29,7 @@ public class BasicBlock {
     private BasicBlock joinBlock;
     private BasicBlock left;
     private BasicBlock right;
+    private BlockType type;
 
     public BasicBlock() {
         label = count++;
@@ -109,6 +112,12 @@ public class BasicBlock {
         return parents;
     }
 
+    public void setParents(Set<BasicBlock> parents) {
+        this.parents = parents;
+    }
+
+
+
     public void addChild(BasicBlock child, boolean addDominatedOver) {
         child.getParents().add(this);
         this.children.add(child);
@@ -165,4 +174,38 @@ public class BasicBlock {
         this.isVisited = isVisited;
     }
 
+    public Set<Integer> getLiveRanges() {
+        return liveRanges;
+    }
+
+    public void setLiveRanges(Set<Integer> liveRanges) {
+        this.liveRanges = liveRanges;
+    }
+
+    public BlockType getType() {
+        return type;
+    }
+
+    public void setType(BlockType type) {
+        this.type = type;
+    }
+
+    public boolean isWhileBody() {
+        return type != null && type.isWhileBody();
+    }
+    public boolean isWhileHead() {
+        return type != null && type.isWhileHead();
+    }
+
+    public boolean isWhileFollow() {
+        return type != null && type.isWhileFollow();
+    }
+    public boolean isCall() {
+        return type != null && type.isCall();
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(label);
+    }
 }

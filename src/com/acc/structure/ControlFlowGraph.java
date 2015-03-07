@@ -8,6 +8,7 @@ import com.acc.data.Instruction;
 public class ControlFlowGraph {
     private BasicBlock currentBlock;
     private final BasicBlock rootBlock;
+    private BasicBlock lastNode;
 
     public ControlFlowGraph() {
         BasicBlock.resetCount();
@@ -35,4 +36,11 @@ public class ControlFlowGraph {
         return rootBlock;
     }
 
+    public BasicBlock setLastNode() {
+        return lastNode = currentBlock;
+    }
+
+    public BasicBlock getLastNode() {
+        return lastNode;
+    }
 }

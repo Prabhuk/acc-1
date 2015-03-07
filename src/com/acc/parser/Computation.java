@@ -10,12 +10,15 @@ import com.acc.ui.OutputContents;
 import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
+import java.util.List;
+
 /**
  * Created by Rumpy on 05-02-2015.
  */
 public class Computation extends Parser {
 
     private String programName;
+    private List<String> formalParams;
 
     public Computation(Code code, Tokenizer tokenizer, SymbolTable symbolTable, String programName, OutputContents outputContents) {
         super(code, tokenizer, symbolTable);
@@ -54,10 +57,19 @@ public class Computation extends Parser {
         if (!next.getToken().equals("}")) {
             throw new SyntaxErrorException("Expected \"}\". Found [" + next + "] instead");
         }
+        code.setLastNode();
         return s;
     }
 
     public String getProgramName() {
         return programName;
+    }
+
+    public List<String> getFormalParams() {
+        return formalParams;
+    }
+
+    public void setFormalParams(List<String> formalParams) {
+        this.formalParams = formalParams;
     }
 }

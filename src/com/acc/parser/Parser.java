@@ -19,7 +19,7 @@ public abstract class Parser {
     protected Code code;
     protected Tokenizer tokenizer;
     protected final SymbolTable symbolTable;
-    private static final Map<String, List<String>> procedureArguments = new HashMap<String, List<String>>();
+    protected static final Map<String, Integer> predefinedProcedureArguments = new HashMap<String, Integer>();
     protected static final Result FP = new Result(Kind.FRAME_POINTER);
     protected static OutputContents outputContents;
 
@@ -27,10 +27,9 @@ public abstract class Parser {
     static {
         FP.value(100); //FRAME POINTER ADDRESS
         //$TODO$ Cannot hardcode to 100. Needs fixing $Fixme$
-        procedureArguments.put("InputNum", Collections.EMPTY_LIST);
-        final ArrayList<String> strings = new ArrayList<String>();
-        strings.add("out");
-        procedureArguments.put("OutputNum", strings);
+        predefinedProcedureArguments.put("InputNum", 0);
+        predefinedProcedureArguments.put("OutputNum", 1);
+        predefinedProcedureArguments.put("OutputNewLine", 0);
     }
 
     public Parser(Code code, Tokenizer tokenizer, SymbolTable symbolTable) {
@@ -48,36 +47,10 @@ public abstract class Parser {
     }
 
 
-    public Map<String, List<String>> getProcedureArguments() {
-        return procedureArguments;
-    }
-
     public List<String> getArgumentNamesForProcedure(String procedureName) {
-        final List<String> strings = procedureArguments.get(procedureName);
-        return strings == null ? Collections.EMPTY_LIST : strings;
+        final Computation program = outputContents.getProgram(procedureName);
+        return program.getFormalParams();
     }
-
-    /**
-     * For the given procedureName, stores the list of argument names in order.
-     * throws SyntaxErrorException when duplicate argument name is passed
-     *
-     * @param procedureName
-     * @param argumentName
-     * @return true on successful addition of argument name, false otherwise
-     */
-    public boolean addArgumentNameForProcedure(String procedureName, String argumentName) {
-        if (procedureArguments.get(procedureName) == null) {
-            procedureArguments.put(procedureName, new ArrayList<String>());
-        }
-
-        List<String> args = procedureArguments.get(procedureName);
-        if (args.contains(argumentName)) {
-            throw new SyntaxErrorException("Duplicate argument name: [" + argumentName + "] in the procedure [" + procedureName + "]");
-        }
-
-        return args.add(argumentName);
-    }
-
 
     public abstract Result parse();
 

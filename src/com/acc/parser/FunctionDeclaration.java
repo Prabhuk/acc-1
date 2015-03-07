@@ -30,6 +30,7 @@ public class FunctionDeclaration extends Parser {
         //$TODO$ DEAL WITH ident
         final SymbolTable procedureSymbolTable = new SymbolTable();
         procedureSymbolTable.setGlobalSymbolTable(getSymbolTable());
+        List<String> argumentNames = new ArrayList<String>();
         Token next = tokenizer.next();
         if (!isSemiColonToken(next)) {
             tokenizer.previous();
@@ -40,10 +41,8 @@ public class FunctionDeclaration extends Parser {
             while(!isClosedParanthesis(next)) {
                 tokenizer.previous();
                 final Result y = new FormalParam(code, tokenizer, symbolTable).parse();
-
-                if(y != null) {
-                    procedureSymbolTable.addSymbol(new Symbol(y.getVariableName(), -1, null, SymbolType.VARIABLE));
-                }
+                argumentNames.add(y.getVariableName());
+                procedureSymbolTable.addSymbol(new Symbol(y.getVariableName(), -1, null, SymbolType.VARIABLE));
                 next = tokenizer.next();
             }
             next = tokenizer.next();
@@ -54,6 +53,7 @@ public class FunctionDeclaration extends Parser {
         final Code procedureCode = new Code();
         procedureCode.setProgramName(procedureName.getToken());
         final Computation computation = new Computation(procedureCode, tokenizer, procedureSymbolTable, procedureName.getToken(), outputContents);
+        computation.setFormalParams(argumentNames);
         computation.programBody();
         AuxiliaryFunctions.addInstruction(OperationCode.end, procedureCode, null, null, procedureSymbolTable);
 

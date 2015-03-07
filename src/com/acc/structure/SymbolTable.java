@@ -69,6 +69,7 @@ public class SymbolTable {
         }
         if(s == null && globalSymbolTable != null) {
             s = globalSymbolTable.getRecentOccurence(symbolName);
+            s.setGlobal(true);
         }
         return s;
     }
@@ -82,6 +83,7 @@ public class SymbolTable {
         }
         if(!globalSymbolTable.equals(this) && globalSymbolTable != null) {
             s = globalSymbolTable.getDeclaration(symbolName);
+            s.setGlobal(true);
         }
         return s;
     }
@@ -111,6 +113,7 @@ public class SymbolTable {
         }
         if(targetSymbol == null && globalSymbolTable != null) {
             targetSymbol = globalSymbolTable.getTargetSymbol(symbol);
+            targetSymbol.setGlobal(true);
         }
 
         return targetSymbol;

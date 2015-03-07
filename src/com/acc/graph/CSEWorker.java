@@ -141,10 +141,14 @@ public class CSEWorker extends Worker {
     private boolean isVariableKilledBetween(Result variable, BasicBlock node, InstructionCompartment priorCompartment) {
 
         List<InstructionCompartment> killAnchorObject;
-        if (variable.isArray())
+        if (variable.isArray()) {
             killAnchorObject = index.get(OperationCode.kill);
-        else
+        } else {
             killAnchorObject = index.get(OperationCode.phi);
+            if(killAnchorObject == null) {
+                killAnchorObject = index.get(OperationCode.kill); //global variable changed in function call
+            }
+        }
         if (killAnchorObject == null) {
             return false;
         }
@@ -155,7 +159,7 @@ public class CSEWorker extends Worker {
             Printer.debugMessage("[139]" + holder.getInstruction().getInstructionString());
             Printer.debugMessage("a." + variable.getVariableName());
             final Result x = holder.getInstruction().getX();
-            Printer.debugMessage("b." + holder.getInstruction().getSymbol().getName());
+//            Printer.debugMessage("b." + holder.getInstruction().getSymbol().getName());
             if (x.isVariable()) {
                 if (x.getVariableName().equals(variable.getVariableName())) {
                     if (holder.getBasicBlock().isDominatingOver(node) && priorCompartment.getInstruction().getLocation() > holder.getInstruction().getLocation()) {

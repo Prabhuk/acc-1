@@ -16,6 +16,7 @@ public class Symbol {
     private Object arrayValue;
     private int arrayDimension;
     private List<Result> arrayIdentifiers;
+    private boolean isGlobal;
 
     /**
      * @param name           - unique symbol name in the symbol table
@@ -122,5 +123,13 @@ public class Symbol {
 
     public Object getArrayValue() {
         return arrayValue;
+    }
+
+    public boolean isGlobal() {
+        return isGlobal;
+    }
+
+    public void setGlobal(boolean isGlobal) {
+        this.isGlobal = isGlobal;
     }
 }

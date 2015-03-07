@@ -2,10 +2,7 @@ package com.acc.parser;
 
 import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
-import com.acc.data.Code;
-import com.acc.data.Result;
-import com.acc.data.Token;
-import com.acc.data.TokenType;
+import com.acc.data.*;
 import com.acc.exception.SyntaxErrorException;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.Symbol;
@@ -31,9 +28,6 @@ public class FunctionCall extends Parser {
         if (!procedureName.isIdentifier()) {
             throw new SyntaxErrorException(procedureName.tokenType(), TokenType.IDENTIFIER);
         }
-        final BasicBlock functionBlock = new BasicBlock();
-        code.getCurrentBlock().addChild(functionBlock, false);
-        code.setCurrentBlock(functionBlock);
         final Token openBracket = tokenizer.next();
         List<Result> parameters = new ArrayList<Result>();
         if (openBracket.getToken().equals("(")) {
@@ -56,9 +50,27 @@ public class FunctionCall extends Parser {
         } else {
             tokenizer.previous();
         }
+
+        if(predefinedProcedureArguments.containsKey(procedureName.getToken())) {
+            final Result predefined = new Result(Kind.INTERMEDIATE);
+            predefined.setIntermediateLoation(code.getPc());
+            if(procedureName.getToken().equals("InputNum")) {
+                AuxiliaryFunctions.addInstruction(OperationCode.read, code, null, null, getSymbolTable());
+            } else if (procedureName.getToken().equals("OutputNum")) {
+                AuxiliaryFunctions.addInstruction(OperationCode.write, code, parameters.get(0), null, getSymbolTable());
+            } else { //OutputNewLine
+                AuxiliaryFunctions.addInstruction(OperationCode.writenl, code, null, null, getSymbolTable());
+            }
+            return predefined;
+        }
+
+        final BasicBlock functionBlock = new BasicBlock();
+        functionBlock.setType(BlockType.CALL);
+        code.getCurrentBlock().addChild(functionBlock, false);
+        code.setCurrentBlock(functionBlock);
         final List<String> args = getArgumentNamesForProcedure(procedureName.getToken());
         if (args.size() != parameters.size()) {
-//            throw new SyntaxErrorException("Argument list mismatch in the procedure call for the procedure [" + procedureName.getToken() + "]");
+            throw new SyntaxErrorException("Argument list mismatch in the procedure call for the procedure [" + procedureName.getToken() + "]");
         }
 
         for (int i = 0; i < parameters.size(); i++) {

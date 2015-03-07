@@ -1,12 +1,11 @@
 main
-var x, y, i;
-array[3][2] b, c;
+var x, y;
+var i,b;
 {
-    let b[0][0] <- 0;
-    let i <- b[0][0];
-    while i < 10 do
-      let i <- i + 1
-    od;
-    let b[0][0] <- 0;
-    let i <- b[0][0]
+    let x <- call InputNum();
+    if x > 5 then
+        let y <- x + 1
+    else
+        let y <- x - 1
+    fi
 }.

@@ -3,7 +3,12 @@ package com.acc.ui;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
 import com.acc.graph.*;
+import com.acc.memory.RegisterAllocator;
 import com.acc.parser.Computation;
+import com.acc.ra.structure.GraphNode;
+import com.acc.ra.structure.InterferenceGraph;
+import com.acc.ra.structure.InterferenceGraphWorker;
+import com.acc.ra.structure.LiveRangeCreator;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
@@ -13,8 +18,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,20 +77,48 @@ public class CompileInputFile {
         final Computation mainProgram = contents.getMainProgram();
 
         for (Computation parser : parsers) {
-
             final Code code = parser.getCode();
-            printInstructions(parser, code);
+//            printInstructions(parser, code);
             final BasicBlock rootNode = code.getControlFlowGraph().getRootBlock();
             new GraphHelper(new CPWorker(parser), rootNode);
             new GraphHelper(new DeleteInstructions(code, parser), rootNode);
-            printInstructions(parser, code);
+//            printInstructions(parser, code);
             new GraphHelper(new CSEWorker(parser), rootNode);
             new GraphHelper(new DeleteInstructions(code, parser), rootNode);
             final DCEWorker worker = new DCEWorker(code);
             worker.visit();
-            printInstructions(parser, code);
-            new GraphHelper(new VCGWorker("output\\" + prefix+"_" + parser.getProgramName() + ".vcg", parser), rootNode);
+//            printInstructions(parser, code);
+//            new GraphHelper(new VCGWorker("output\\" + prefix+"_" + parser.getProgramName() + ".vcg", parser), rootNode);
+
         }
+        Map<String, Integer> functionCodeLocations = new HashMap<String, Integer>();
+        final Code mainProgramCode = mainProgram.getCode();
+        for (Computation parser : parsers) {
+            if(!parser.equals(mainProgram)) {
+                functionCodeLocations.put(parser.getProgramName(), mainProgramCode.getPc());
+                final List<Instruction> instructions = parser.getCode().getInstructions();
+                for (Instruction instruction : instructions) {
+                    instruction.setLocation(mainProgramCode.getPc());
+                    mainProgramCode.addCode(instruction);
+                }
+            }
+        }
+        mainProgramCode.setFunctionCodeLocations(functionCodeLocations);
+        //$TODO$ - NOTE: All the function codes are inserted into main
+
+
+
+        final LiveRangeCreator liveRangeWorker = new LiveRangeCreator(mainProgram, contents);
+        new GraphReverseTraversalHelper(liveRangeWorker, mainProgramCode.getControlFlowGraph().getLastNode());
+        final InterferenceGraphWorker igCreator = new InterferenceGraphWorker(mainProgram);
+        new GraphHelper(igCreator, mainProgramCode.getControlFlowGraph().getRootBlock());
+        final InterferenceGraph graph = igCreator.getGraph();
+        final Set<Instruction> phis = liveRangeWorker.getPhis();
+
+        final RegisterAllocator registerAllocator = new RegisterAllocator(mainProgram, phis, graph);
+        //$TODO$ coloring, clustering and insertion of spill code.
+        printInstructions(mainProgram, mainProgramCode);
+
         Printer.print("Compilation completed for ["+inputFile+"]");
     }
 
