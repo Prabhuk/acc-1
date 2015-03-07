@@ -6,7 +6,9 @@ import java.util.Set;
 /**
  * Created by prabhuk on 3/5/2015.
  */
-public class GraphNode {
+public class GraphNode
+//        implements Comparable<GraphNode>
+{
     private int nodeId;
     Set<GraphNode> neighbors = new HashSet<GraphNode>();
 
@@ -43,4 +45,10 @@ public class GraphNode {
     public String toString() {
         return "GraphNode: " + String.valueOf(nodeId);
     }
+
+
+//    @Override
+//    public int compareTo(GraphNode o) {
+//        return this.neighbors.size() - o.neighbors.size();
+//    }
 }

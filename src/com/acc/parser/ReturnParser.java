@@ -21,7 +21,7 @@ public class ReturnParser extends Parser {
         //$TODO Pending implementation
         final Result x = new Expression(code, tokenizer, symbolTable).parse();
         //$TODO$ watch out for returning array cases
-//        AuxiliaryFunctions.addInstruction(OperationCode.move, ); $TODO$ x is intermediate value - move it to return register
+        AuxiliaryFunctions.addInstruction(OperationCode.ret, code, x, null, symbolTable);// $TODO$ x is intermediate value - move it to return register R31
         return x;
     }
 }
