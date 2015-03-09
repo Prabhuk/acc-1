@@ -72,7 +72,11 @@ public class WhileParser extends Parser {
         final Result rightTree = new StatSequence(code, tokenizer, symbolTable).parse();
         if(rightTree.getJoin() != null) {
             join.setRight(rightTree.getJoin());
-            rightTree.getJoin().addChild(loopBlock); //Does loop body dominate loop condition block?
+        }
+
+        if(rightTree.getFollow() != null) {
+            join.setRight(rightTree.getFollow());
+            rightTree.getFollow().addChild(loopBlock); //Does loop body dominate loop condition block?
         } else {
             right.addChild(loopBlock);
         }
@@ -83,6 +87,7 @@ public class WhileParser extends Parser {
         final BasicBlock followBlock = new BasicBlock();
         followBlock.setType(BlockType.WHILE_FOLLOW);
         join.addChild(followBlock, true);
+        x.setFollow(followBlock);
 
         code.setCurrentBlock(followBlock);
         handleODtoken(tokenizer.next());
