@@ -33,6 +33,7 @@ public class AssignmentParser extends Parser {
         final Computation mainProgram = this.getOutputContents().getMainProgram();
         if(code.getProgramName() != null && recentLHS.isGlobal() && !mainProgram.getProgramName().equals(code.getProgramName())) {
             AuxiliaryFunctions.addKillInstruction(mainProgram.getCode(), recentLHS);
+            //$TODO$ added in the right place?
         }
 
         Result y = new Expression(code, tokenizer, symbolTable).parse();
