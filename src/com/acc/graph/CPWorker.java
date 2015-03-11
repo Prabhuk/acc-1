@@ -18,8 +18,6 @@ import java.util.*;
 public class CPWorker extends Worker {
 
     private Map<String, Result> valueMap = new HashMap<String, Result>();
-    private Map<Integer, Result> intermediateMap = new HashMap<Integer, Result>();
-    private Map<String, Result> allValues = new HashMap<String, Result>();
     private List<String> exclude = new ArrayList<String>();
     private Set<Instruction> phiInstructions = new HashSet<Instruction>();
 
@@ -31,16 +29,16 @@ public class CPWorker extends Worker {
     public void visit(BasicBlock node) {
         final List<Instruction> instructions = node.getInstructions();
         final List<BasicBlock> dominatesOver = node.getDominatesOver();
-        processInstructions(node, instructions);
+        final Map<String, Result> thisNodeValues = processInstructions(node, instructions);
         for (BasicBlock basicBlock : dominatesOver) {
-            updateDominatedBy(basicBlock.getInstructions());
+            basicBlock.updateValueMap(thisNodeValues);
         }
         for (Instruction instruction : phiInstructions) {
             if (instruction.isPhi()) {
                 updatePhiInstruction(instruction);
             }
         }
-        allValues.putAll(valueMap);
+        valueMap.putAll(thisNodeValues);
     }
 
 
@@ -60,7 +58,8 @@ public class CPWorker extends Worker {
         }
     }
 
-    private void processInstructions(BasicBlock node, List<Instruction> instructions) {
+    private Map<String, Result> processInstructions(BasicBlock basicBlock, List<Instruction> instructions) {
+        Map<String, Result> valueMap = basicBlock.getValueMap();
         for (Instruction instruction : instructions) {
             final Integer opcode = instruction.getOpcode();
             if (instruction.isPhi()) {
@@ -80,17 +79,17 @@ public class CPWorker extends Worker {
                 final Result y = instruction.getY();
                 if (opcode == OperationCode.move) {
                     final String variableName = instruction.getX().getVariableName();
-                    updateValueMap(instruction, variableName, instruction.getX().getUniqueIdentifier(), y);
+                    updateValueMap(basicBlock.getValueMap(), instruction, variableName, instruction.getX().getUniqueIdentifier(), y);
                 } else {
                     if (x != null) {
-                        final Result result = valueMap.get(x.getVariableName());
+                        final Result result = basicBlock.getValueMap().get(x.getVariableName());
                         if (result != null && !result.isVariable()) {
                             instruction.setX(result);
                         }
                     }
                 }
                 if (y != null) {
-                    final Result result = valueMap.get(y.getVariableName());
+                    final Result result = basicBlock.getValueMap().get(y.getVariableName());
                     if (result != null && !result.isVariable()) {
                         instruction.setY(result);
                     }
@@ -98,60 +97,17 @@ public class CPWorker extends Worker {
 
             }
         }
+        return valueMap;
     }
 
-    private void updateDominatedBy(List<Instruction> instructions) {
-        for (Instruction instruction : instructions) {
-            final Integer opcode = instruction.getOpcode();
-            if (OperationCode.end == opcode) {
-                return;
-            }
-            if (instruction.isPhi()) {
-                final Result result = new Result(Kind.INTERMEDIATE);
-                result.setIntermediateLoation(instruction.getLocation());
-                valueMap.put(instruction.getSymbol().getName(), result);
-                phiInstructions.add(instruction);
-//                updatePhiInstruction(instruction);
-                continue;
-            }
-
-            if (instruction.isKill()) {
-                final String variableName = instruction.getX().getVariableName();
-                valueMap.remove(variableName);
-                continue;
-            } else {
-                if (instruction.getX() == null && instruction.getY() == null) {
-                    return;
-                }
-                final Result x = instruction.getX();
-                final Result y = instruction.getY();
-                if (opcode != OperationCode.move) {
-                    if (x != null) {
-                        final Result result = valueMap.get(x.getVariableName());
-                        if (result != null) {
-                            instruction.setX(result);
-                        }
-                    }
-                }
-                if (y != null) {
-                    final Result result = valueMap.get(y.getVariableName());
-                    if (result != null) {
-                        instruction.setY(result);
-                    }
-                }
-
-            }
-        }
-    }
-
-    private void updateValueMap(Instruction instruction, String variableName, String uniqueIdentifier, Result y) {
+    private void updateValueMap(Map<String, Result> valueMap, Instruction instruction, String variableName, String uniqueIdentifier, Result y) {
         if (!exclude.contains(variableName)) {
 
             if (y.isVariable()) {
                 final Result yValue = valueMap.get(y.getVariableName());
                 if (yValue != null) {
                     if (yValue.isVariable()) {
-                        updateValueMap(instruction, variableName, uniqueIdentifier, yValue);
+                        updateValueMap(valueMap, instruction, variableName, uniqueIdentifier, yValue);
                         return;
                     }
                     y = yValue;

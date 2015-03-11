@@ -2,6 +2,7 @@ package com.acc.structure;
 
 import com.acc.data.BlockType;
 import com.acc.data.Instruction;
+import com.acc.data.Result;
 
 import java.util.*;
 
@@ -20,6 +21,7 @@ public class BasicBlock {
     private final Set<BasicBlock> children = new HashSet<BasicBlock>();
     private Set<BasicBlock> parents = new HashSet<BasicBlock>();
     private Set<Integer> liveRanges = new HashSet<Integer>();
+    private Map<String, Result> valueMap = new HashMap<String, Result>();
 
     private static Set<BasicBlock> allBlocks = new HashSet<BasicBlock>();
     private boolean isVisited = false;
@@ -215,5 +217,15 @@ public class BasicBlock {
 
     public static void setAllBlocks(Set<BasicBlock> allBlocks) {
         BasicBlock.allBlocks = allBlocks;
+    }
+
+    public void updateValueMap(Map<String, Result> valueMap) {
+        for (String s : valueMap.keySet()) {
+            this.valueMap.put(s, valueMap.get(s));
+        }
+    }
+
+    public Map<String, Result> getValueMap() {
+        return valueMap;
     }
 }
