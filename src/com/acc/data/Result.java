@@ -19,6 +19,7 @@ public class Result {
     private Integer fixupLoc;  //Contains information on where I branch off from. ie: pcBranch
     private List<Integer> dimensions; //Contains the dimensions for array initialization $TODO$ Add array initialization to the symbol table
     private BasicBlock join;
+    private BasicBlock follow;
     private Integer intermediateLoation;
     private String variableName;
     private Integer location;
@@ -203,4 +204,11 @@ public class Result {
         return kind.isProcedure();
     }
 
+    public BasicBlock getFollow() {
+        return follow;
+    }
+
+    public void setFollow(BasicBlock follow) {
+        this.follow = follow;
+    }
 }

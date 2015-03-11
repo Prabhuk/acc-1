@@ -1,11 +1,11 @@
+# While loop code generation test
+# Also ensures code gen can handle constants in the condition
 main
-var x, y;
-var i,b;
+var i, j;
 {
-    let x <- call InputNum();
-    if x > 5 then
-        let y <- x + 1
-    else
-        let y <- x - 1
-    fi
+	let i <- 15;
+	while i < 1000 do
+		let i <- i + 1
+	od;
+	call OutputNum(i)
 }.

@@ -1,4 +1,4 @@
-package com.acc.ra.structure;
+package com.acc.ra;
 
 import com.acc.constants.OperationCode;
 import com.acc.data.BlockType;
@@ -13,10 +13,7 @@ import com.acc.structure.ControlFlowGraph;
 import com.acc.ui.OutputContents;
 import com.acc.util.Printer;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by prabhuk on 3/4/2015.
@@ -24,7 +21,6 @@ import java.util.Set;
 public class LiveRangeCreator extends Worker {
 
     private final OutputContents outputContents;
-    private Set<Instruction> phis = new HashSet<Instruction>();
 
     public LiveRangeCreator(Parser parser, OutputContents contents) {
         super(parser);
@@ -43,26 +39,9 @@ public class LiveRangeCreator extends Worker {
             liveRanges.addAll(child.getLiveRanges());
         }
 
-        if(node.isCall()) {
-            //handle the function's liverange and add it to this block
-            //$TODO$ function instruction numbers are currently beginning from zero which is wrong. It has to point to different numbers
-            final Instruction callInstruction = node.getInstructions().get(0);
-            final Computation functionProgram = outputContents.getProgram(callInstruction.getX().getVariableName());
-            if(!functionProgram.equals(parser)) { //Recursion
-                final LiveRangeCreator liveRangeWorker = new LiveRangeCreator(functionProgram, outputContents);
-                final ControlFlowGraph functionCFG = functionProgram.getCode().getControlFlowGraph();
-                new GraphReverseTraversalHelper(liveRangeWorker, functionCFG.getLastNode());
-                liveRanges.addAll(functionCFG.getRootBlock().getLiveRanges());
-            }
-        }
-
         final List<Instruction> instructions = node.getInstructions();
         for (int i = instructions.size() - 1; i >= 0; i--) {
-
             final Instruction instruction = instructions.get(i);
-            if(instruction.isPhi()) {
-                phis.add(instruction);
-            }
             final Integer opcode = instruction.getOpcode();
             final Integer operandCount = OperationCode.getOperandCount(opcode);
             if (operandCount > 0) {
@@ -71,6 +50,7 @@ public class LiveRangeCreator extends Worker {
             if (operandCount > 1) {
                 updateLiveRange(instruction, instruction.getY(), liveRanges);
             }
+            instruction.addToLiveRanges(liveRanges); //Not used at this point
         }
 
         Printer.debugMessage("Live Ranges for BB:[" + node.getLabel() + "] are {");
@@ -79,8 +59,7 @@ public class LiveRangeCreator extends Worker {
         }
         Printer.debugMessage("}");
         handleWhileBodyBlock(node, liveRanges);
-        node.setLiveRanges(liveRanges);
-
+        node.setLiveRanges(liveRanges); //Used at this point
     }
 
     protected void handleWhileBodyBlock(BasicBlock node, Set<Integer> liveRanges) {
@@ -130,10 +109,9 @@ public class LiveRangeCreator extends Worker {
         if (result.isIntermediate()) {
             liveRanges.add(result.getIntermediateLoation());
         }
+        if(instruction.isPhi() && result.isVariable()) {
+            liveRanges.add(result.getLocation());
+        }
         liveRanges.remove(instruction.getLocation());
-    }
-
-    public Set<Instruction> getPhis() {
-        return phis;
     }
 }

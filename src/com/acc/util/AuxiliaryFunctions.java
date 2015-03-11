@@ -44,9 +44,8 @@ public class AuxiliaryFunctions {
         AuxiliaryFunctions.addInstruction(Condition.getNegatedInstruction(currentState.condition()), code, x, y, symbolTable);
         currentState.fixupLoc(code.getPc() - 1);
     }
-    
 
-    
+
     /*
      * Combines x & y and resultant result obj is maintained in x.
      */
@@ -84,14 +83,18 @@ public class AuxiliaryFunctions {
             s.setArrayIdentifiers(originalArrayIdentifiers);
             s.setArrayValue(Array.newInstance(Integer.class, dimensionsArray));
         } else {
-            s = new Symbol(symbolName, -1,null, type);
+            s = new Symbol(symbolName, -1, null, type);
         }
         symbolTable.addSymbol(s);
     }
 
     public static void addInstruction(int op, Code code, Result x, Result y, SymbolTable symbolTable) {
+        addInstruction(op, code, x, y, symbolTable, -1);
+    }
+
+    public static Instruction addInstruction(int op, Code code, Result x, Result y, SymbolTable symbolTable, int index) {
         final Instruction instruction = new Instruction(op, x, y, code.getPc());
-        if(OperationCode.getOperandCount(op) > 0) {
+        if (OperationCode.getOperandCount(op) > 0) {
             if (symbolTable != null && (x.isVariable() || x.isArray())) {
                 Symbol recent = symbolTable.getRecentOccurence(x.getVariableName());
                 if (x.isArray()) {
@@ -104,19 +107,25 @@ public class AuxiliaryFunctions {
                 }
             }
         }
-        code.addCode(instruction);
+        code.addCode(instruction, index);
+        return instruction;
     }
 
     public static void addMoveInstruction(Code code, Result x, Result y, SymbolTable symbolTable) {
         addToSymbolTable(code, symbolTable, x);
         x.setLocation(code.getPc());
+        if(y.isVariable() && y.getLocation() == null) {
+            Printer.debugMessage("Variable without location in Move");
+            final Symbol recentOccurence = symbolTable.getRecentOccurence(y.getVariableName());
+            y.setLocation(recentOccurence.getSuffix());
+        }
         addInstruction(OperationCode.move, code, x, y, symbolTable);
     }
 
     private static void addToSymbolTable(Code code, SymbolTable symbolTable, Result x) {
         Symbol recent = symbolTable.getRecentOccurence(x.getVariableName());
         final Symbol symbol;
-        if(recent.getType().isArray()) {
+        if (recent.getType().isArray()) {
             symbol = new Symbol(recent.getName(), code.getPc(), recent.getArrayDimension(), Symbol.cloneValue(recent.getValue()));
         } else {
             symbol = new Symbol(recent.getName(), code.getPc(), recent.getValue());

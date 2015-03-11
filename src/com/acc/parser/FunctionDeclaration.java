@@ -29,7 +29,7 @@ public class FunctionDeclaration extends Parser {
         }
         //$TODO$ DEAL WITH ident
         final SymbolTable procedureSymbolTable = new SymbolTable();
-        procedureSymbolTable.setGlobalSymbolTable(getSymbolTable());
+        procedureSymbolTable.setGlobalSymbolTable(getSymbolTable().getGlobalSymbolTable() != null ? getSymbolTable().getGlobalSymbolTable() : getSymbolTable());
         List<String> argumentNames = new ArrayList<String>();
         Token next = tokenizer.next();
         if (!isSemiColonToken(next)) {

@@ -4,6 +4,9 @@ import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
 import com.acc.structure.Symbol;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by prabhuk on 2/12/2015.
  */
@@ -14,6 +17,7 @@ public class Instruction {
     protected Integer location;
     protected Result x;
     protected Result y;
+    protected final Set<Integer> liveRanges = new HashSet<Integer>();
 
     private String deletePurpose;
     private boolean isDeleted;
@@ -26,6 +30,10 @@ public class Instruction {
     }
 
     public Result getX() {
+        if(OperationCode.move == opcode) {
+            symbol.setSuffix(location);
+            x.setLocation(location);
+        }
         return x;
     }
 
@@ -89,6 +97,10 @@ public class Instruction {
         } else if(x.isVariable() || x.isProcedure()) {
             if(opcode == OperationCode.cmp || opcode == OperationCode.kill || x.getLocation() == null) {
                 return x.getVariableName();
+            }
+            if(OperationCode.move == opcode) {
+                symbol.setSuffix(location);
+                x.setLocation(location);
             }
             return x.getVariableName() + ":" + x.getLocation();
         } else if (x.isArray()) {
@@ -163,6 +175,14 @@ public class Instruction {
     @Override
     public String toString() {
         return getInstructionString();
+    }
+
+    public Set<Integer> getLiveRanges() {
+        return liveRanges;
+    }
+
+    public void addToLiveRanges(Set<Integer> liveRanges) {
+        this.liveRanges.addAll(liveRanges);
     }
 }
 

@@ -33,6 +33,7 @@ public class OperationCode {
     public static int kill = 22;
     public static int call = 23;
     public static int ret = 24;
+    public static int moveRegister = 25;
 
     public static final Map<Integer, Integer> intermediatesOperandCount = new HashMap<Integer, Integer>();
     public static final Map<Integer, String> opcodeNames = new HashMap<Integer, String>();
@@ -63,6 +64,7 @@ public class OperationCode {
         intermediatesOperandCount.put(kill, 1);
         intermediatesOperandCount.put(call, 1);
         intermediatesOperandCount.put(ret, 1);
+        intermediatesOperandCount.put(moveRegister, 2);
 
         opcodeNames.put(neg,"neg");
         opcodeNames.put(add,"add");
@@ -89,6 +91,7 @@ public class OperationCode {
         opcodeNames.put(kill, "kill");
         opcodeNames.put(call, "call");
         opcodeNames.put(ret, "return");
+        opcodeNames.put(moveRegister, "moveRegister");
 
         
     }

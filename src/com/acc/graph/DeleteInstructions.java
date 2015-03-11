@@ -140,6 +140,7 @@ public class DeleteInstructions extends Worker {
         }
     }
 
-
-
+    public Map<Integer, Integer> getOldNewLocations() {
+        return oldNewLocations;
+    }
 }

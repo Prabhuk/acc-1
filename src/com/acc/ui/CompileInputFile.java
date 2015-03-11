@@ -1,15 +1,16 @@
 package com.acc.ui;
 
+import com.acc.codegenerator.MapSSAtoDLX;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
 import com.acc.graph.*;
-import com.acc.memory.RegisterAllocator;
+import com.acc.ra.RegisterAllocator;
 import com.acc.parser.Computation;
-import com.acc.ra.structure.GraphNode;
-import com.acc.ra.structure.InterferenceGraph;
-import com.acc.ra.structure.InterferenceGraphWorker;
-import com.acc.ra.structure.LiveRangeCreator;
+import com.acc.ra.InterferenceGraph;
+import com.acc.ra.InterferenceGraphWorker;
+import com.acc.ra.LiveRangeCreator;
 import com.acc.structure.BasicBlock;
+import com.acc.structure.ControlFlowGraph;
 import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
 import com.acc.util.Printer;
@@ -48,8 +49,8 @@ public class CompileInputFile {
     public static void main(String[] args) {
 
 
-        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test"), new String[]{"txt"}, false);
-//        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test2"), new String[]{"txt"}, false);
+//        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test"), new String[]{"txt"}, false);
+        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test2"), new String[]{"txt"}, false);
         for (File inputFile : files) {
             currentFileName = inputFile.getName();
             processFile(inputFile.getAbsolutePath(), inputFile.getName());
@@ -78,57 +79,60 @@ public class CompileInputFile {
 
         for (Computation parser : parsers) {
             final Code code = parser.getCode();
-//            printInstructions(parser, code);
-            final BasicBlock rootNode = code.getControlFlowGraph().getRootBlock();
-            new GraphHelper(new CPWorker(parser), rootNode);
-            new GraphHelper(new DeleteInstructions(code, parser), rootNode);
-//            printInstructions(parser, code);
-            new GraphHelper(new CSEWorker(parser), rootNode);
-            new GraphHelper(new DeleteInstructions(code, parser), rootNode);
-            final DCEWorker worker = new DCEWorker(code);
-            worker.visit();
-//            printInstructions(parser, code);
-//            new GraphHelper(new VCGWorker("output\\" + prefix+"_" + parser.getProgramName() + ".vcg", parser), rootNode);
+            final ControlFlowGraph CFG = code.getControlFlowGraph();
+            final BasicBlock rootNode = CFG.getRootBlock();
+
+            copyPropagation(parser, code, rootNode);
+            commonSubExpressionElimination(parser, code, rootNode);
+            deadCodeElimination(code);
+
+            printInstructions(parser, code);
+            final LiveRangeCreator liveRangeWorker = new LiveRangeCreator(mainProgram, contents);
+            new GraphReverseTraversalHelper(liveRangeWorker, CFG.getLastNode());
+
+            final InterferenceGraphWorker igCreator = new InterferenceGraphWorker(mainProgram);
+            new GraphHelper(igCreator, CFG.getRootBlock());
+            final InterferenceGraph graph = igCreator.getGraph();
+            final RegisterAllocator registerAllocator = new RegisterAllocator(mainProgram, graph);
+            registerAllocator.processPhis();
+            final Map<Integer, Integer> regInfo = registerAllocator.getRegisterInfoAfterUpdate();
+            new MapSSAtoDLX(code, regInfo);
+            createVCG(prefix, parser, rootNode);
 
         }
-        Map<String, Integer> functionCodeLocations = new HashMap<String, Integer>();
-        final Code mainProgramCode = mainProgram.getCode();
-        for (Computation parser : parsers) {
-            if(!parser.equals(mainProgram)) {
-                functionCodeLocations.put(parser.getProgramName(), mainProgramCode.getPc());
-                final List<Instruction> instructions = parser.getCode().getInstructions();
-                for (Instruction instruction : instructions) {
-                    instruction.setLocation(mainProgramCode.getPc());
-                    mainProgramCode.addCode(instruction);
-                }
-            }
-        }
-        mainProgramCode.setFunctionCodeLocations(functionCodeLocations);
-        //$TODO$ - NOTE: All the function codes are inserted into main
 
-
-
-        final LiveRangeCreator liveRangeWorker = new LiveRangeCreator(mainProgram, contents);
-        new GraphReverseTraversalHelper(liveRangeWorker, mainProgramCode.getControlFlowGraph().getLastNode());
-        final InterferenceGraphWorker igCreator = new InterferenceGraphWorker(mainProgram);
-        new GraphHelper(igCreator, mainProgramCode.getControlFlowGraph().getRootBlock());
-        final InterferenceGraph graph = igCreator.getGraph();
-        final Set<Instruction> phis = liveRangeWorker.getPhis();
-
-        final RegisterAllocator registerAllocator = new RegisterAllocator(mainProgram, phis, graph);
         //$TODO$ coloring, clustering and insertion of spill code.
-        printInstructions(mainProgram, mainProgramCode);
+//        printInstructions(mainProgram, mainProgramCode);
 
         Printer.print("Compilation completed for ["+inputFile+"]");
+    }
+
+    private static void createVCG(String prefix, Computation parser, BasicBlock rootNode) {
+        new GraphHelper(new VCGWorker("output\\" + prefix+"_" + parser.getProgramName() + ".vcg", parser), rootNode);
+    }
+
+    private static void deadCodeElimination(Code code) {
+        final DCEWorker worker = new DCEWorker(code);
+        worker.visit();
+    }
+
+    private static void commonSubExpressionElimination(Computation parser, Code code, BasicBlock rootNode) {
+        new GraphHelper(new CSEWorker(parser), rootNode);
+        new GraphHelper(new DeleteInstructions(code, parser), rootNode);
+    }
+
+    private static void copyPropagation(Computation parser, Code code, BasicBlock rootNode) {
+        new GraphHelper(new CPWorker(parser), rootNode);
+        new GraphHelper(new DeleteInstructions(code, parser), rootNode);
     }
 
     private static void printInstructions(Computation parser, Code code) {
         final List<Instruction> instructions = code.getInstructions();
         if (instructions.size() > 0) {
-            System.out.println("Code for:["+parser.getProgramName()+"] \n");
+            Printer.print("Code for:[" + parser.getProgramName() + "] \n");
         }
         for (Instruction instruction : instructions) {
-            System.out.println(instruction.getLocation() + "  "+ instruction.getInstructionString());
+            Printer.print(instruction.getLocation() + "  " + instruction.getInstructionString());
         }
 
         final SymbolTable symbolTable = parser.getSymbolTable();

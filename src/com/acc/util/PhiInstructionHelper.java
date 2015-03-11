@@ -1,5 +1,6 @@
 package com.acc.util;
 
+import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
@@ -71,7 +72,9 @@ public class PhiInstructionHelper {
                 } else {
                     phi = createPhi(join, table, code, symbol);
                 }
-                phi.setX(new Result(symbol));
+                final Result r = new Result(Kind.INTERMEDIATE);
+                r.setIntermediateLoation(symbol.getSuffix());
+                phi.setX(r);
             }
         }
     }

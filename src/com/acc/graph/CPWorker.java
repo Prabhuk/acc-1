@@ -19,7 +19,7 @@ public class CPWorker extends Worker {
 
     private Map<String, Result> valueMap = new HashMap<String, Result>();
     private List<String> exclude = new ArrayList<String>();
-    private List<Instruction> phiInstructions = new ArrayList<Instruction>();
+    private Set<Instruction> phiInstructions = new HashSet<Instruction>();
 
     public CPWorker(Parser parser) {
         super(parser);
@@ -27,14 +27,14 @@ public class CPWorker extends Worker {
 
     @Override
     public void begin() {
-        final List<Symbol> symbols = getSymbolTable().getSymbols();
-        for (Symbol symbol : symbols) {
-            if (symbol.getType().isVariable()) {
-                final Result zero = new Result(Kind.CONSTANT);
-                zero.value(0);
-                valueMap.put(symbol.getName(), zero);
-            }
-        }
+//        final List<Symbol> symbols = getSymbolTable().getSymbols();
+//        for (Symbol symbol : symbols) {
+//            if (symbol.getType().isVariable()) {
+//                final Result zero = new Result(Kind.CONSTANT);
+//                zero.value(0);
+//                valueMap.put(symbol.getName(), zero);
+//            }
+//        }
 //        if(symbolTable.getGlobalSymbolTable() != null) {
 //            final List<Symbol> globalSymbols = symbolTable.getGlobalSymbolTable().getSymbols();
 //            for (Symbol symbol : globalSymbols) {
@@ -67,6 +67,9 @@ public class CPWorker extends Worker {
     }
 
     private void updatePhiInstruction(Instruction instruction) {
+        if(instruction.isPhi() && instruction.canIgnore()) {
+            instruction.setDeleted(true, "CP");
+        }
         Result result = valueMap.get(instruction.getX().getUniqueIdentifier());
         if (result != null) {
             instruction.setX(result);
@@ -86,6 +89,7 @@ public class CPWorker extends Worker {
         for (Instruction instruction : instructions) {
             final Integer opcode = instruction.getOpcode();
             if (instruction.isPhi()) {
+                phiInstructions.add(instruction);
                 valueMap.remove(instruction.getSymbol().getName());
                 exclude.add(instruction.getSymbol().getName());
                 continue;
