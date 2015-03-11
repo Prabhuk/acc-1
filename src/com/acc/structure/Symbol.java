@@ -1,5 +1,6 @@
 package com.acc.structure;
 
+import com.acc.constants.Kind;
 import com.acc.data.Result;
 
 import java.lang.reflect.Field;
@@ -12,8 +13,7 @@ public class Symbol {
     private String name;
     private int suffix; //Different version of the same variable will have different suffix value.
     private SymbolType type;
-    private Integer value; //Could just be integer in our case.
-    private Object arrayValue;
+    private Result value; //Could just be integer in our case.
     private int arrayDimension;
     private List<Result> arrayIdentifiers;
     private boolean isGlobal;
@@ -23,23 +23,31 @@ public class Symbol {
      * @param suffix         - -1 will represent declaration
      * @param value          - value to be assigned.
      */
-    public Symbol(String name, int suffix, Integer value) {
+    public Symbol(String name, int suffix, Result value) {
         this(name, suffix, value, SymbolType.VARIABLE);
 
     }
 
-    public Symbol(String name, int suffix, Integer value, SymbolType type) {
+    public Symbol(String name, int suffix, Result value, SymbolType type) {
         this.name = name;
         this.suffix = suffix;
         this.type = type;
+        if(value == null) {
+            value = new Result(Kind.CONSTANT);
+            value.value(0);
+        }
         this.value = value;
     }
 
-    public Symbol(String name, int suffix, int arrayDimension, Object value) {
+    public Symbol(String name, int suffix, int arrayDimension, Result value) {
         this.name = name;
         this.suffix = suffix;
         this.type = SymbolType.ARRAY;
-        this.arrayValue = value;
+        if(value == null) {
+            value = new Result(Kind.CONSTANT);
+            value.value(0);
+        }
+        this.value = value;
         this.arrayDimension = arrayDimension;
     }
 
@@ -64,33 +72,12 @@ public class Symbol {
         throw new UnsupportedOperationException("You cannot change the name of the variable");
     }
 
-    public Integer getValue() {
+    public Result getValue() {
         return value;
     }
 
-    public void setValue(Integer value) {
+    public void setValue(Result value) {
         this.value = value;
-    }
-
-    public void setArrayValue(Object value) {
-        this.arrayValue = value;
-    }
-
-    //based on http://stackoverflow.com/questions/869033/how-do-i-copy-an-object-in-java
-    public static Object cloneValue(Object obj) {
-        try {
-            if (obj.getClass() == Integer.class) {
-                return new Integer((Integer) obj);
-            }
-            Object clone = obj.getClass().newInstance();
-            for (Field field : obj.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
-                field.set(clone, field.get(obj));
-            }
-            return clone;
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     public SymbolType getType() {
@@ -119,10 +106,6 @@ public class Symbol {
 
     public void setSuffix(int suffix) {
         this.suffix = suffix;
-    }
-
-    public Object getArrayValue() {
-        return arrayValue;
     }
 
     public boolean isGlobal() {

@@ -9,6 +9,7 @@ import com.acc.structure.BasicBlock;
 import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,25 +18,30 @@ import java.util.List;
  */
 public class PhiInstructionHelper {
 
-    public static void createPhiInstructions(SymbolTable table, BasicBlock join, Code code) {
+    private static List<Instruction> phis;
 
+    public static void createPhiInstructions(SymbolTable table, BasicBlock join, Code code) {
+        phis = new ArrayList<Instruction>();
         handleLeft(join, table, code);
         handleRight(join, table, code);
-        fillIncomplete(join, table);
+        fillIncomplete(code, join, table);
     }
 
-    private static void fillIncomplete(BasicBlock join, SymbolTable table) {
+    private static void fillIncomplete(Code code, BasicBlock join, SymbolTable table) {
         //Handle Phi Statements where right did not have assignments
-        final Collection<Instruction> allPhiInstructions = join.getAllPhiInstructions();
+        final Collection<Instruction> allPhiInstructions = phis;
+        int locationOffset = 0;
         for (Instruction phi : allPhiInstructions) {
-            if (!phi.isComplete()) {
-                Symbol targetSymbol = table.getTargetSymbol(phi.getSymbol());
-                final Result targetResult = new Result(targetSymbol);
-                if(phi.getX() == null) {
-                    phi.setX(targetResult);
+            if (phi.isComplete()) {
+                final Instruction instruction = join.addPhiInstruction(phi);
+                if(instruction != null) {
+                    code.addCode(phi, instruction);
+                    //this is make sure the order of instructions are maintained in the flat list of instructions within Code
                 } else {
-                    phi.setY(targetResult);
+                    code.addCode(phi);
                 }
+                phi.getSymbol().setSuffix(phi.getLocation());
+
             }
         }
     }
@@ -53,8 +59,18 @@ public class PhiInstructionHelper {
                     createPhi(join, table, code, symbol);
                 }
                 //If there is an NPE in the next line then the variable is not declared in the scope
-                final Instruction phi = join.getPhiInstruction(symbol.getName());
-                phi.setY(new Result(instruction.getSymbol()));
+                Instruction phi = join.getPhiInstruction(symbol.getName());
+                if(phi == null) {
+                    for (Instruction phi1 : phis) {
+                        if(phi1.getSymbol().getName().equals(symbol.getName())) {
+                            phi = phi1;
+                            break;
+                        }
+                    }
+                }
+                if(phi != null) {
+                    phi.setY(new Result(instruction.getSymbol()));
+                }
             }
         }
     }
@@ -72,9 +88,7 @@ public class PhiInstructionHelper {
                 } else {
                     phi = createPhi(join, table, code, symbol);
                 }
-                final Result r = new Result(Kind.INTERMEDIATE);
-                r.setIntermediateLoation(symbol.getSuffix());
-                phi.setX(r);
+                phi.setX(new Result(symbol));
             }
         }
     }
@@ -84,15 +98,9 @@ public class PhiInstructionHelper {
         final Symbol phiSymbol = new Symbol(targetSymbol.getName(), targetSymbol.getSuffix(), targetSymbol.getValue());
         Instruction phi = new Instruction(OperationCode.phi, null, null, code.getPc());
         phi.setSymbol(phiSymbol);
-
-        final Instruction instruction = join.addPhiInstruction(phi);
-        if(instruction != null) {
-            code.addCode(phi, instruction);
-            //this is make sure the order of instructions are maintained in the flat list of instructions within Code
-        } else {
-            code.addCode(phi);
+        if(!phis.contains(phi)) {
+            phis.add(phi);
         }
-        phiSymbol.setSuffix(phi.getLocation());
         return phi;
     }
 }

@@ -36,6 +36,7 @@ public class WhileParser extends Parser {
         final BasicBlock previousBlock = code.getCurrentBlock();
         final BasicBlock currentBlock = new BasicBlock();
         currentBlock.setType(BlockType.WHILE_HEAD);
+        currentBlock.setJoinBlock(currentBlock);
         previousBlock.addChild(currentBlock);
         code.setCurrentBlock(currentBlock);
         BasicBlock loopBlock = code.getCurrentBlock();
@@ -65,6 +66,7 @@ public class WhileParser extends Parser {
 
         final BasicBlock right = new BasicBlock();
         right.setType(BlockType.WHILE_BODY);
+        right.setJoinBlock(currentBlock);
         currentBlock.addChild(right, true);
         join.setRight(right);
         code.setCurrentBlock(right);

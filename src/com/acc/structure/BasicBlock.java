@@ -21,7 +21,7 @@ public class BasicBlock {
     private Set<BasicBlock> parents = new HashSet<BasicBlock>();
     private Set<Integer> liveRanges = new HashSet<Integer>();
 
-    private static volatile Set<BasicBlock> allBlocks = new HashSet<BasicBlock>();
+    private static Set<BasicBlock> allBlocks = new HashSet<BasicBlock>();
     private boolean isVisited = false;
 
     private static volatile int count = 0;
@@ -197,6 +197,10 @@ public class BasicBlock {
         return type != null && type.isWhileHead();
     }
 
+    public boolean isIF() {
+        return type != null && type.isIF();
+    }
+
     public boolean isWhileFollow() {
         return type != null && type.isWhileFollow();
     }
@@ -207,5 +211,9 @@ public class BasicBlock {
     @Override
     public String toString() {
         return String.valueOf(label);
+    }
+
+    public static void setAllBlocks(Set<BasicBlock> allBlocks) {
+        BasicBlock.allBlocks = allBlocks;
     }
 }

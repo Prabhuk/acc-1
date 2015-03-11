@@ -87,7 +87,7 @@ public class VariableDeclaration extends Parser {
             }
             s.setArrayDimension(dimensionCount);
             s.setArrayIdentifiers(originalArrayIdentifiers);
-            s.setArrayValue(Array.newInstance(Integer.class, dimensionsArray));
+//            s.setArrayValue(Array.newInstance(Integer.class, dimensionsArray));
         } else {
             s = new Symbol(symbolName, -1,null, type);
         }

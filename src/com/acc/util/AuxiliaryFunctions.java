@@ -81,7 +81,7 @@ public class AuxiliaryFunctions {
             }
             s.setArrayDimension(dimensionCount);
             s.setArrayIdentifiers(originalArrayIdentifiers);
-            s.setArrayValue(Array.newInstance(Integer.class, dimensionsArray));
+//            s.setArrayValue(Array.newInstance(Integer.class, dimensionsArray));
         } else {
             s = new Symbol(symbolName, -1, null, type);
         }
@@ -126,7 +126,7 @@ public class AuxiliaryFunctions {
         Symbol recent = symbolTable.getRecentOccurence(x.getVariableName());
         final Symbol symbol;
         if (recent.getType().isArray()) {
-            symbol = new Symbol(recent.getName(), code.getPc(), recent.getArrayDimension(), Symbol.cloneValue(recent.getValue()));
+            symbol = new Symbol(recent.getName(), code.getPc(), recent.getArrayDimension(), recent.getValue());
         } else {
             symbol = new Symbol(recent.getName(), code.getPc(), recent.getValue());
         }

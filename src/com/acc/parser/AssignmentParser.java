@@ -36,6 +36,12 @@ public class AssignmentParser extends Parser {
         }
 
         Result y = new Expression(code, tokenizer, symbolTable).parse();
+        if(y.isVariable()) {
+            final Symbol recentRHS = symbolTable.getRecentOccurence(y.getVariableName());
+            if(recentRHS != null) {
+                y.setLocation(recentRHS.getSuffix());
+            }
+        }
 
 
         if(!lhs.isArray() && !y.isArray()) {

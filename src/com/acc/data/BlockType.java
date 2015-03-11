@@ -7,8 +7,13 @@ public enum BlockType {
     WHILE_BODY,
     WHILE_HEAD,
     WHILE_FOLLOW,
-    CALL
+    CALL,
+    IF
     ;
+
+    public boolean isIF() {
+        return this == IF;
+    }
 
     public boolean isWhileBody() {
         return this == WHILE_BODY;

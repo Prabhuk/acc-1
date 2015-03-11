@@ -3,6 +3,7 @@ package com.acc.ui;
 import com.acc.codegenerator.MapSSAtoDLX;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
+import com.acc.data.Result;
 import com.acc.graph.*;
 import com.acc.ra.RegisterAllocator;
 import com.acc.parser.Computation;
@@ -75,25 +76,27 @@ public class CompileInputFile {
         new CompileInputFile(inputFile, contents);
         final List<Computation> parsers = contents.getPrograms();
 
-        final Computation mainProgram = contents.getMainProgram();
+//        final Computation mainProgram = contents.getMainProgram();
 
         for (Computation parser : parsers) {
             final Code code = parser.getCode();
             final ControlFlowGraph CFG = code.getControlFlowGraph();
             final BasicBlock rootNode = CFG.getRootBlock();
-
+            new GraphHelper(new DeleteInstructions(code, parser), rootNode);
+            removeEmptyBlocks(parser, code, rootNode);
             copyPropagation(parser, code, rootNode);
             commonSubExpressionElimination(parser, code, rootNode);
-            deadCodeElimination(code);
+            removeKills(parser, code, rootNode);
+//            deadCodeElimination(code);
 
             printInstructions(parser, code);
-            final LiveRangeCreator liveRangeWorker = new LiveRangeCreator(mainProgram, contents);
+            final LiveRangeCreator liveRangeWorker = new LiveRangeCreator(parser, contents);
             new GraphReverseTraversalHelper(liveRangeWorker, CFG.getLastNode());
 
-            final InterferenceGraphWorker igCreator = new InterferenceGraphWorker(mainProgram);
+            final InterferenceGraphWorker igCreator = new InterferenceGraphWorker(parser);
             new GraphHelper(igCreator, CFG.getRootBlock());
             final InterferenceGraph graph = igCreator.getGraph();
-            final RegisterAllocator registerAllocator = new RegisterAllocator(mainProgram, graph);
+            final RegisterAllocator registerAllocator = new RegisterAllocator(parser, graph);
             registerAllocator.processPhis();
             final Map<Integer, Integer> regInfo = registerAllocator.getRegisterInfoAfterUpdate();
             new MapSSAtoDLX(code, regInfo);
@@ -124,6 +127,23 @@ public class CompileInputFile {
     private static void copyPropagation(Computation parser, Code code, BasicBlock rootNode) {
         new GraphHelper(new CPWorker(parser), rootNode);
         new GraphHelper(new DeleteInstructions(code, parser), rootNode);
+        new GraphHelper(new PhiMapper(parser), rootNode);
+    }
+
+    private static void removeKills(Computation parser, Code code, BasicBlock rootNode) {
+        final List<Instruction> instructions = code.getInstructions();
+        for (Instruction instruction : instructions) {
+            if(instruction.isKill()) {
+                instruction.setDeleted(true, "KILL");
+            }
+        }
+        new GraphHelper(new DeleteInstructions(code, parser), rootNode);
+        removeEmptyBlocks(parser, code, rootNode);
+    }
+
+
+    private static void removeEmptyBlocks(Computation parser, Code code, BasicBlock rootNode) {
+        new GraphHelper(new EmptyBlockRemover(parser), rootNode);
     }
 
     private static void printInstructions(Computation parser, Code code) {

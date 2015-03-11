@@ -1,5 +1,7 @@
 package com.acc.structure;
 
+import com.acc.data.Result;
+
 import java.util.*;
 
 /**
@@ -14,10 +16,6 @@ public class SymbolTable {
     public SymbolTable() {
         symbols = new ArrayList<Symbol>();
         symbolsByName = new HashMap<String, Symbol>();
-    }
-
-    public int getFramePointer() {
-        return this.symbols.size();
     }
 
     public Map<String, Symbol> getSymbolsByName() {
@@ -50,12 +48,12 @@ public class SymbolTable {
         }
     }
 
-    public void removeSymbol(String symbolName, int suffix) {
+    public void updateSymbol(String symbolName, Result currentValue) {
         final Iterator<Symbol> iterator = symbols.iterator();
         while (iterator.hasNext()) {
             final Symbol next = iterator.next();
-            if(next.getName().equals(symbolName) && next.getSuffix() == suffix) {
-                iterator.remove();
+            if(next.getName().equals(symbolName)) {
+                next.setValue(currentValue);
             }
         }
     }

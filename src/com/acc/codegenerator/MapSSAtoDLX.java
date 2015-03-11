@@ -52,7 +52,7 @@ public class MapSSAtoDLX {
             }
 
             final DLXInstruction dlxCode = new DLXInstruction(instruction.getOpcode(), a, b, c);
-            System.out.println(dlxCode);
+//            System.out.println(dlxCode);
         }
     }
 }

@@ -24,8 +24,8 @@ public class GraphHelper {
     public GraphHelper(Worker worker, BasicBlock root, BasicBlock end)
     {
         this.worker = worker;
-        processSubGraph(root, end);
         secondaryVisit = new HashSet<BasicBlock>();
+        processSubGraph(root, end);
     }
 
     public void processGraph(BasicBlock node)

@@ -85,7 +85,7 @@ public class PhiCoalesceWorker extends Worker{
 
     protected void introduceMove(Result symbol, BasicBlock targetNode, Result operand) {
         final BasicBlock oldCurrent = parser.getCode().getControlFlowGraph().getCurrentBlock();
-        parser.getCode().getControlFlowGraph().setCurrentBlock(targetNode);
+
         final Result x = new Result(Kind.REG); //$TODO$ update register number after coloring
         List<Instruction> instructions = targetNode.getInstructions();
         while (instructions.isEmpty()) {
@@ -99,17 +99,26 @@ public class PhiCoalesceWorker extends Worker{
                 break;
             } //$TODO$ what happens on more than one parent
         }
-        final Instruction instruction = instructions.get(instructions.size() - 1);
-        int targetIndex = parser.getCode().getInstructions().indexOf(instruction);
-        if(instruction.getOpcode() >= OperationCode.bra && instruction.getOpcode() <= OperationCode.bgt) {
-            targetIndex--;
+
+        parser.getCode().getControlFlowGraph().setCurrentBlock(targetNode);
+        int targetIndex = 0;
+        if(!instructions.isEmpty()) {
+            final Instruction instruction = instructions.get(instructions.size() - 1);
+            targetIndex = parser.getCode().getInstructions().indexOf(instruction);
+            if(instruction.getOpcode() >= OperationCode.bra && instruction.getOpcode() <= OperationCode.bgt) {
+                targetIndex--;
+            }
+//            throw new RuntimeException("Where to insert move?");
+//            return; //$TODO$ bug case
         }
+
         final Instruction addedInstruction = AuxiliaryFunctions.addInstruction(OperationCode.moveRegister, parser.getCode(), x, operand, parser.getSymbolTable(), targetIndex);
         parser.getCode().getControlFlowGraph().setCurrentBlock(oldCurrent);
 
         final GraphNode node = graph.getNodeForId(symbol.getLocation());
-        if(node != null)
-        node.addToMoveInstructions(addedInstruction);
+        if(node != null) {
+            node.addToMoveInstructions(addedInstruction);
+        }
     }
 
     public Set<GraphNode> getNodes() {

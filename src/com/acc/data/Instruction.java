@@ -30,10 +30,6 @@ public class Instruction {
     }
 
     public Result getX() {
-        if(OperationCode.move == opcode) {
-            symbol.setSuffix(location);
-            x.setLocation(location);
-        }
         return x;
     }
 
