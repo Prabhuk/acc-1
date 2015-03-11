@@ -87,9 +87,12 @@ public class CPWorker extends Worker {
                             instruction.setX(result);
                         } else {
                             if(instruction.getX().isVariable()) {
-                                final Result zero = new Result(Kind.CONSTANT);
-                                zero.value(0);
-                                instruction.setX(zero);
+                                final Result zeroIfUninitialized = getZeroIfUninitialized(instruction.getX());
+                                if(zeroIfUninitialized == null) {
+                                    final Result zero = new Result(Kind.CONSTANT);
+                                    zero.value(0);
+                                    instruction.setX(zero);
+                                }
                             }
                         }
                     }
@@ -100,9 +103,12 @@ public class CPWorker extends Worker {
                         instruction.setY(result);
                     } else {
                         if(instruction.getY().isVariable()) {
-                            final Result zero = new Result(Kind.CONSTANT);
-                            zero.value(0);
-                            instruction.setY(zero);
+                            final Result zeroIfUninitialized = getZeroIfUninitialized(instruction.getY());
+                            if(zeroIfUninitialized == null) {
+                                final Result zero = new Result(Kind.CONSTANT);
+                                zero.value(0);
+                                instruction.setY(zero);
+                            }
                         }
                     }
                 }
@@ -240,17 +246,10 @@ public class CPWorker extends Worker {
             final Computation computation = (Computation) parser;
             final String programName = computation.getProgramName();
             final Symbol recentOccurence = parser.getSymbolTable().getRecentOccurence(operand.getVariableName());
-            if (!programName.equals("main")) {
-                if (recentOccurence.isGlobal()) {
-                    return operand;
-                }
-                final List<String> argumentNames = computation.getFormalParams();
-                for (String argumentName : argumentNames) {
-                    if (operand.getVariableName().equals(argumentName)) {
-                        return operand;
-                    }
-                }
+            if(getZeroIfUninitialized(operand) != null) {
+                return operand;
             }
+
             if (recentOccurence.getSuffix() != -1) {
                 return operand;
             }
@@ -259,6 +258,24 @@ public class CPWorker extends Worker {
             return zero;
         }
         return operand;
+    }
+
+    private Result getZeroIfUninitialized(Result operand) {
+        final Computation computation = (Computation) parser;
+        String programName = computation.getProgramName();
+        final Symbol recentOccurence = parser.getSymbolTable().getRecentOccurence(operand.getVariableName());
+        if (!programName.equals("main")) {
+            if (recentOccurence.isGlobal()) {
+                return operand;
+            }
+            final List<String> argumentNames = computation.getFormalParams();
+            for (String argumentName : argumentNames) {
+                if (operand.getVariableName().equals(argumentName)) {
+                    return operand;
+                }
+            }
+        }
+        return null;
     }
 
     protected Result getTarget(Map<Integer, Result> remainingMoves, Result operand, Instruction instruction) {

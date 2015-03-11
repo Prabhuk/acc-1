@@ -63,9 +63,6 @@ public class SymbolTable {
         for (Symbol symbol : symbols) {
             if(symbol.getName().equals(symbolName)) {
                 s = symbol;
-                if(globalSymbolTable == null) {
-                    s.setGlobal(true);
-                }
             }
         }
         if(s == null && globalSymbolTable != null) {
