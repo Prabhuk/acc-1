@@ -85,6 +85,12 @@ public class CPWorker extends Worker {
                         final Result result = basicBlock.getValueMap().get(x.getVariableName());
                         if (result != null && !result.isVariable()) {
                             instruction.setX(result);
+                        } else {
+                            if(instruction.getX().isVariable()) {
+                                final Result zero = new Result(Kind.CONSTANT);
+                                zero.value(0);
+                                instruction.setX(zero);
+                            }
                         }
                     }
                 }
@@ -92,6 +98,12 @@ public class CPWorker extends Worker {
                     final Result result = basicBlock.getValueMap().get(y.getVariableName());
                     if (result != null && !result.isVariable()) {
                         instruction.setY(result);
+                    } else {
+                        if(instruction.getY().isVariable()) {
+                            final Result zero = new Result(Kind.CONSTANT);
+                            zero.value(0);
+                            instruction.setY(zero);
+                        }
                     }
                 }
 

@@ -5,6 +5,8 @@ import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
 import com.acc.data.Result;
+import com.acc.graph.GraphHelper;
+import com.acc.graph.PhiOperandFinder;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
@@ -32,6 +34,17 @@ public class PhiInstructionHelper {
         final Collection<Instruction> allPhiInstructions = phis;
         int locationOffset = 0;
         for (Instruction phi : allPhiInstructions) {
+            if (!phi.isComplete()) {
+                final PhiOperandFinder operandFinder = new PhiOperandFinder(null, join, phi.getSymbol().getName());
+                new GraphHelper(operandFinder, code.getControlFlowGraph().getRootBlock());
+                final Result operand = operandFinder.getOperand();
+                if(phi.getX() == null) {
+                    phi.setX(operand);
+                } else if(phi.getY() == null) {
+                    phi.setY(operand);
+                }
+            }
+
             if (phi.isComplete()) {
                 final Instruction instruction = join.addPhiInstruction(phi);
                 if(instruction != null) {
@@ -41,7 +54,6 @@ public class PhiInstructionHelper {
                     code.addCode(phi);
                 }
                 phi.getSymbol().setSuffix(phi.getLocation());
-
             }
         }
     }

@@ -83,11 +83,13 @@ public class CompileInputFile {
             final ControlFlowGraph CFG = code.getControlFlowGraph();
             final BasicBlock rootNode = CFG.getRootBlock();
             new GraphHelper(new DeleteInstructions(code, parser), rootNode);
-            removeEmptyBlocks(parser, code, rootNode);
+//            removeEmptyBlocks(parser, code, rootNode);
             copyPropagation(parser, code, rootNode);
             commonSubExpressionElimination(parser, code, rootNode);
             removeKills(parser, code, rootNode);
 //            deadCodeElimination(code);
+            createVCG(prefix, parser, rootNode);
+
 
             printInstructions(parser, code);
             final LiveRangeCreator liveRangeWorker = new LiveRangeCreator(parser, contents);
@@ -100,7 +102,7 @@ public class CompileInputFile {
             registerAllocator.processPhis();
             final Map<Integer, Integer> regInfo = registerAllocator.getRegisterInfoAfterUpdate();
             new MapSSAtoDLX(code, regInfo);
-            createVCG(prefix, parser, rootNode);
+//            createVCG(prefix, parser, rootNode);
 
         }
 
