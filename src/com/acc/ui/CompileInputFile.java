@@ -51,25 +51,12 @@ public class CompileInputFile {
 
     public static void main(String[] args) {
 
-
 //        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test"), new String[]{"txt"}, false);
         final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test2"), new String[]{"txt"}, false);
         for (File inputFile : files) {
             currentFileName = inputFile.getName();
             processFile(inputFile.getAbsolutePath(), inputFile.getName());
         }
-
-
-//        BasicBlock bb0= new BasicBlock();
-//        BasicBlock bb1= new BasicBlock();
-//        BasicBlock bb2= new BasicBlock();
-//        BasicBlock bb3= new BasicBlock();
-//
-//        bb0.addChild(bb1);
-//        bb1.addChild(bb2);
-//        bb1.addChild(bb3);
-//        bb2.addChild(bb1);
-//        GraphHelper v = new GraphHelper(new VCGWorker(), bb0);
     }
 
     private static void processFile(String inputFile, String name) {
@@ -106,16 +93,12 @@ public class CompileInputFile {
             final RegisterAllocator registerAllocator = new RegisterAllocator(parser, graph);
             registerAllocator.processPhis();
             parser.setRegisterInfo(registerAllocator.getRegisterInfoAfterUpdate());
-            new MapSSAtoDLX(code, parser.getRegisterInfo());
             printInstructions(parser, code);
             createVCG(prefix +"_ra", parser, rootNode);
 
-//            createVCG(prefix, parser, rootNode);
-
         }
 
-        //$TODO$ coloring, clustering and insertion of spill code.
-      //  printInstructions(mainProgram, mainProgramCode);
+//        final MapSSAtoDLX mapSSAtoDLX = new MapSSAtoDLX(contents, contents.getMainProgram().getCode(), contents.getMainProgram().getRegisterInfo());
 
         MachineParser mp = new MachineParser(contents);
         DLX.load(mp.begin());
