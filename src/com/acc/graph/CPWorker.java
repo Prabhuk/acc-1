@@ -20,6 +20,7 @@ public class CPWorker extends Worker {
     private Map<String, Result> valueMap = new HashMap<String, Result>();
     private List<String> exclude = new ArrayList<String>();
     private Set<Instruction> phiInstructions = new HashSet<Instruction>();
+    private Map<Integer, Result> deletedMoves = new HashMap<Integer, Result>();
 
     public CPWorker(Parser parser) {
         super(parser);
@@ -29,9 +30,14 @@ public class CPWorker extends Worker {
     public void visit(BasicBlock node) {
         final List<Instruction> instructions = node.getInstructions();
         final List<BasicBlock> dominatesOver = node.getDominatesOver();
-        final Map<String, Result> thisNodeValues = processInstructions(node, instructions);
+        List<String> removed = new ArrayList<String>();
+        final Map<String, Result> thisNodeValues = processInstructions(removed, node, instructions);
         for (BasicBlock basicBlock : dominatesOver) {
             basicBlock.updateValueMap(thisNodeValues);
+            basicBlock.updateExclude(node.getExclude());
+            for (String s : removed) {
+                node.getExclude().remove(s);
+        }
         }
         for (Instruction instruction : phiInstructions) {
             if (instruction.isPhi()) {
@@ -58,8 +64,9 @@ public class CPWorker extends Worker {
         }
     }
 
-    private Map<String, Result> processInstructions(BasicBlock basicBlock, List<Instruction> instructions) {
+    private Map<String, Result> processInstructions(List<String> removed, BasicBlock basicBlock, List<Instruction> instructions) {
         Map<String, Result> valueMap = basicBlock.getValueMap();
+        List<String> exclude = basicBlock.getExclude();
         for (Instruction instruction : instructions) {
             final Integer opcode = instruction.getOpcode();
             if (instruction.isPhi()) {
@@ -80,14 +87,21 @@ public class CPWorker extends Worker {
                 if (opcode == OperationCode.move) {
                     final String variableName = instruction.getX().getVariableName();
                     updateValueMap(basicBlock.getValueMap(), instruction, variableName, instruction.getX().getUniqueIdentifier(), y);
+                    exclude.remove(variableName);
+                    removed.add(variableName);
                 } else {
                     if (x != null) {
-                        final Result result = basicBlock.getValueMap().get(x.getVariableName());
+                        Result result = basicBlock.getValueMap().get(x.getVariableName());
                         if (result != null && !result.isVariable()) {
+                            if(result.isIntermediate()) {
+                                if(deletedMoves.get(result.getIntermediateLoation()) != null) {
+                                    result = deletedMoves.get(result.getIntermediateLoation());
+                                }
+                            }
                             instruction.setX(result);
                         } else {
                             if(instruction.getX().isVariable()) {
-                                final Result zeroIfUninitialized = getZeroIfUninitialized(instruction.getX());
+                                final Result zeroIfUninitialized = getZeroIfUninitialized(instruction.getX(), exclude);
                                 if(zeroIfUninitialized == null) {
                                     final Result zero = new Result(Kind.CONSTANT);
                                     zero.value(0);
@@ -98,12 +112,17 @@ public class CPWorker extends Worker {
                     }
                 }
                 if (y != null) {
-                    final Result result = basicBlock.getValueMap().get(y.getVariableName());
+                    Result result = basicBlock.getValueMap().get(y.getVariableName());
                     if (result != null && !result.isVariable()) {
+                        if(result.isIntermediate()) {
+                            if(deletedMoves.get(result.getIntermediateLoation()) != null) {
+                                result = deletedMoves.get(result.getIntermediateLoation());
+                            }
+                        }
                         instruction.setY(result);
                     } else {
                         if(instruction.getY().isVariable()) {
-                            final Result zeroIfUninitialized = getZeroIfUninitialized(instruction.getY());
+                            final Result zeroIfUninitialized = getZeroIfUninitialized(instruction.getY(), exclude);
                             if(zeroIfUninitialized == null) {
                                 final Result zero = new Result(Kind.CONSTANT);
                                 zero.value(0);
@@ -119,7 +138,7 @@ public class CPWorker extends Worker {
     }
 
     private void updateValueMap(Map<String, Result> valueMap, Instruction instruction, String variableName, String uniqueIdentifier, Result y) {
-        if (!exclude.contains(variableName)) {
+//        if (!exclude.contains(variableName)) {
 
             if (y.isVariable()) {
                 final Result yValue = valueMap.get(y.getVariableName());
@@ -135,10 +154,11 @@ public class CPWorker extends Worker {
             valueMap.put(uniqueIdentifier, y);
             instruction.setY(y);
             instruction.setDeleted(true, "CP");
+            deletedMoves.put(instruction.getLocation(), y);
             getSymbolTable().updateSymbol(variableName, y);
             Printer.debugMessage("Copying for " + variableName + " in instruction number[" + instruction.getLocation() + "]");
+//        }
         }
-    }
 
     @Override
     public void finish() {
@@ -246,7 +266,7 @@ public class CPWorker extends Worker {
             final Computation computation = (Computation) parser;
             final String programName = computation.getProgramName();
             final Symbol recentOccurence = parser.getSymbolTable().getRecentOccurence(operand.getVariableName());
-            if(getZeroIfUninitialized(operand) != null) {
+            if(getZeroIfUninitialized(operand, exclude) != null) {
                 return operand;
             }
 
@@ -260,7 +280,7 @@ public class CPWorker extends Worker {
         return operand;
     }
 
-    private Result getZeroIfUninitialized(Result operand) {
+    private Result getZeroIfUninitialized(Result operand, List<String> exclude) {
         final Computation computation = (Computation) parser;
         String programName = computation.getProgramName();
         final Symbol recentOccurence = parser.getSymbolTable().getRecentOccurence(operand.getVariableName());
@@ -274,6 +294,9 @@ public class CPWorker extends Worker {
                     return operand;
                 }
             }
+        }
+        if(exclude.contains(operand.getVariableName())) {
+            return operand;
         }
         return null;
     }

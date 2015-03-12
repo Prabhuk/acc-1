@@ -22,6 +22,7 @@ public class BasicBlock {
     private Set<BasicBlock> parents = new HashSet<BasicBlock>();
     private Set<Integer> liveRanges = new HashSet<Integer>();
     private Map<String, Result> valueMap = new HashMap<String, Result>();
+    private List<String> exclude = new ArrayList<String>();
 
     private static Set<BasicBlock> allBlocks = new HashSet<BasicBlock>();
     private boolean isVisited = false;
@@ -225,7 +226,27 @@ public class BasicBlock {
         }
     }
 
+    public void updateExclude(List<String> exclude) {
+        for (String s : exclude) {
+            this.exclude.addAll(exclude);
+        }
+    }
+
+
+
     public Map<String, Result> getValueMap() {
         return valueMap;
+    }
+
+    public List<String> getExclude() {
+        return exclude;
+    }
+
+    public void addToExclude(String variableName) {
+        this.exclude.add(variableName);
+    }
+
+    public void removeFromExclude(String variableName) {
+        this.exclude.remove(variableName);
     }
 }
