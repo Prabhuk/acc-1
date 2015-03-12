@@ -22,6 +22,7 @@ public class MemoryManager {
     private Map<Integer,Integer> offsetLocations;
     private MachineCode machineCode;
     private int offsetcoutner;
+
     public MemoryManager(Computation program, MachineCode machineCode)
     {
         registerLocations = new HashMap<Integer, Integer>();

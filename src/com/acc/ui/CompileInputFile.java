@@ -17,6 +17,7 @@ import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
 import com.acc.util.Printer;
 import com.acc.util.Tokenizer;
+import com.acc.vm.DLX;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -51,8 +52,8 @@ public class CompileInputFile {
     public static void main(String[] args) {
 
 
-        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test"), new String[]{"txt"}, false);
-//        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test2"), new String[]{"txt"}, false);
+//        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test"), new String[]{"txt"}, false);
+        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test2"), new String[]{"txt"}, false);
         for (File inputFile : files) {
             currentFileName = inputFile.getName();
             processFile(inputFile.getAbsolutePath(), inputFile.getName());
@@ -88,9 +89,12 @@ public class CompileInputFile {
             copyPropagation(parser, code, rootNode);
             commonSubExpressionElimination(parser, code, rootNode);
             removeKills(parser, code, rootNode);
-            deadCodeElimination(code);
-            createVCG(prefix, parser, rootNode);
             printInstructions(parser, code);
+            constantFolding(parser, code, rootNode);
+            printInstructions(parser, code);
+
+//            deadCodeElimination(code);
+            createVCG(prefix, parser, rootNode);
 
             final LiveRangeCreator liveRangeWorker = new LiveRangeCreator(parser, contents);
             new GraphReverseTraversalHelper(liveRangeWorker, CFG.getLastNode());
@@ -121,6 +125,20 @@ public class CompileInputFile {
             e.printStackTrace();
         }
         Printer.print("Compilation completed for ["+inputFile+"]");
+    }
+
+    private static void constantFolding(Computation parser, Code code, BasicBlock rootNode) {
+        final List<Instruction> instructions = code.getInstructions();
+        for (Instruction instruction : instructions) {
+            if(instruction.isPhi()) {
+                if(instruction.getX().isConstant() && instruction.getY().isConstant()) {
+                   if(instruction.getX().value() == instruction.getY().value()) {
+                       instruction.setDeleted(true, "CONSTANT_FOLDING");
+                   }
+                }
+            }
+        }
+        new GraphHelper(new DeleteInstructions(code, parser), rootNode);
     }
 
     private static void createVCG(String prefix, Computation parser, BasicBlock rootNode) {
@@ -166,12 +184,6 @@ public class CompileInputFile {
         }
         for (Instruction instruction : instructions) {
             Printer.print(instruction.getLocation() + "  " + instruction.getInstructionString());
-        }
-
-        final SymbolTable symbolTable = parser.getSymbolTable();
-        final List<Symbol> symbols = symbolTable.getSymbols();
-        for (Symbol symbol : symbols) {
-            Printer.print(symbol.getName() + " " + symbol.getSuffix());
         }
     }
 

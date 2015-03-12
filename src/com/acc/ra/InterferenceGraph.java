@@ -64,7 +64,7 @@ public class InterferenceGraph {
 
     public boolean doesInterfere(GraphNode node, Result operand) {
         if(operand.isConstant()) {
-            return false;
+            return true;
         }
         final GraphNode operandNode = getNodeForOperand(operand);
         return doesInterfere(node, operandNode);

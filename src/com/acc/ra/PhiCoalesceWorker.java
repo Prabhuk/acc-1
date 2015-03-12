@@ -39,9 +39,6 @@ public class PhiCoalesceWorker extends Worker{
             }
             final Result operand1 = phi.getX();
             final Result operand2 = phi.getY();
-            final Symbol targetSymbol = phi.getSymbol();
-            final Result symbol = new Result(Kind.VAR);
-            symbol.setLocation(targetSymbol.getSuffix());
 
             GraphNode phiNode = graph.getNodeForId(phi.getLocation());
             if(phiNode == null) {
@@ -70,19 +67,25 @@ public class PhiCoalesceWorker extends Worker{
 
     public void coalesce(GraphNode phiNode, BasicBlock node, Result operand1, Result operand2) {
 
+        if(operand1.isIntermediate()) {
+            graph.coalesce(phiNode, graph.getNodeForId(operand1.getIntermediateLoation()));
+        }
         if(operand1.isVariable()) {
             graph.coalesce(phiNode, graph.getNodeForId(operand1.getLocation()));
         }
         if(operand2.isVariable()) {
             graph.coalesce(phiNode, graph.getNodeForId(operand2.getLocation()));
         }
+        if(operand2.isIntermediate()) {
+            graph.coalesce(phiNode, graph.getNodeForId(operand2.getIntermediateLoation()));
+        }
 
-        if(operand1.isConstant()) {
-            introduceMove(phiNode, operand1, node.getLeft());
-        }
-        if(operand2.isConstant()) {
-            introduceMove(phiNode, operand2, node.getRight());
-        }
+//        if(operand1.isConstant()) {
+//            introduceMove(phiNode, operand1, node.getLeft());
+//        }
+//        if(operand2.isConstant()) {
+//            introduceMove(phiNode, operand2, node.getRight());
+//        }
     }
 
     protected void introduceMove(GraphNode phiNode, Result interferingResult, BasicBlock targetNode) {

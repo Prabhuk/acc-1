@@ -66,6 +66,10 @@ public class Instruction {
         StringBuilder sb = new StringBuilder(OperationCode.getOperationName(opcode));
         final Integer operandCount = OperationCode.getOperandCount(opcode);
 
+        if(opcode == OperationCode.phi) {
+            sb.append(" ").append(symbol.getName());
+        }
+
         if(operandCount > 0) {
             if(opcode == OperationCode.move || opcode == OperationCode.store) {
                 sb.append(" ").append(getOperand(y));

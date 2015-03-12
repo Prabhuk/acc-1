@@ -30,28 +30,7 @@ public class RegisterAllocator {
         final PhiCoalesceWorker phiWorker = new PhiCoalesceWorker(parser, graph);
         final BasicBlock rootNode = parser.getCode().getControlFlowGraph().getRootBlock();
         new GraphHelper(phiWorker, rootNode);
-        graph.sortDescendingByClusterSize();
-        List<GraphNode> clusteredNodes = new ArrayList<GraphNode>();
-        final Iterator<GraphNode> clusterSize = graph.getNodes().iterator();
-        while (clusterSize.hasNext()) {
-            final GraphNode next = clusterSize.next();
-            if(next.getClustered().isEmpty()) {
-                break;
-            }
-            removeFromGraph(clusterSize, next);
-            clusteredNodes.add(next);
-        }
 
-        final Iterator<GraphNode> iterator = graph.getNodes().iterator();
-        while (iterator.hasNext()) {
-            final GraphNode graphNode = iterator.next();
-            if(graphNode.getNeighbors().size() <=8) {
-                removeFromGraph(iterator, graphNode);
-                nodeStack.push(graphNode);
-            } else {
-                break;
-            }
-        }
 
         graph.sortByCost();
         final Iterator<GraphNode> costIterator = graph.getNodes().iterator();
@@ -61,7 +40,7 @@ public class RegisterAllocator {
             nodeStack.push(next);
         }
 
-        sortAndAddToStack(clusteredNodes);
+//        sortAndAddToStack(clusteredNodes);
         int colorNumber = 0;
         final List<GraphNode> existingNodes = graph.getNodes();
         while (!nodeStack.isEmpty()) {
@@ -92,29 +71,39 @@ public class RegisterAllocator {
             }
         }
         System.out.println("Total colors used : " + colorNumber);
-        final Set<Instruction> deletedPhis = phiWorker.getDeletedPhis();
-        List<Integer> deletedPhiLocations = new ArrayList<Integer>();
-        for (Instruction deletedPhi : deletedPhis) {
-            deletedPhiLocations.add(deletedPhi.getLocation());
-        }
 
         final List<Instruction> instructions = parser.getCode().getInstructions();
-        for (Instruction instruction : instructions) {
-            instruction.setX(phiReference(deletedPhiLocations, instruction.getX()));
-            instruction.setY(phiReference(deletedPhiLocations, instruction.getY()));
-        }
-        //This iteration of Delete will actually have added instructions for compensated moves
-        final DeleteInstructions reorder = new DeleteInstructions(parser.getCode(), parser);
-        new GraphHelper(reorder, rootNode);
-        final Map<Integer, Integer> oldNewLocations = reorder.getOldNewLocations();
-        for (Integer old : registerInfo.keySet()) {
-            final Integer newLocation = oldNewLocations.get(old);
-            if(newLocation != null) {
-                registerInfoAfterUpdate.put(newLocation, registerInfo.get(old));
+        final Iterator<Instruction> iterator = instructions.iterator();
+        int i = 0;
+        while (iterator.hasNext()) {
+            final Instruction instruction = iterator.next();
+            if(instruction.isDeleted()) {
+                iterator.remove();
             }
         }
-        for (Integer integer : registerInfoAfterUpdate.keySet()) {
-            System.out.println("Mapping key ["+integer+"] to register R["+registerInfoAfterUpdate.get(integer)+"]");
+//        final Set<Instruction> deletedPhis = phiWorker.getDeletedPhis();
+//        List<Integer> deletedPhiLocations = new ArrayList<Integer>();
+//        for (Instruction deletedPhi : deletedPhis) {
+//            deletedPhiLocations.add(deletedPhi.getLocation());
+//        }
+//
+//        final List<Instruction> instructions = parser.getCode().getInstructions();
+//        for (Instruction instruction : instructions) {
+//            instruction.setX(phiReference(deletedPhiLocations, instruction.getX()));
+//            instruction.setY(phiReference(deletedPhiLocations, instruction.getY()));
+//        }
+//        //This iteration of Delete will actually have added instructions for compensated moves
+//        final DeleteInstructions reorder = new DeleteInstructions(parser.getCode(), parser);
+//        new GraphHelper(reorder, rootNode);
+//        final Map<Integer, Integer> oldNewLocations = reorder.getOldNewLocations();
+//        for (Integer old : registerInfo.keySet()) {
+//            final Integer newLocation = oldNewLocations.get(old);
+//            if(newLocation != null) {
+//                registerInfoAfterUpdate.put(newLocation, registerInfo.get(old));
+//            }
+//        }
+        for (Integer integer : registerInfo.keySet()) {
+            System.out.println("Mapping key ["+integer+"] to register R["+registerInfo.get(integer)+"]");
         }
     }
 

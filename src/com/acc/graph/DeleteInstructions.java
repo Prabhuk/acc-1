@@ -57,6 +57,8 @@ public class DeleteInstructions extends Worker {
                     instruction.setX(updateIntermediates(instruction.getX()));
                     instruction.setY(updateIntermediates(instruction.getY()));
                 }
+            } else {
+                iterator.remove();
             }
         }
     }
