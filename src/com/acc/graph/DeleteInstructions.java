@@ -49,10 +49,10 @@ public class DeleteInstructions extends Worker {
             final Integer opcode = instruction.getOpcode();
             if(!instruction.isDeleted()) {
                 if(opcode == OperationCode.bra) {
-                    updateBranchDestinationTargets(instruction.getX());
+                    instruction.setX(updateBranchDestinationTargets(instruction.getX()));
                 } else if(opcode >= OperationCode.bne && opcode <= OperationCode.bgt) {
                     instruction.setX(updateIntermediates(instruction.getX()));
-                    updateBranchDestinationTargets(instruction.getY());
+                    instruction.setY(updateBranchDestinationTargets(instruction.getY()));
                 }  else {
                     instruction.setX(updateIntermediates(instruction.getX()));
                     instruction.setY(updateIntermediates(instruction.getY()));
@@ -61,18 +61,21 @@ public class DeleteInstructions extends Worker {
         }
     }
 
-    private void updateBranchDestinationTargets(Result result) {
+    private Result updateBranchDestinationTargets(Result result) {
         if(result == null) {
-            return;
+            return result;
         }
         if(result.isConstant()) {
+            final Result result1 = new Result(Kind.CONSTANT);
             if(oldNewLocations.get(result.value()) != null) {
-                result.value(oldNewLocations.get(result.value()));
+                result1.value(oldNewLocations.get(result.value()));
             } else {
                 int target = getNextAvailableLocation(result.value());
-                result.value(target);
+                result1.value(target);
             }
+            return result1;
         }
+        return result;
     }
 
     private int getNextAvailableLocation(Integer deletedInstruction) {
@@ -122,24 +125,28 @@ public class DeleteInstructions extends Worker {
                 iterator.remove();
             } else {
                 if (instruction.isPhi()) {
-                    handlePhiInstructionOperand(instruction.getX());
-                    handlePhiInstructionOperand(instruction.getY());
+                    instruction.setX(handlePhiInstructionOperand(instruction.getX()));
+                    instruction.setY(handlePhiInstructionOperand(instruction.getY()));
                 }
                 instruction.setLocation(instructionNumber++);
             }
         }
     }
 
-    private void handlePhiInstructionOperand(Result result) {
+    private Result handlePhiInstructionOperand(Result result) {
         if(result == null) {
-            return;
+            return result;
         }
         if(result.isVariable()) {
+            final Result result1 = new Result(Kind.VAR);
+            result1.setVariableName(result.getVariableName());
             final Integer targetOldLocation = result.getLocation();
             if(oldNewLocations.get(targetOldLocation) != null) {
-                result.setLocation(oldNewLocations.get(targetOldLocation));
+                result1.setLocation(oldNewLocations.get(targetOldLocation));
             }
+            return result1;
         }
+        return result;
     }
 
     public Map<Integer, Integer> getOldNewLocations() {
