@@ -1,6 +1,8 @@
 package com.acc.ra;
 
+import com.acc.constants.Kind;
 import com.acc.data.Instruction;
+import com.acc.data.Result;
 import com.acc.graph.DeleteInstructions;
 import com.acc.graph.GraphHelper;
 import com.acc.parser.Computation;
@@ -13,20 +15,20 @@ import java.util.*;
  */
 public class RegisterAllocator {
 
-    private final Computation program;
+    private final Computation parser;
     private final InterferenceGraph graph;
     private final Stack<GraphNode> nodeStack = new Stack<GraphNode>();
     private final Map<Integer, Integer> registerInfo = new HashMap<Integer, Integer>();
     private final Map<Integer, Integer> registerInfoAfterUpdate = new HashMap<Integer, Integer>();
 
-    public RegisterAllocator(Computation program, InterferenceGraph graph) {
-        this.program = program;
+    public RegisterAllocator(Computation parser, InterferenceGraph graph) {
+        this.parser = parser;
         this.graph = graph;
     }
 
     public void processPhis() {
-        final PhiCoalesceWorker phiWorker = new PhiCoalesceWorker(program, graph);
-        final BasicBlock rootNode = program.getCode().getControlFlowGraph().getRootBlock();
+        final PhiCoalesceWorker phiWorker = new PhiCoalesceWorker(parser, graph);
+        final BasicBlock rootNode = parser.getCode().getControlFlowGraph().getRootBlock();
         new GraphHelper(phiWorker, rootNode);
         graph.sortDescendingByClusterSize();
         List<GraphNode> clusteredNodes = new ArrayList<GraphNode>();
@@ -90,10 +92,19 @@ public class RegisterAllocator {
             }
         }
         System.out.println("Total colors used : " + colorNumber);
+        final Set<Instruction> deletedPhis = phiWorker.getDeletedPhis();
+        List<Integer> deletedPhiLocations = new ArrayList<Integer>();
+        for (Instruction deletedPhi : deletedPhis) {
+            deletedPhiLocations.add(deletedPhi.getLocation());
+        }
 
-
+        final List<Instruction> instructions = parser.getCode().getInstructions();
+        for (Instruction instruction : instructions) {
+            instruction.setX(phiReference(deletedPhiLocations, instruction.getX()));
+            instruction.setY(phiReference(deletedPhiLocations, instruction.getY()));
+        }
         //This iteration of Delete will actually have added instructions for compensated moves
-        final DeleteInstructions reorder = new DeleteInstructions(program.getCode(), program);
+        final DeleteInstructions reorder = new DeleteInstructions(parser.getCode(), parser);
         new GraphHelper(reorder, rootNode);
         final Map<Integer, Integer> oldNewLocations = reorder.getOldNewLocations();
         for (Integer old : registerInfo.keySet()) {
@@ -105,6 +116,17 @@ public class RegisterAllocator {
         for (Integer integer : registerInfoAfterUpdate.keySet()) {
             System.out.println("Mapping key ["+integer+"] to register R["+registerInfoAfterUpdate.get(integer)+"]");
         }
+    }
+
+    protected Result phiReference(List<Integer> deletedPhiLocations, Result operand) {
+        if(operand != null && operand.isIntermediate()) {
+            if(deletedPhiLocations.contains(operand.getIntermediateLoation())) {
+                final Result reg = new Result(Kind.REG);
+                reg.regNo(registerInfo.get(operand.getIntermediateLoation()));
+                return reg;
+            }
+        }
+        return operand;
     }
 
     protected void sortAndAddToStack(List<GraphNode> clusteredNodes) {

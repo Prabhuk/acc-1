@@ -21,6 +21,7 @@ import java.util.Set;
 public class PhiCoalesceWorker extends Worker{
     private final InterferenceGraph graph;
     private Set<GraphNode> nodes = new HashSet<GraphNode>();
+    private Set<Instruction> deletedPhis = new HashSet<Instruction>();
 
     public PhiCoalesceWorker(Parser parser, InterferenceGraph graph) {
         super(parser);
@@ -63,6 +64,7 @@ public class PhiCoalesceWorker extends Worker{
             coalesce(phiNode, node, operand1, operand2);
             //$TODO$ introduce value update to symbol table before deletion
             phi.setDeleted(true, "coalesced");
+            deletedPhis.add(phi);
         }
     }
 
@@ -103,5 +105,9 @@ public class PhiCoalesceWorker extends Worker{
 
     public Set<GraphNode> getNodes() {
         return nodes;
+    }
+
+    public Set<Instruction> getDeletedPhis() {
+        return deletedPhis;
     }
 }

@@ -50,8 +50,8 @@ public class CompileInputFile {
     public static void main(String[] args) {
 
 
-        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test"), new String[]{"txt"}, false);
-//        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test2"), new String[]{"txt"}, false);
+//        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test"), new String[]{"txt"}, false);
+        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test2"), new String[]{"txt"}, false);
         for (File inputFile : files) {
             currentFileName = inputFile.getName();
             processFile(inputFile.getAbsolutePath(), inputFile.getName());
@@ -97,11 +97,13 @@ public class CompileInputFile {
             final InterferenceGraphWorker igCreator = new InterferenceGraphWorker(parser);
             new GraphHelper(igCreator, CFG.getRootBlock());
             final InterferenceGraph graph = igCreator.getGraph();
+            printInstructions(parser, code);
             final RegisterAllocator registerAllocator = new RegisterAllocator(parser, graph);
             registerAllocator.processPhis();
             final Map<Integer, Integer> regInfo = registerAllocator.getRegisterInfoAfterUpdate();
             new MapSSAtoDLX(code, regInfo);
             printInstructions(parser, code);
+            createVCG(prefix +"_ra", parser, rootNode);
 
 //            createVCG(prefix, parser, rootNode);
 
