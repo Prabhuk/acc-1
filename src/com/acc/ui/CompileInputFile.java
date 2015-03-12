@@ -1,6 +1,5 @@
 package com.acc.ui;
 
-import com.acc.codegenerator.MapSSAtoDLX;
 import com.acc.codeGen.MachineParser;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
@@ -18,6 +17,7 @@ import com.acc.structure.SymbolTable;
 import com.acc.util.Printer;
 import com.acc.util.Tokenizer;
 import com.acc.vm.DLX;
+import com.acc.vm.MapSSAtoDLX;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
