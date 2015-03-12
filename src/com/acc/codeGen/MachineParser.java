@@ -10,7 +10,6 @@ import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
 import com.acc.ui.OutputContents;
 import com.acc.util.Printer;
-import com.acc.ui.DLX;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +30,7 @@ public class MachineParser {
         procedureFixupTable = new ProcedureFixupTable();
         functionMap = new HashMap<String, Integer>();
         functionMap.put("main", -1);
-        AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.ADD, 29, 0, 30);
+        AuxilaryDLXFunctions.putF2(machineCode, MachineOperationCode.ADD, 29, 0, 30);
         //AuxilaryDLXFunctions.putF1(machineCode ,MachineOperationCode.ADD, 29,0,30);
     }
 
@@ -54,7 +53,11 @@ public class MachineParser {
         if (!program.getProgramName().equals("main")) {
             procedureFixupTable.fix(program.getProgramName(), machineCode.getPc());  // Fixing all references to this function
             //machineCode.addCode(DLX.assemble(MachineOperationCode.PSH, 31,29,-4));
+
+            //PROLOGUE
             AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, 31, 29, -4);
+            AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, 28, 29, -4);
+            AuxilaryDLXFunctions.putF2(machineCode, MachineOperationCode.ADD, 28, 0, 29);
         }
         //Copying local symbol table into memory
         List<Symbol> localSymbols = symboltable.getLocalDeclarations();
@@ -80,7 +83,7 @@ public class MachineParser {
             } else if (instructionOpCode >= OperationCode.add && instructionOpCode <= OperationCode.cmp) {
                 ArithmeticTranslator.translate(machineCode, currentInstruction, memoryManager);
                 //Todo Have to deal with arrays!!
-            } else if (instructionOpCode >= OperationCode.read && instructionOpCode <= OperationCode.write) {
+            } else if (instructionOpCode >= OperationCode.read && instructionOpCode <= OperationCode.writenl) {
                 ReadWriteTranslator.translate(currentInstruction, machineCode, memoryManager);
             } else if (instructionOpCode >= OperationCode.bra && instructionOpCode <= OperationCode.bgt) {
                 BranchTranslator.translate(currentInstruction, instructionMap, branchFixupTable, memoryManager, machineCode);
@@ -90,7 +93,10 @@ public class MachineParser {
 
         }
         if (!program.getProgramName().equals("main")) {
-            AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.POP, 31, 29, 4);
+            //EPILOGUE
+            AuxilaryDLXFunctions.putF2(machineCode, MachineOperationCode.ADD, 29, 0, 28);
+            AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.POP, 28, 29, 4);
+          //  AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.POP, 31, 29, 4);  //todo This line is for handling parameters
             AuxilaryDLXFunctions.putF2(machineCode, MachineOperationCode.RET, 0, 0, 31);
         }
 

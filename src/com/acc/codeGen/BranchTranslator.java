@@ -5,8 +5,6 @@ import com.acc.constants.OperationCode;
 import com.acc.data.BranchFixupTable;
 import com.acc.data.Instruction;
 import com.acc.data.Result;
-import com.acc.parser.Computation;
-import com.acc.ui.DLX;
 
 import java.util.Map;
 

@@ -23,8 +23,6 @@ public class Computation extends Parser {
     private Map<Integer,Integer> registerInfo;
 
 
-    //$TODO$ move it to Code or other code related area
-    private int programLocation;
 
     public Computation(Code code, Tokenizer tokenizer, SymbolTable symbolTable, String programName, OutputContents outputContents) {
         super(code, tokenizer, symbolTable);
@@ -79,13 +77,6 @@ public class Computation extends Parser {
         this.formalParams = formalParams;
     }
 
-    public int getProgramLocation() {
-        return programLocation;
-    }
-
-    public void setProgramLocation(int programLocation) {
-        this.programLocation = programLocation;
-    }
 
     public Map<Integer, Integer> getRegisterInfo() {
         return registerInfo;

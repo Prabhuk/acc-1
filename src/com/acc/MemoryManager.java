@@ -34,16 +34,19 @@ public class MemoryManager {
         {
             if(regInfo.get(i)<8)
             {
-                registerLocations.put(i,registercount);
+                registerLocations.put(i,regInfo.get(i)+1);
                 registercount++;
             }
             else
             {
-                offsetLocations.put(i,offsetcoutner);
-                offsetcoutner++;
-                AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, 0,29,-4);
+                offsetLocations.put(i,(regInfo.get(i)-1)-8);
+                if(((regInfo.get(i)-1)-8)>offsetcoutner) {
+                    offsetcoutner = (regInfo.get(i)-1)-8;
+                }
             }
         }
+        if(offsetcoutner>0)
+            AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.SUBI, 29, 0, offsetcoutner*4);
     }
 
     public Result getInstructionRegister(Integer location) {
@@ -52,9 +55,12 @@ public class MemoryManager {
         {
             return new Result(Kind.REG, registerLocations.get(location),null, null, null,null, null);
         }
-        int offset = offsetcoutner - offsetLocations.get(location);
-        return new Result(Kind.REG, 25, offset,null, null,null, null);
-        //fixup register 25 in memory after
+        else if(offsetLocations.containsKey(location)) {
+            int offset = offsetcoutner - offsetLocations.get(location);
+            return new Result(Kind.REG, 25, offset, null, null, null, null);
+        }
+        return new Result(Kind.REG, 20 , null, null, null, null);
+        //todo Remove this line
     }
 
     public Result getOperand(Instruction currentInstruction, Result x, boolean isB) {
@@ -64,18 +70,26 @@ public class MemoryManager {
         }
         else if(x.isRegister())
         {
+            Integer regInfo = x.regNo();
+            if(regInfo<8)
+            {
+                return new Result(Kind.REG, regInfo+1,null,null,null,null);
+            }
+            else
+            {
+                int offset = (regInfo-1)-8;
+                if(isB) {
+                    AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.LDW, 26, 29, (offset * 4));
+                    return new Result(Kind.REG, 26, offset, null, null, null, null);
+                }
+                else
+                {
+                    AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.LDW, 27, 29, (offset * 4));
+                    return new Result(Kind.REG, 27, offset, null, null, null, null);
+                }
 
-            return x;
-//            Integer regInfo = x.regNo();
-//            if(regInfo<8)
-//            {
-//                return new Result(Kind.REG, regInfo+1,null,null,null,null);
-//            }
-//            else
-//            {
-//                int offset = offsetcoutner - offsetLocations.get(x.getIntermediateLoation());
-//
-//            }
+
+            }
 
         }
         else if(x.isIntermediate())
