@@ -84,6 +84,7 @@ public class CPWorker extends Worker {
             } else {
                 final Result x = instruction.getX();
                 final Result y = instruction.getY();
+                final List<Result> parameters = instruction.getParameters();
                 if (opcode == OperationCode.move) {
                     final String variableName = instruction.getX().getVariableName();
                     updateValueMap(basicBlock.getValueMap(), instruction, variableName, instruction.getX().getUniqueIdentifier(), y);
@@ -106,6 +107,41 @@ public class CPWorker extends Worker {
                         }
                     }
                 }
+
+                if(parameters != null) {
+                    Map<Result, Result> parameterMap = new LinkedHashMap<Result, Result>();
+                    for (Result parameter : parameters) {
+                        parameterMap.put(parameter, null);
+
+                        Result result = basicBlock.getValueMap().get(parameter.getVariableName());
+                        if (result != null && !result.isVariable()) {
+                            parameterMap.put(parameter, result);
+                        } else {
+                            if(parameter.isVariable()) {
+                                final Result zeroIfUninitialized = getZeroIfUninitialized(parameter, exclude);
+                                if(zeroIfUninitialized == null) {
+                                    final Result zero = new Result(Kind.CONSTANT);
+                                    zero.value(0);
+                                    parameterMap.put(parameter, zero);
+                                }
+                            }
+                        }
+
+                    }
+
+
+
+                    List<Result> newParams = new ArrayList<Result>();
+                    for (Result result : parameterMap.keySet()) {
+                        if(parameterMap.get(result) != null) {
+                            newParams.add(parameterMap.get(result));
+                        } else {
+                            newParams.add(result);
+                        }
+                    }
+                    instruction.setParameters(newParams);
+                }
+
                 if (y != null) {
                     Result result = basicBlock.getValueMap().get(y.getVariableName());
                     if (result != null && !result.isVariable()) {

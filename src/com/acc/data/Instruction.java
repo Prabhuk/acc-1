@@ -5,6 +5,7 @@ import com.acc.constants.OperationCode;
 import com.acc.structure.Symbol;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -18,6 +19,7 @@ public class Instruction {
     protected Result x;
     protected Result y;
     protected final Set<Integer> liveRanges = new HashSet<Integer>();
+    protected List<Result> parameters;
 
     private String deletePurpose;
     private boolean isDeleted;
@@ -82,6 +84,12 @@ public class Instruction {
                 sb.append(" ").append(getOperand(x));
             } else {
                 sb.append(" ").append(getOperand(y));
+            }
+        }
+
+        if(isCall() && parameters != null) {
+            for (Result parameter : parameters) {
+                sb.append(" ").append(getOperand(parameter));
             }
         }
 
@@ -185,6 +193,18 @@ public class Instruction {
 
     public void addToLiveRanges(Set<Integer> liveRanges) {
         this.liveRanges.addAll(liveRanges);
+    }
+
+    public List<Result> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(List<Result> parameters) {
+        this.parameters = parameters;
+    }
+
+    public boolean isCall() {
+        return opcode == OperationCode.call;
     }
 }
 

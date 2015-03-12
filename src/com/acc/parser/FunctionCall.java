@@ -12,6 +12,7 @@ import com.acc.util.Tokenizer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by prabhuk on 2/8/2015.
@@ -28,6 +29,18 @@ public class FunctionCall extends Parser {
         if (!procedureName.isIdentifier()) {
             throw new SyntaxErrorException(procedureName.tokenType(), TokenType.IDENTIFIER);
         }
+        functionsUsed.add(procedureName.getToken());
+        for (String s : functionsUsed) {
+            final Computation program = outputContents.getProgram(s);
+            if(program != null) {
+                final Set<String> globalVariables = program.getGlobalVariablesUsed();
+                for (String globalVariable : globalVariables) {
+                    AuxiliaryFunctions.addKillInstruction(outputContents.getMainProgram().getCode(), program.getSymbolTable().getRecentOccurence(globalVariable));
+                }
+            }
+        }
+            //$TODO$ added in the right place?
+
         final Token openBracket = tokenizer.next();
         List<Result> parameters = new ArrayList<Result>();
         if (openBracket.getToken().equals("(")) {
@@ -96,7 +109,9 @@ public class FunctionCall extends Parser {
         x.setIntermediateLoation(code.getPc());
         Result y = new Result(Kind.PROCEDURE);
         y.setVariableName(procedureName.getToken());
-        AuxiliaryFunctions.addInstruction(OperationCode.call, code, y, null, symbolTable);
+        final Instruction callInstruction = AuxiliaryFunctions.addInstruction(OperationCode.call, code, y, null, symbolTable);
+        callInstruction.setParameters(parameters);
+
         final BasicBlock newBlock = new BasicBlock();
         functionBlock.addChild(newBlock, false);
         code.setCurrentBlock(newBlock);

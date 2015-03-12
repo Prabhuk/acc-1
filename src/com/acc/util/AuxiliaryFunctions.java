@@ -88,8 +88,8 @@ public class AuxiliaryFunctions {
         symbolTable.addSymbol(s);
     }
 
-    public static void addInstruction(int op, Code code, Result x, Result y, SymbolTable symbolTable) {
-        addInstruction(op, code, x, y, symbolTable, -1);
+    public static Instruction addInstruction(int op, Code code, Result x, Result y, SymbolTable symbolTable) {
+        return addInstruction(op, code, x, y, symbolTable, -1);
     }
 
     public static Instruction addInstruction(int op, Code code, Result x, Result y, SymbolTable symbolTable, int index) {

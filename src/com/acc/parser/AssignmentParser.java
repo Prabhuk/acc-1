@@ -30,10 +30,9 @@ public class AssignmentParser extends Parser {
         //$TODO$ well do something with the identifiers
         handleAssignmentOperator();
         final Symbol recentLHS = symbolTable.getRecentOccurence(lhs.getVariableName());
-        final Computation mainProgram = this.getOutputContents().getMainProgram();
-        if(code.getProgramName() != null && recentLHS.isGlobal() && !mainProgram.getProgramName().equals(code.getProgramName())) {
-            AuxiliaryFunctions.addKillInstruction(mainProgram.getCode(), recentLHS);
-            //$TODO$ added in the right place?
+        if(code.getProgramName() != null && recentLHS.isGlobal() && !code.getProgramName().equals("main")) {
+            outputContents.getProgram(code.getProgramName()).getGlobalVariablesUsed().add(lhs.getVariableName());
+            globalVariablesUsed.add(lhs.getVariableName());
         }
 
         Result y = new Expression(code, tokenizer, symbolTable).parse();

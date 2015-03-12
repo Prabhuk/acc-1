@@ -56,6 +56,27 @@ public class DeleteInstructions extends Worker {
                 }  else {
                     instruction.setX(updateIntermediates(instruction.getX()));
                     instruction.setY(updateIntermediates(instruction.getY()));
+
+                    if(instruction.isCall()) {
+                        final List<Result> parameters = instruction.getParameters();
+                        if(parameters != null) {
+                            Map<Result, Result> parameterMap = new LinkedHashMap<Result, Result>();
+                            for (Result parameter : parameters) {
+                                parameterMap.put(parameter, updateIntermediates(parameter));
+                            }
+
+                            List<Result> newParams = new ArrayList<Result>();
+                            for (Result result : parameterMap.keySet()) {
+                                if (parameterMap.get(result) != null) {
+                                    newParams.add(parameterMap.get(result));
+                                } else {
+                                    newParams.add(result);
+                                }
+                            }
+                            instruction.setParameters(newParams);
+                        }
+                    }
+
                 }
             } else {
                 iterator.remove();

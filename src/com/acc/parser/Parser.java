@@ -22,6 +22,8 @@ public abstract class Parser {
     protected static final Map<String, Integer> predefinedProcedureArguments = new HashMap<String, Integer>();
     protected static final Result FP = new Result(Kind.FRAME_POINTER);
     protected static OutputContents outputContents;
+    protected Set<String> globalVariablesUsed = new HashSet<String>();
+    protected Set<String> functionsUsed = new HashSet<String>();
 
 
     static {
@@ -89,5 +91,21 @@ public abstract class Parser {
 
     public void setOutputContents(OutputContents outputContents) {
         this.outputContents = outputContents;
+    }
+
+    public Set<String> getGlobalVariablesUsed() {
+        return globalVariablesUsed;
+    }
+
+    public void setGlobalVariablesUsed(Set<String> globalVariablesUsed) {
+        this.globalVariablesUsed = globalVariablesUsed;
+    }
+
+    public Set<String> getFunctionsUsed() {
+        return functionsUsed;
+    }
+
+    public void setFunctionsUsed(Set<String> functionsUsed) {
+        this.functionsUsed = functionsUsed;
     }
 }
