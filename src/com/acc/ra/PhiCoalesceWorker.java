@@ -10,10 +10,7 @@ import com.acc.structure.BasicBlock;
 import com.acc.structure.Symbol;
 import com.acc.util.AuxiliaryFunctions;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by prabhuk on 3/9/2015.
@@ -101,7 +98,7 @@ public class PhiCoalesceWorker extends Worker{
                 targetIndex--;
             }
         }
-        final Instruction addedInstruction = AuxiliaryFunctions.addInstruction(OperationCode.move, parser.getCode(), x, interferingResult, parser.getSymbolTable(), targetIndex);
+        final Instruction addedInstruction = AuxiliaryFunctions.addInstruction(OperationCode.move, parser.getCode(), x, interferingResult, parser.getSymbolTable(), targetIndex + 1);
         parser.getCode().getControlFlowGraph().setCurrentBlock(oldCurrent);
         phiNode.addToMoveInstructions(addedInstruction);
     }

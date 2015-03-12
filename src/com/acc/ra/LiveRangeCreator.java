@@ -51,6 +51,7 @@ public class LiveRangeCreator extends Worker {
                 updateLiveRange(instruction, instruction.getY(), liveRanges);
             }
             instruction.addToLiveRanges(liveRanges); //Not used at this point
+            liveRanges.remove(instruction.getLocation());
         }
 
         Printer.debugMessage("Live Ranges for BB:[" + node.getLabel() + "] are {");
@@ -110,6 +111,5 @@ public class LiveRangeCreator extends Worker {
         if(instruction.isPhi() && result.isVariable()) {
             liveRanges.add(result.getLocation());
         }
-        liveRanges.remove(instruction.getLocation());
     }
 }

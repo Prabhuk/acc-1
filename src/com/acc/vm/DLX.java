@@ -220,7 +220,9 @@ public class DLX {
                         R[a] = Integer.parseInt(line);
                         break;
                     case WRD:
+                        System.out.println("PRINTING FROM DLX \n");
                         System.out.print(R[b] + "  ");
+                        System.out.println("\n");
                         break;
                     case WRH:
                         System.out.print("0x" + Integer.toHexString(R[b]) + "  ");

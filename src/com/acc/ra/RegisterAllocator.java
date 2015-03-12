@@ -1,6 +1,7 @@
 package com.acc.ra;
 
 import com.acc.constants.Kind;
+import com.acc.constants.OperationCode;
 import com.acc.data.Instruction;
 import com.acc.data.Result;
 import com.acc.graph.DeleteInstructions;
@@ -75,36 +76,113 @@ public class RegisterAllocator {
         final List<Instruction> instructions = parser.getCode().getInstructions();
         final Iterator<Instruction> iterator = instructions.iterator();
         int i = 0;
-        while (iterator.hasNext()) {
-            final Instruction instruction = iterator.next();
-            if(instruction.isDeleted()) {
-                iterator.remove();
-            }
-        }
-//        final Set<Instruction> deletedPhis = phiWorker.getDeletedPhis();
-//        List<Integer> deletedPhiLocations = new ArrayList<Integer>();
-//        for (Instruction deletedPhi : deletedPhis) {
-//            deletedPhiLocations.add(deletedPhi.getLocation());
-//        }
-//
-//        final List<Instruction> instructions = parser.getCode().getInstructions();
-//        for (Instruction instruction : instructions) {
-//            instruction.setX(phiReference(deletedPhiLocations, instruction.getX()));
-//            instruction.setY(phiReference(deletedPhiLocations, instruction.getY()));
-//        }
-//        //This iteration of Delete will actually have added instructions for compensated moves
-//        final DeleteInstructions reorder = new DeleteInstructions(parser.getCode(), parser);
-//        new GraphHelper(reorder, rootNode);
-//        final Map<Integer, Integer> oldNewLocations = reorder.getOldNewLocations();
-//        for (Integer old : registerInfo.keySet()) {
-//            final Integer newLocation = oldNewLocations.get(old);
-//            if(newLocation != null) {
-//                registerInfoAfterUpdate.put(newLocation, registerInfo.get(old));
+//        while (iterator.hasNext()) {
+//            final Instruction instruction = iterator.next();
+//            if(instruction.isDeleted()) {
+//                iterator.remove();
 //            }
 //        }
-        for (Integer integer : registerInfo.keySet()) {
-            System.out.println("Mapping key ["+integer+"] to register R["+registerInfo.get(integer)+"]");
+        final Set<Instruction> deletedPhis = phiWorker.getDeletedPhis();
+        List<Integer> deletedPhiLocations = new ArrayList<Integer>();
+        for (Instruction deletedPhi : deletedPhis) {
+            deletedPhiLocations.add(deletedPhi.getLocation());
         }
+//
+        for (Instruction instruction : instructions) {
+            instruction.setX(phiReference(deletedPhiLocations, instruction.getX()));
+            instruction.setY(phiReference(deletedPhiLocations, instruction.getY()));
+            if(instruction.isCall()) {
+                final List<Result> parameters = instruction.getParameters();
+                if(parameters != null) {
+                    Map<Result, Result> parameterMap = new LinkedHashMap<Result, Result>();
+                    for (Result parameter : parameters) {
+                        parameterMap.put(parameter, phiReference(deletedPhiLocations, parameter));
+                    }
+
+                    List<Result> newParams = new ArrayList<Result>();
+                    for (Result result : parameterMap.keySet()) {
+                        if (parameterMap.get(result) != null) {
+                            newParams.add(parameterMap.get(result));
+                        } else {
+                            newParams.add(result);
+                        }
+                    }
+                    instruction.setParameters(newParams);
+                }
+            }
+        }
+//        //This iteration of Delete will actually have added instructions for compensated moves
+        final DeleteInstructions reorder = new DeleteInstructions(parser.getCode(), parser);
+        new GraphHelper(reorder, rootNode);
+        final Map<Integer, Integer> oldNewLocations = reorder.getOldNewLocations();
+        for (Integer old : registerInfo.keySet()) {
+            final Integer newLocation = oldNewLocations.get(old);
+            if(newLocation != null) {
+                registerInfoAfterUpdate.put(newLocation, registerInfo.get(old));
+            }
+        }
+        Map<Integer, Integer> moveRegisters = new HashMap<Integer, Integer>();
+        for (Instruction instruction : parser.getCode().getInstructions()) {
+            if(instruction.getOpcode() == OperationCode.move) {
+                if(!instruction.getX().isRegister()) {
+                    System.out.println("ERROR EROOR");
+                }
+                moveRegisters.put(instruction.getLocation(), instruction.getX().regNo());
+            }
+        }
+
+        for (Instruction instruction : parser.getCode().getInstructions()) {
+            if(instruction.getX() != null && instruction.getX().isIntermediate()) {
+                final Integer integer = moveRegisters.get(instruction.getX().getIntermediateLoation());
+                if(integer != null) {
+                    final Result x = new Result(Kind.REG);
+                    x.regNo(integer);
+                    instruction.setX(x);
+                }
+            }
+            if(instruction.getY() != null && instruction.getY().isIntermediate()) {
+                final Integer integer = moveRegisters.get(instruction.getY().getIntermediateLoation());
+                if(integer != null) {
+                    final Result x = new Result(Kind.REG);
+                    x.regNo(integer);
+                    instruction.setY(x);
+                }
+            }
+
+            if(instruction.isCall()) {
+                final List<Result> parameters = instruction.getParameters();
+                if(parameters != null) {
+                    Map<Result, Result> parameterMap = new LinkedHashMap<Result, Result>();
+                    for (Result parameter : parameters) {
+                        parameterMap.put(parameter, updateIntermediates(moveRegisters, parameter, instruction));
+                    }
+
+                    List<Result> newParams = new ArrayList<Result>();
+                    for (Result result : parameterMap.keySet()) {
+                        if (parameterMap.get(result) != null) {
+                            newParams.add(parameterMap.get(result));
+                        } else {
+                            newParams.add(result);
+                        }
+                    }
+                    instruction.setParameters(newParams);
+                }
+            }
+        }
+
+        for (Integer integer : registerInfoAfterUpdate.keySet()) {
+            System.out.println("Mapping key ["+integer+"] to register R["+registerInfoAfterUpdate.get(integer)+"]");
+        }
+    }
+
+    private Result updateIntermediates(Map<Integer, Integer> moveRegisters, Result parameter, Instruction instruction) {
+        final Integer integer = moveRegisters.get(instruction.getY().getIntermediateLoation());
+        if(integer != null) {
+            final Result x = new Result(Kind.REG);
+            x.regNo(integer);
+            return x;
+        }
+        return parameter;
     }
 
     protected Result phiReference(List<Integer> deletedPhiLocations, Result operand) {
