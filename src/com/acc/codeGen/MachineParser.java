@@ -112,7 +112,10 @@ public class MachineParser {
         Integer dlxOpCode = MachineOperationCode.BSR;
         if (!functionMap.containsKey(currentInstruction.getX().getVariableName())) {
             MachineInstruction machineInstruction = AuxilaryDLXFunctions.putF1(machineCode, dlxOpCode, 0, 0, -1);
-            //Todo: What do i do with parameter values?
+            final List<Result> parameters = currentInstruction.getParameters();
+            if(parameters != null && !parameters.isEmpty()) {
+                //Todo: What do i do with parameter values?
+            }
             functionMap.put(currentInstruction.getX().getVariableName(), -1);
             procedureFixupTable.add(currentInstruction.getX().getVariableName(), machineInstruction);
         } else {
