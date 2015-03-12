@@ -4,9 +4,6 @@ import com.acc.data.Instruction;
 import com.acc.graph.DeleteInstructions;
 import com.acc.graph.GraphHelper;
 import com.acc.parser.Computation;
-import com.acc.ra.GraphNode;
-import com.acc.ra.InterferenceGraph;
-import com.acc.ra.PhiCoalesceWorker;
 import com.acc.structure.BasicBlock;
 
 import java.util.*;
@@ -31,41 +28,38 @@ public class RegisterAllocator {
         final PhiCoalesceWorker phiWorker = new PhiCoalesceWorker(program, graph);
         final BasicBlock rootNode = program.getCode().getControlFlowGraph().getRootBlock();
         new GraphHelper(phiWorker, rootNode);
-        graph.sortNodesByNeighborsCount();
+        graph.sortDescendingByClusterSize();
+        List<GraphNode> clusteredNodes = new ArrayList<GraphNode>();
+        final Iterator<GraphNode> clusterSize = graph.getNodes().iterator();
+        while (clusterSize.hasNext()) {
+            final GraphNode next = clusterSize.next();
+            if(next.getClustered().isEmpty()) {
+                break;
+            }
+            removeFromGraph(clusterSize, next);
+            clusteredNodes.add(next);
+        }
+
         final Iterator<GraphNode> iterator = graph.getNodes().iterator();
         while (iterator.hasNext()) {
             final GraphNode graphNode = iterator.next();
             if(graphNode.getNeighbors().size() <=8) {
-                final Iterator<GraphNode> iterator2 = graph.getNodes().iterator();
-                while (iterator2.hasNext()) {
-                    final GraphNode targetNode = iterator2.next();
-                    targetNode.getNeighbors().remove(graphNode);
-                }
+                removeFromGraph(iterator, graphNode);
                 nodeStack.push(graphNode);
-                iterator.remove();
             } else {
                 break;
             }
         }
 
-//        final Iterator<GraphNode> iterator2 = graph.getNodes().iterator();
-//        while (iterator2.hasNext()) {
-//            final GraphNode targetNode = iterator2.next();
-//            if(remove.contains(targetNode)) {
-//                iterator2.remove();
-//            }
-//            targetNode.getNeighbors().remove(graphNode);
-//        }
-
         graph.sortByCost();
         final Iterator<GraphNode> costIterator = graph.getNodes().iterator();
         while (costIterator.hasNext()) {
             final GraphNode next = costIterator.next();
-            costIterator.remove();
+            removeFromGraph(costIterator,next);
             nodeStack.push(next);
         }
 
-
+        sortAndAddToStack(clusteredNodes);
         int colorNumber = 0;
         final List<GraphNode> existingNodes = graph.getNodes();
         while (!nodeStack.isEmpty()) {
@@ -82,8 +76,8 @@ public class RegisterAllocator {
                 }
                 int existingColor = -1;
                 for (GraphNode existingNode : existingNodes) {
-                    if(!graph.doesInterfere(null, existingNode, top)) {
-                        existingColor = registerInfo.get(existingNode.getNodeId());
+                    if(!existingNode.equals(top) && !graph.doesInterfere(existingNode, top)) {
+                        existingColor = registerInfo.get(existingNode.getNodeId()); //$TODO$ taking too much time: needs to be optimized
                         break;
                     }
                 }
@@ -111,6 +105,28 @@ public class RegisterAllocator {
         for (Integer integer : registerInfoAfterUpdate.keySet()) {
             System.out.println("Mapping key ["+integer+"] to register R["+registerInfoAfterUpdate.get(integer)+"]");
         }
+    }
+
+    protected void sortAndAddToStack(List<GraphNode> clusteredNodes) {
+        Collections.sort(clusteredNodes, new Comparator<GraphNode>() {
+            @Override
+            public int compare(GraphNode o1, GraphNode o2) {
+                return o1.getClustered().size() - o2.getClustered().size();
+            }
+        });
+
+        for (GraphNode clusteredNode : clusteredNodes) {
+            nodeStack.push(clusteredNode);
+        }
+    }
+
+    protected void removeFromGraph(Iterator<GraphNode> nodesIterator, GraphNode next) {
+        final Iterator<GraphNode> neighborsRemoverIterator = graph.getNodes().iterator();
+        while (neighborsRemoverIterator.hasNext()) {
+            final GraphNode targetNode = neighborsRemoverIterator.next();
+            targetNode.getNeighbors().remove(next);
+        }
+        nodesIterator.remove();
     }
 
     protected void updateRegisterInfo(GraphNode top, int colorNumber, List<GraphNode> existingNodes) {

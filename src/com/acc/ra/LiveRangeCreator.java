@@ -60,6 +60,10 @@ public class LiveRangeCreator extends Worker {
         Printer.debugMessage("}");
         handleWhileBodyBlock(node, liveRanges);
         node.setLiveRanges(liveRanges); //Used at this point
+        if (node.isWhileHead()) {
+            node.setVisited(true);
+            handleUnvisitedChildren(children);
+        }
     }
 
     protected void handleWhileBodyBlock(BasicBlock node, Set<Integer> liveRanges) {
@@ -90,17 +94,11 @@ public class LiveRangeCreator extends Worker {
     }
 
     protected void handleUnvisitedChildren(Set<BasicBlock> children) {
-        if (children.size() > 1) {
-            List<BasicBlock> unvisited = new ArrayList<BasicBlock>();
-            for (BasicBlock child : children) {
-                if (!child.isVisited()) {
-                    unvisited.add(child);
-                }
-            }
-            if (unvisited.size() == 1) {
-                visit(unvisited.get(0));
-                unvisited.get(0).setVisited(true);
-                addToNodes(unvisited.get(0));
+        for (BasicBlock child : children) {
+            if (!child.isVisited()) {
+                visit(child);
+                child.setVisited(true);
+                addToNodes(child);
             }
         }
     }
@@ -108,6 +106,7 @@ public class LiveRangeCreator extends Worker {
     private void updateLiveRange(Instruction instruction, Result result, Set<Integer> liveRanges) {
         if (result.isIntermediate()) {
             liveRanges.add(result.getIntermediateLoation());
+            System.out.println(result.getIntermediateLoation());
         }
         if(instruction.isPhi() && result.isVariable()) {
             liveRanges.add(result.getLocation());

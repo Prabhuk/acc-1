@@ -105,6 +105,8 @@ public class Instruction {
             return "FP:0";
         } else if (x.isBaseAddress()) {
             return x.getVariableName() + ":baseaddress";
+        } else if(x.isRegister()) {
+            return "R[" + x.regNo() + "]";
         }
         return "";
     }

@@ -50,8 +50,8 @@ public class CompileInputFile {
     public static void main(String[] args) {
 
 
-//        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test"), new String[]{"txt"}, false);
-        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test2"), new String[]{"txt"}, false);
+        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test"), new String[]{"txt"}, false);
+//        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test2"), new String[]{"txt"}, false);
         for (File inputFile : files) {
             currentFileName = inputFile.getName();
             processFile(inputFile.getAbsolutePath(), inputFile.getName());
@@ -91,7 +91,6 @@ public class CompileInputFile {
             createVCG(prefix, parser, rootNode);
 
 
-            printInstructions(parser, code);
             final LiveRangeCreator liveRangeWorker = new LiveRangeCreator(parser, contents);
             new GraphReverseTraversalHelper(liveRangeWorker, CFG.getLastNode());
 
@@ -102,6 +101,8 @@ public class CompileInputFile {
             registerAllocator.processPhis();
             final Map<Integer, Integer> regInfo = registerAllocator.getRegisterInfoAfterUpdate();
             new MapSSAtoDLX(code, regInfo);
+            printInstructions(parser, code);
+
 //            createVCG(prefix, parser, rootNode);
 
         }

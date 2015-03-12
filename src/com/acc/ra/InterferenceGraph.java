@@ -1,5 +1,6 @@
 package com.acc.ra;
 
+import com.acc.data.Instruction;
 import com.acc.data.Result;
 
 import java.util.*;
@@ -32,25 +33,20 @@ public class InterferenceGraph {
     }
 
     public void sortByCost() {
-//        nodes.remove(null);
         Collections.sort(nodes, new Comparator<GraphNode>() {
             @Override
             public int compare(GraphNode o1, GraphNode o2) {
-                if(o1.getClustered().size() != o2.getClustered().size()) {
-                    return o1.getClustered().size() - o2.getClustered().size();
-                }
                 return o1.getNeighbors().size() - o2.getNeighbors().size();
             }
             //$TODO$ add the loop level weight
         });
     }
 
-    public void sortNodesByNeighborsCount() {
-//        nodes.remove(null);
+    public void sortDescendingByClusterSize() {
         Collections.sort(nodes, new Comparator<GraphNode>() {
             @Override
             public int compare(GraphNode o1, GraphNode o2) {
-                return o1.getNeighbors().size() - o2.getNeighbors().size();
+                return o2.getClustered().size() - o1.getClustered().size();
             }
             //$TODO$ add the loop level weight
         });
@@ -61,58 +57,40 @@ public class InterferenceGraph {
         if(operand1.isConstant() || operand2.isConstant()) {
             return false;
         }
-        int nodeId = getSearchKey(operand1);
-        int node2Id = getSearchKey(operand2);
-        for (GraphNode node : nodes) {
-            if(nodeId == node.getNodeId()) {
-                final Set<GraphNode> neighbors = node.getNeighbors();
-                for (GraphNode neighbor : neighbors) {
-                    if(node2Id == neighbor.getNodeId()) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        final GraphNode operand1Node = getNodeForOperand(operand1);
+        final GraphNode operand2Node = getNodeForOperand(operand2);
+        return doesInterfere(operand1Node, operand2Node);
     }
 
-    //For Phi Instructions
-    public boolean doesInterfere(Result symbol, Result operand1, Result operand2) {
-
-        if(operand1.isConstant() && operand2.isConstant()) {
+    public boolean doesInterfere(GraphNode node, Result operand) {
+        if(operand.isConstant()) {
             return false;
         }
-
-        int node1key = getSearchKey(operand1);
-        int node2key = getSearchKey(operand2);
-        final GraphNode node1 = getNodeForId(node1key);
-        final GraphNode node2 = getNodeForId(node2key);
-
-        return doesInterfere(symbol, node1, node2);
-
+        final GraphNode operandNode = getNodeForOperand(operand);
+        return doesInterfere(node, operandNode);
     }
 
-    public boolean doesInterfere(Result symbol, GraphNode node1, GraphNode node2) {
-        if(node1 != null && node2 != null) {
-            if(node1.equals(node2)) {
-                return true;
-            }
-            final Set<GraphNode> neighbors = node1.getNeighbors();
-            if(neighbors.contains(node2)) {
-                return true;
-            }
-            if(symbol != null) {
-                final GraphNode symbolNode = getNodeForId(symbol.getLocation());
-                if (symbolNode != null) {
-                    if (neighbors.contains(symbolNode)) {
-                        return true;
-                    }
-                    if (node2.getNeighbors().contains(symbolNode)) {
-                        return true;
-                    }
-                }
-            }
+    protected GraphNode getNodeForOperand(Result operand) {
+        int node1key = getSearchKey(operand);
+        GraphNode nodeForId = getNodeForId(node1key);
+        return nodeForId;
+    }
+
+    protected boolean doesInterfere(GraphNode node1, GraphNode node2) {
+        if(node1.equals(node2)) {
+            return false;
         }
+        final Set<GraphNode> nodeNeighbors = node1.getNeighbors();
+        final Set<GraphNode> operandNeighbors = node2.getNeighbors();
+
+        if(nodeNeighbors.contains(node2)) {
+            return true;
+        }
+
+        if(operandNeighbors.contains(node1)) {
+            return true;
+        }
+
         return false;
     }
 
@@ -141,6 +119,11 @@ public class InterferenceGraph {
             }
         }
         node1.addToCluster(node2);
+
+        final Set<Instruction> moveInstructions = node2.getMoveInstructions();
+        for (Instruction moveInstruction : moveInstructions) {
+            node2.addToMoveInstructions(moveInstruction);
+        }
         nodes.remove(node2);
         return node1.getClustered();
     }
