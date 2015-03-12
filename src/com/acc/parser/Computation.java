@@ -11,6 +11,7 @@ import com.acc.util.AuxiliaryFunctions;
 import com.acc.util.Tokenizer;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Rumpy on 05-02-2015.
@@ -19,6 +20,11 @@ public class Computation extends Parser {
 
     private String programName;
     private List<String> formalParams;
+    private Map<Integer,Integer> registerInfo;
+
+
+    //$TODO$ move it to Code or other code related area
+    private int programLocation;
 
     public Computation(Code code, Tokenizer tokenizer, SymbolTable symbolTable, String programName, OutputContents outputContents) {
         super(code, tokenizer, symbolTable);
@@ -72,4 +78,21 @@ public class Computation extends Parser {
     public void setFormalParams(List<String> formalParams) {
         this.formalParams = formalParams;
     }
+
+    public int getProgramLocation() {
+        return programLocation;
+    }
+
+    public void setProgramLocation(int programLocation) {
+        this.programLocation = programLocation;
+    }
+
+    public Map<Integer, Integer> getRegisterInfo() {
+        return registerInfo;
+    }
+
+    public void setRegisterInfo(Map<Integer, Integer> registerInfo) {
+        this.registerInfo = registerInfo;
+    }
+
 }

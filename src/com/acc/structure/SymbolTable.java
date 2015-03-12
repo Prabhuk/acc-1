@@ -86,6 +86,18 @@ public class SymbolTable {
         return s;
     }
 
+    public List<Symbol> getLocalDeclarations()
+    {
+        List<Symbol> declarations = new ArrayList<Symbol>();
+        for (Symbol symbol : symbols) {
+            if(symbol.getSuffix() == -1) {
+                declarations.add(symbol);
+            }
+        }
+        return declarations;
+    }
+
+
     private String getSymbolKey(Symbol s) {
         return s.getName() + s.getSuffix();
     }

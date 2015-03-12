@@ -106,7 +106,6 @@ public class LiveRangeCreator extends Worker {
     private void updateLiveRange(Instruction instruction, Result result, Set<Integer> liveRanges) {
         if (result.isIntermediate()) {
             liveRanges.add(result.getIntermediateLoation());
-            System.out.println(result.getIntermediateLoation());
         }
         if(instruction.isPhi() && result.isVariable()) {
             liveRanges.add(result.getLocation());

@@ -1,6 +1,7 @@
 package com.acc.ui;
 
 import com.acc.codegenerator.MapSSAtoDLX;
+import com.acc.codeGen.MachineParser;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
 import com.acc.data.Result;
@@ -89,7 +90,7 @@ public class CompileInputFile {
             removeKills(parser, code, rootNode);
 //            deadCodeElimination(code);
             createVCG(prefix, parser, rootNode);
-
+            printInstructions(parser, code);
 
             final LiveRangeCreator liveRangeWorker = new LiveRangeCreator(parser, contents);
             new GraphReverseTraversalHelper(liveRangeWorker, CFG.getLastNode());
@@ -100,8 +101,8 @@ public class CompileInputFile {
             printInstructions(parser, code);
             final RegisterAllocator registerAllocator = new RegisterAllocator(parser, graph);
             registerAllocator.processPhis();
-            final Map<Integer, Integer> regInfo = registerAllocator.getRegisterInfoAfterUpdate();
-            new MapSSAtoDLX(code, regInfo);
+            parser.setRegisterInfo(registerAllocator.getRegisterInfoAfterUpdate());
+            new MapSSAtoDLX(code, parser.getRegisterInfo());
             printInstructions(parser, code);
             createVCG(prefix +"_ra", parser, rootNode);
 
@@ -110,8 +111,15 @@ public class CompileInputFile {
         }
 
         //$TODO$ coloring, clustering and insertion of spill code.
-//        printInstructions(mainProgram, mainProgramCode);
+      //  printInstructions(mainProgram, mainProgramCode);
 
+        MachineParser mp = new MachineParser(contents);
+        DLX.load(mp.begin());
+        try {
+            DLX.execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Printer.print("Compilation completed for ["+inputFile+"]");
     }
 
