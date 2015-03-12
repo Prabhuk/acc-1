@@ -1,5 +1,6 @@
 package com.acc.graph;
 
+import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
@@ -50,14 +51,12 @@ public class DeleteInstructions extends Worker {
                 if(opcode == OperationCode.bra) {
                     updateBranchDestinationTargets(instruction.getX());
                 } else if(opcode >= OperationCode.bne && opcode <= OperationCode.bgt) {
-                    updateIntermediates(instruction.getX());
+                    instruction.setX(updateIntermediates(instruction.getX()));
                     updateBranchDestinationTargets(instruction.getY());
                 }  else {
-                    updateIntermediates(instruction.getX());
-                    updateIntermediates(instruction.getY());
+                    instruction.setX(updateIntermediates(instruction.getX()));
+                    instruction.setY(updateIntermediates(instruction.getY()));
                 }
-            } else {
-                iterator.remove();
             }
         }
     }
@@ -88,15 +87,18 @@ public class DeleteInstructions extends Worker {
     }
 
 
-    private void updateIntermediates(Result result) {
+    private Result updateIntermediates(Result result) {
         if(result == null) {
-            return;
+            return result;
         }
         if(result.isIntermediate()) {
             if(oldNewLocations.get(result.getIntermediateLoation()) != null) {
-                result.setIntermediateLoation(oldNewLocations.get(result.getIntermediateLoation()));
+                final Result result1 = new Result(Kind.INTERMEDIATE);
+                result1.setIntermediateLoation(oldNewLocations.get(result.getIntermediateLoation()));
+                return result1;
             }
         }
+        return result;
     }
 
 

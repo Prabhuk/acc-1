@@ -93,11 +93,6 @@ public class CPWorker extends Worker {
                     if (x != null) {
                         Result result = basicBlock.getValueMap().get(x.getVariableName());
                         if (result != null && !result.isVariable()) {
-                            if(result.isIntermediate()) {
-                                if(deletedMoves.get(result.getIntermediateLoation()) != null) {
-                                    result = deletedMoves.get(result.getIntermediateLoation());
-                                }
-                            }
                             instruction.setX(result);
                         } else {
                             if(instruction.getX().isVariable()) {
@@ -114,11 +109,6 @@ public class CPWorker extends Worker {
                 if (y != null) {
                     Result result = basicBlock.getValueMap().get(y.getVariableName());
                     if (result != null && !result.isVariable()) {
-                        if(result.isIntermediate()) {
-                            if(deletedMoves.get(result.getIntermediateLoation()) != null) {
-                                result = deletedMoves.get(result.getIntermediateLoation());
-                            }
-                        }
                         instruction.setY(result);
                     } else {
                         if(instruction.getY().isVariable()) {
@@ -196,17 +186,10 @@ public class CPWorker extends Worker {
             }
         }
 
-        for (Instruction instruction : instructions) {
-            instruction.setX(updatePhiReferences(instruction.getX()));
-            instruction.setY(updatePhiReferences(instruction.getY()));
-        }
-
-        List<Instruction> deleted = new ArrayList<Instruction>();
         Map<Integer, Result> update = new HashMap<Integer, Result>();
 
         for (Instruction instruction : instructions) {
             if (instruction.isDeleted()) {
-                deleted.add(instruction);
                 if(!instruction.getY().isVariable()) {
                     update.put(instruction.getLocation(), instruction.getY());
                 }
@@ -235,23 +218,16 @@ public class CPWorker extends Worker {
         }
     }
 
-    private Result updatePhiReferences(Result operand) {
-        if (operand == null) {
-            return operand;
-        }
-        return operand;
-    }
-
     private Result updateDeleted(Map<Integer, Result> update, Instruction instruction, Result operand) {
         if (operand == null) {
             return operand;
         }
-        if(operand.isIntermediate()) {
-            final Result result = update.get(operand.getIntermediateLoation());
-            if(result != null) {
-                return result;
-            }
-        }
+//        if(operand.isIntermediate()) {
+//            final Result result = update.get(operand.getIntermediateLoation());
+//            if(result != null) {
+//                return result;
+//            }
+//        }
         if(instruction.isPhi() && operand.isVariable()) {
             final Result result = update.get(operand.getLocation());
             if(result != null) {
@@ -308,9 +284,9 @@ public class CPWorker extends Worker {
                 return result;
             }
         }
-        if (operand != null && operand.isIntermediate()) {
-            return remainingMoves.get(operand.getIntermediateLoation());
-        }
+//        if (operand != null && operand.isIntermediate()) {
+//            return remainingMoves.get(operand.getIntermediateLoation());
+//        }
 
         return null;
     }

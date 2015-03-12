@@ -51,8 +51,8 @@ public class CompileInputFile {
     public static void main(String[] args) {
 
 
-//        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test"), new String[]{"txt"}, false);
-        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test2"), new String[]{"txt"}, false);
+        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test"), new String[]{"txt"}, false);
+//        final Collection<File> files = FileUtils.listFiles(new File("C:\\work\\acc\\test2"), new String[]{"txt"}, false);
         for (File inputFile : files) {
             currentFileName = inputFile.getName();
             processFile(inputFile.getAbsolutePath(), inputFile.getName());
@@ -83,12 +83,12 @@ public class CompileInputFile {
             final Code code = parser.getCode();
             final ControlFlowGraph CFG = code.getControlFlowGraph();
             final BasicBlock rootNode = CFG.getRootBlock();
-            new GraphHelper(new DeleteInstructions(code, parser), rootNode);
-//            removeEmptyBlocks(parser, code, rootNode);
+            new GraphHelper(new DeleteInstructions(code, parser), rootNode); //$TO Reorder Phis into place
+            removeEmptyBlocks(parser, code, rootNode);
             copyPropagation(parser, code, rootNode);
             commonSubExpressionElimination(parser, code, rootNode);
             removeKills(parser, code, rootNode);
-//            deadCodeElimination(code);
+            deadCodeElimination(code);
             createVCG(prefix, parser, rootNode);
             printInstructions(parser, code);
 
