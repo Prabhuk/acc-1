@@ -72,6 +72,7 @@ public class CompileInputFile {
             final ControlFlowGraph CFG = code.getControlFlowGraph();
             final BasicBlock rootNode = CFG.getRootBlock();
             new GraphHelper(new DeleteInstructions(code, parser), rootNode); //$TO Reorder Phis into place
+            createVCG(prefix, parser, rootNode);
             removeEmptyBlocks(parser, code, rootNode);
             copyPropagation(parser, code, rootNode);
             commonSubExpressionElimination(parser, code, rootNode);

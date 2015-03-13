@@ -26,6 +26,7 @@ public class EmptyBlockRemover extends Worker {
     @Override
     public void finish() {
         for (BasicBlock node : nodes) {
+            node.setDeleted(true);
             final Set<BasicBlock> children = node.getChildren();
             final Set<BasicBlock> parents = node.getParents();
             for (BasicBlock parent : parents) {

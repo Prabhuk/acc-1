@@ -3,6 +3,7 @@ package com.acc.data;
 import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
 import com.acc.structure.Symbol;
+import com.acc.vm.Register;
 
 import java.util.HashSet;
 import java.util.List;
@@ -118,7 +119,11 @@ public class Instruction {
         } else if (x.isBaseAddress()) {
             return x.getVariableName() + ":baseaddress";
         } else if(x.isRegister()) {
-            return "R[" + x.regNo() + "]";
+            if(Register.ssaToDLX.get(x.regNo()) != null) {
+                return "R[" + Register.ssaToDLX.get(x.regNo()) + "]";
+            } else {
+                return "R[" + x.regNo() + "]";
+            }
         }
         return "";
     }

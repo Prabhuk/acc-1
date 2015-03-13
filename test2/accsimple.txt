@@ -1,11 +1,15 @@
 //Simple parsing test
   main
-  var i,b;
+  var i,b,j;
   {
-    let i <- 1;
-    while i < 4 do
-      let b <- call InputNum();
-      call OutputNum(b);
-        let i <- i + 1
-    od
+    let j <- 1;
+    while j < 2 do
+        let i <- 1;
+        let j <- j + 1;
+        while i < 4 do
+            let i <- i + 1
+        od
+    od;
+    call OutputNum(b)
     }.
+

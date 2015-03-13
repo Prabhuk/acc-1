@@ -1,6 +1,5 @@
 package com.acc.vm;
 
-import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
 import com.acc.data.Code;
 import com.acc.data.Instruction;
@@ -79,7 +78,7 @@ public class MapSSAtoDLX {
     }
 
     private int getBackwardBranchTarget(Instruction instruction) {
-        final Integer mciTarget = cmpLocationsForBackwardBranch.get(instruction.getLocation());
+        final Integer mciTarget = cmpLocationsForBackwardBranch.get(instruction.getX().value());
         return mciTarget - instructions.size();
     }
 
@@ -91,14 +90,34 @@ public class MapSSAtoDLX {
             if (ssaCode >= OperationCode.add && ssaCode <= OperationCode.cmp) {
                 final Result x = instruction.getX();
                 final Result y = instruction.getY();
-                int xReg = loadOperand(x, Register.DUMMY_REGISTER);
-                int yReg = loadOperand(y, Register.DUMMY_REGISTER_2);
-                int target = reg.getRegisterNumber(instruction.getLocation());
-                this.instructions.add(DLX.assemble(OpcodeMapper.arithmetic.get(ssaCode), target, xReg, yReg));
+                int target = reg.getReg4Intermediates(instruction.getLocation());
+
+                if(x.isRegister() || x.isIntermediate()) {
+                    final int xreg = getRegnoForResult(x);
+                    associateY(ssaCode, y, target, xreg);
+                } else {
+                    if(x.isConstant()) {
+                        final int xreg = loadOperand(x, Register.DUMMY_REGISTER_2);
+                        associateY(ssaCode, y, target, xreg);
+                    } else {
+                        throw new RuntimeException("Unhandled type ["+x.kind().name()+"]");
+                    }
+                }
             }
 
             if(ssaCode == OperationCode.move) {
-                this.instructions.add(DLX.assemble(DLX.ADDI, reg.getRegisterNumber(instruction.getX().regNo()), 0, loadOperand(instruction.getY(), Register.DUMMY_REGISTER)));
+                if(instruction.getY().isConstant()) {
+                    this.instructions.add(DLX.assemble(DLX.ADDI, reg.getDLXReg(instruction.getX().regNo()), 0, instruction.getY().value()));
+                } else {
+                    if(instruction.getY().isIntermediate()) {
+                        this.instructions.add(DLX.assemble(DLX.ADD, reg.getDLXReg(instruction.getX().regNo()),
+                                reg.getReg4Intermediates(instruction.getY().getIntermediateLoation()), 0));
+                    } else {
+                        this.instructions.add(DLX.assemble(DLX.ADDI, reg.getDLXReg(instruction.getX().regNo()),
+                                reg.getDLXReg(instruction.getY().regNo()), 0));
+                    }
+
+                }
             }
 
             if(ssaCode == OperationCode.store) {
@@ -117,17 +136,43 @@ public class MapSSAtoDLX {
         }
     }
 
+    private void associateY(Integer ssaCode, Result y, int target, int xreg) {
+        if(y.isRegister() || y.isIntermediate()) {
+            final int yreg = getRegnoForResult(y);
+            this.instructions.add(DLX.assemble(OpcodeMapper.arithmetic.get(ssaCode), target, xreg, yreg));
+        } else {
+            if(y.isConstant()) {
+                this.instructions.add(DLX.assemble(OpcodeMapper.arithmetic.get(ssaCode) + 16, target, xreg, y.value()));
+            } else {
+                throw new RuntimeException("Unhandled type ["+y.kind().name()+"]");
+            }
+        }
+    }
+
+    private int getRegnoForResult(Result operand) {
+        if(operand.isRegister()) {
+            return reg.getDLXReg(operand.regNo());
+        } else if(operand.isIntermediate()) {
+            return reg.getReg4Intermediates(operand.getIntermediateLoation());
+        }
+        return -1;
+    }
+
     private int loadOperand(Result operand, int targetRegister) {
         int xReg;
         if(operand.isConstant()) {
             this.instructions.add(DLX.assemble(DLX.ADDI, targetRegister, 0, operand.value()));
             xReg = targetRegister;
         } else if(operand.isRegister()) {
-            xReg = reg.getRegisterNumber(operand.regNo());
+            xReg = reg.getDLXReg(operand.regNo());
         } else if(operand.isIntermediate()) {
-            xReg = reg.getRegisterNumber(operand.getIntermediateLoation());
+            xReg = reg.getReg4Intermediates(operand.getIntermediateLoation());
+        } else if(operand.isFramePointer()) {
+            xReg = Register.FP;
+        } else if(operand.isBaseAddress()) {
+            xReg = Register.FP; //$TODO$ has to be variable's base address
         } else {
-            throw new RuntimeException("Unhandled result type");
+            throw new RuntimeException("Unhandled result type ["+operand.kind().name()+"]");
         }
         return xReg;
     }
@@ -136,19 +181,31 @@ public class MapSSAtoDLX {
         if(operandCount == 1) {
             if(ssaCode == OperationCode.write) {
                 final Result targetLocaion = instruction.getX();
-                instructions.add(DLX.assemble(DLX.WRD, getTargetRegister(targetLocaion)));
+                if(targetLocaion.isConstant()) {
+                    loadOperand(targetLocaion, Register.DUMMY_REGISTER);
+                    instructions.add(DLX.assemble(DLX.WRD, Register.DUMMY_REGISTER));
+                }
+                if(targetLocaion.isIntermediate()) {
+                    instructions.add(DLX.assemble(DLX.WRD, reg.getReg4Intermediates(targetLocaion.getIntermediateLoation())));
+                } else {
+                    if(targetLocaion.isVariable()) {
+                        //$TODO
+                    }
+                    instructions.add(DLX.assemble(DLX.WRD, reg.getDLXReg(targetLocaion.regNo())));
+                }
             } else if (ssaCode == OperationCode.load) {
                 if(tempInstruction != null && tempInstruction.getOpcode() == OperationCode.adda) {
                     //$TODO$ tempHolds adda and load holds target
                 }
             } else if (ssaCode == OperationCode.bra) {
-                if(cmpLocationsForBackwardBranch.containsKey(instruction.getX().value())) {
-                    instructions.add(DLX.assemble(DLX.BSR, getBackwardBranchTarget(instruction)));
+                if(isBackwardBranch(instruction)) {
+                    if (cmpLocationsForBackwardBranch.containsKey(instruction.getX().value())) {
+                        instructions.add(DLX.assemble(DLX.BEQ, 0, getBackwardBranchTarget(instruction)));
+                    }
                 } else {
                     BRAtargetLocationMCIindex.put(instruction.getX().value(), instructions.size());
-                    instructions.add(DLX.assemble(DLX.BSR, 0)); //$Fixed up later
+                    instructions.add(DLX.assemble(DLX.BEQ, 0, 0)); //$Fixed up later
                     //Forward branch in case of else block's presence
-
                 }
                 //$TODO$ handle branches
             } else if (ssaCode == OperationCode.call) {
@@ -157,15 +214,19 @@ public class MapSSAtoDLX {
         }
     }
 
+    private boolean isBackwardBranch(Instruction instruction) {
+        return instruction.getX().value() < instruction.getLocation();
+    }
+
     private int getTargetRegister(Result targetLocaion) {
         int regNo;
         if(targetLocaion.isConstant()) {
             instructions.add(DLX.assemble(DLX.ADDI, Register.DUMMY_REGISTER, 0, targetLocaion.value()));
             regNo = Register.DUMMY_REGISTER;
         } else if(targetLocaion.isIntermediate()) {
-            regNo = reg.getRegisterNumber(targetLocaion.getLocation());
+            regNo = reg.getReg4Intermediates(targetLocaion.getLocation());
         } else if(targetLocaion.isRegister()) {
-            regNo = reg.getRegisterNumber(targetLocaion.regNo());
+            regNo = reg.getDLXReg(targetLocaion.regNo());
         } else {
             throw new RuntimeException("Handle Variables");
         }
@@ -175,7 +236,7 @@ public class MapSSAtoDLX {
     private void handleNoOperands(Instruction instruction, Integer ssaCode, Integer operandCount) {
         if(operandCount == 0) {
             if(ssaCode == OperationCode.read) {
-                final int regNo = reg.getRegisterNumber(instruction.getLocation());
+                final int regNo = reg.getReg4Intermediates(instruction.getLocation());
                 instructions.add(DLX.assemble(DLX.RDI, regNo));
             } else if(ssaCode == OperationCode.writenl) {
                 instructions.add(DLX.assemble(DLX.WRL));
@@ -190,6 +251,16 @@ public class MapSSAtoDLX {
     }
 
     public int[] getInstructionList() {
+
+        for (Integer instruction : instructions) {
+            int op = instruction >>> 26; // without sign extension
+            int a = (instruction >>> 21) & 0x1F;
+            int b = (instruction >>> 16) & 0x1F;
+            int i = instruction;
+            int c = (short) i; // another dirty trick
+            System.out.println(DLX.mnemo[op] +" " + a + "  " +  b + "  " + c);
+        }
+
         int DLXInstructions[] = new int[instructions.size()];
         int i=0;
         for (Integer instruction : instructions) {

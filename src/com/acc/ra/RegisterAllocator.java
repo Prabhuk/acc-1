@@ -8,6 +8,7 @@ import com.acc.graph.DeleteInstructions;
 import com.acc.graph.GraphHelper;
 import com.acc.parser.Computation;
 import com.acc.structure.BasicBlock;
+import com.acc.vm.Register;
 
 import java.util.*;
 
@@ -171,7 +172,7 @@ public class RegisterAllocator {
         }
 
         for (Integer integer : registerInfoAfterUpdate.keySet()) {
-            System.out.println("Mapping key ["+integer+"] to register R["+registerInfoAfterUpdate.get(integer)+"]");
+            System.out.println("Mapping key ["+integer+"] to register R["+ Register.ssaToDLX.get(registerInfoAfterUpdate.get(integer))+"]");
         }
     }
 
@@ -224,13 +225,24 @@ public class RegisterAllocator {
         }
         registerInfo.put(top.getNodeId(), colorNumber);
         final Set<GraphNode> clustered = top.getClustered();
-        for (GraphNode graphNode : clustered) {
-            registerInfo.put(graphNode.getNodeId(), colorNumber);
-            existingNodes.add(graphNode);
-        }
+        processClusters(colorNumber, existingNodes, clustered);
         final Set<Instruction> moveInstructions = top.getMoveInstructions();
+        updateMoveInstructions(colorNumber, moveInstructions);
+    }
+
+    private void updateMoveInstructions(int colorNumber, Set<Instruction> moveInstructions) {
         for (Instruction moveInstruction : moveInstructions) {
             moveInstruction.getX().regNo(colorNumber);
+        }
+    }
+
+    private void processClusters(int colorNumber, List<GraphNode> existingNodes, Set<GraphNode> clustered) {
+        for (GraphNode graphNode : clustered) {
+            registerInfo.put(graphNode.getNodeId(), colorNumber);
+            final Set<Instruction> moveInstructions = graphNode.getMoveInstructions();
+            updateMoveInstructions(colorNumber, moveInstructions);
+            existingNodes.add(graphNode);
+            processClusters(colorNumber, existingNodes, graphNode.getClustered());
         }
     }
 

@@ -35,7 +35,7 @@ public class Register {
         this.regInfo = regInfo;
     }
 
-    public int getRegisterNumber(Integer intermediateLocation) {
+    public int getReg4Intermediates(Integer intermediateLocation) {
         if(regInfo.get(intermediateLocation) != null) {
             final Integer ssaRegister = regInfo.get(intermediateLocation);
             final Integer dlxReg = ssaToDLX.get(ssaRegister);
@@ -45,6 +45,13 @@ public class Register {
             return SCRATCH_REGISTER_1;
         }
         return DUMMY_REGISTER;
+    }
+
+    public int getDLXReg(Integer register) {
+        if(ssaToDLX.get(register) != null) {
+            return ssaToDLX.get(register);
+        }
+        return SCRATCH_REGISTER_1;
     }
 
     public boolean isScratch(int regNo) {

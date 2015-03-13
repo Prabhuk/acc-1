@@ -26,6 +26,7 @@ public class BasicBlock {
 
     private static Set<BasicBlock> allBlocks = new HashSet<BasicBlock>();
     private boolean isVisited = false;
+    private boolean isDeleted = false;
 
     private static volatile int count = 0;
     private int label = 0;
@@ -199,6 +200,9 @@ public class BasicBlock {
     public boolean isWhileHead() {
         return type != null && type.isWhileHead();
     }
+    public boolean isCompare() {
+        return type != null && type.isCompare();
+    }
 
     public boolean isIF() {
         return type != null && type.isIF();
@@ -248,5 +252,13 @@ public class BasicBlock {
 
     public void removeFromExclude(String variableName) {
         this.exclude.remove(variableName);
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

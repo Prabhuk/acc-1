@@ -64,6 +64,9 @@ public class LiveRangeCreator extends Worker {
         if (node.isWhileHead()) {
             node.setVisited(true);
             handleUnvisitedChildren(children);
+            node.setType(null);
+            visit(node);
+            node.setType(BlockType.WHILE_HEAD);
         }
     }
 

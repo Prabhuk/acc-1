@@ -8,8 +8,9 @@ public enum BlockType {
     WHILE_HEAD,
     WHILE_FOLLOW,
     CALL,
-    IF
-    ;
+    IF,
+    COMPARE,
+    IF_JOIN;
 
     public boolean isIF() {
         return this == IF;
@@ -27,5 +28,8 @@ public enum BlockType {
     }
     public boolean isCall() {
         return this == CALL;
+    }
+    public boolean isCompare() {
+        return this == COMPARE;
     }
 }

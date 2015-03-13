@@ -25,10 +25,11 @@ public class IfParser extends Parser {
     public Result parse() {
         Result x = new Relation(code, tokenizer, symbolTable).parse();  //Statement eats the first word for all statements except assignment
         AuxiliaryFunctions.CJF(code, x, getSymbolTable());
-
         final BasicBlock currentBlock = code.getCurrentBlock();
+        currentBlock.setType(BlockType.IF);
         final BasicBlock join = new BasicBlock();
-        join.setType(BlockType.IF);
+        join.setType(BlockType.IF_JOIN);
+
         x.setJoin(join);
         currentBlock.setJoinBlock(join);
 
