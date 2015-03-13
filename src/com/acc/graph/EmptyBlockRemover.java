@@ -29,6 +29,20 @@ public class EmptyBlockRemover extends Worker {
             node.setDeleted(true);
             final Set<BasicBlock> children = node.getChildren();
             final Set<BasicBlock> parents = node.getParents();
+            BasicBlock selectedParent1 = null;
+            BasicBlock selectedParent2 = null;
+            for (BasicBlock parent : parents) {
+                if(selectedParent1 == null) {
+                    selectedParent1 = parent;
+                } else {
+                    selectedParent2 = parent;
+                }
+            }
+            for (BasicBlock child : children) {
+                if(child.getLeft().equals(node)) {
+                    child.setLeft(selectedParent1);
+                }
+            }
             for (BasicBlock parent : parents) {
                 parent.getChildren().remove(node);
                 if(parent.getLeft()!= null && parent.getLeft().equals(node)) {

@@ -44,15 +44,14 @@ public class PhiCoalesceWorker extends Worker{
             }
 
             if(graph.doesInterfere(operand1, operand2)) {
-                introduceMove(phiNode, operand1, node.getLeft(), node.getType(), node);
-                introduceMoveRight(phiNode, operand2, node.getRight(), node.getType());
+                introduceMoveLeft(phiNode, operand1, node);
+                introduceMoveRight(phiNode, operand2, node);
             } else {
                 if (graph.doesInterfere(phiNode, operand1)) {
-                    introduceMove(phiNode, operand1, node.getLeft(), node.getType(), node);
+                    introduceMoveLeft(phiNode, operand1, node);
                 }
-
                 if (graph.doesInterfere(phiNode, operand2)) {
-                    introduceMoveRight(phiNode, operand2, node.getRight(), node.getType());
+                    introduceMoveRight(phiNode, operand2, node);
                 }
             }
             coalesce(phiNode, node, operand1, operand2);
@@ -76,88 +75,76 @@ public class PhiCoalesceWorker extends Worker{
         if(operand2.isIntermediate()) {
             graph.coalesce(phiNode, graph.getNodeForId(operand2.getIntermediateLoation()));
         }
-
-//        if(operand1.isConstant()) {
-//            introduceMove(phiNode, operand1, node.getLeft());
-//        }
-//        if(operand2.isConstant()) {
-//            introduceMove(phiNode, operand2, node.getRight());
-//        }
     }
 
-    protected void introduceMove(GraphNode phiNode, Result interferingResult, BasicBlock targetNode, BlockType blockType, BasicBlock node) {
-        final BasicBlock oldCurrent = parser.getCode().getControlFlowGraph().getCurrentBlock();
+    protected void introduceMoveRight(GraphNode phiNode, Result interferingResult, BasicBlock node) {
         final Result x = new Result(Kind.REG);
-        List<Instruction> instructions = targetNode.getInstructions();
-        parser.getCode().getControlFlowGraph().setCurrentBlock(targetNode);
-
-        int targetIndex = -1;
-
-        final List<Instruction> allInstructions = parser.getCode().getInstructions();
-        if(blockType == null) {
-            for (Instruction instruction : instructions) {
-                if(instruction.getOpcode() == OperationCode.bra) {
-                    targetIndex = allInstructions.indexOf(instruction);
-                }
+        final BasicBlock oldCurrent = parser.getCode().getControlFlowGraph().getCurrentBlock();
+        BasicBlock targetNode = node.getRight();
+        if(node.isWhileHead()) {
+            final List<Instruction> instructions = targetNode.getInstructions();
+            final Instruction instruction = instructions.get(instructions.size() - 1);
+            int target = parser.getCode().getInstructions().indexOf(instruction);
+            if(instruction.getOpcode() != OperationCode.bra) {
+                target++;
             }
-            if(targetIndex == -1) {
-                targetIndex = instructions.isEmpty() ? 0 : (allInstructions.indexOf(instructions.get(instructions.size() - 1)) + 1);
-            }
+            parser.getCode().getControlFlowGraph().setCurrentBlock(targetNode);
+            final Instruction addedInstruction = AuxiliaryFunctions.addInstruction(OperationCode.move, parser.getCode(), x,
+                    interferingResult, parser.getSymbolTable(), target);
+            parser.getCode().getControlFlowGraph().setCurrentBlock(oldCurrent);
+            phiNode.addToMoveInstructions(addedInstruction);
         } else {
-//            assert blockType == BlockType.WHILE_HEAD;
-            if(!targetNode.isDeleted()) {
-                targetIndex = instructions.isEmpty() ? 0 : allInstructions.indexOf(instructions.get(0));
-            } else {
-                final List<Instruction> instructions1 = node.getInstructions();
-                parser.getCode().getControlFlowGraph().setCurrentBlock(node);
-                targetIndex = allInstructions.indexOf(instructions1.get(0));
-            }
+            handleIfPhiMove(phiNode, interferingResult, targetNode);
         }
 
-        final Instruction addedInstruction = AuxiliaryFunctions.addInstruction(OperationCode.move, parser.getCode(), x, interferingResult, parser.getSymbolTable(), targetIndex);
-        parser.getCode().getControlFlowGraph().setCurrentBlock(oldCurrent);
-        phiNode.addToMoveInstructions(addedInstruction);
     }
 
-
-
-    protected void introduceMoveRight(GraphNode phiNode, Result interferingResult, BasicBlock targetNode, BlockType blockType) {
-        final BasicBlock oldCurrent = parser.getCode().getControlFlowGraph().getCurrentBlock();
+    protected void introduceMoveLeft(GraphNode phiNode, Result interferingResult, BasicBlock node) {
         final Result x = new Result(Kind.REG);
-        List<Instruction> instructions = targetNode.getInstructions();
-        parser.getCode().getControlFlowGraph().setCurrentBlock(targetNode);
-
-        int targetIndex = -1;
-
-        final List<Instruction> allInstructions = parser.getCode().getInstructions();
-        if(blockType == null) {
-            for (Instruction instruction : instructions) {
-                if(instruction.getOpcode() == OperationCode.bra) {
-                    targetIndex = allInstructions.indexOf(instruction);
-                }
-            }
-            if(targetIndex == -1) {
-                targetIndex = instructions.isEmpty() ? 0 : (allInstructions.indexOf(instructions.get(instructions.size() - 1)) + 1);
-            }
+        final BasicBlock oldCurrent = parser.getCode().getControlFlowGraph().getCurrentBlock();
+        BasicBlock targetNode = node.getLeft();
+        if(node.isWhileHead()) {
+            targetNode = node;
+            final Instruction instruction = node.getInstructions().get(0);
+            parser.getCode().getControlFlowGraph().setCurrentBlock(targetNode);
+            int target = parser.getCode().getInstructions().indexOf(instruction);
+            final Instruction addedInstruction = AuxiliaryFunctions.addInstruction(OperationCode.move, parser.getCode(), x,
+                    interferingResult, parser.getSymbolTable(), target);
+            parser.getCode().getControlFlowGraph().setCurrentBlock(oldCurrent);
+            phiNode.addToMoveInstructions(addedInstruction);
         } else {
-            assert blockType == BlockType.WHILE_HEAD;
-            for (Instruction instruction : instructions) {
-                if(instruction.getOpcode() == OperationCode.bra) {
-                    targetIndex = allInstructions.indexOf(instruction);
-                }
-            }
-            if(targetIndex == -1) {
-                targetIndex = instructions.isEmpty() ? 0 : (allInstructions.indexOf(instructions.get(instructions.size() - 1)) + 1);
+            handleIfPhiMove(phiNode, interferingResult, targetNode);
+
+        }
+    }
+
+    private void handleIfPhiMove(GraphNode phiNode, Result interferingResult,BasicBlock targetNode) {
+        List<Instruction> instructions = targetNode.getInstructions();
+        Instruction instruction = instructions.get(instructions.size() - 1);
+        int target = parser.getCode().getInstructions().indexOf(instruction);
+        if(instruction.getOpcode() == OperationCode.noop) {
+            if(instructions.size() > 1) {
+                target--;
+                instruction = instructions.get(instructions.size() - 1);
             }
         }
-        final Instruction addedInstruction = AuxiliaryFunctions.addInstruction(OperationCode.move, parser.getCode(), x, interferingResult, parser.getSymbolTable(), targetIndex);
+        if(instruction.getOpcode() == OperationCode.bra) {
+            if(instruction.getLocation() > instruction.getX().value()) {
+                target++;
+            }
+        } else if(instruction.getOpcode() > OperationCode.bra && instruction.getOpcode() <= OperationCode.bgt) {
+            target--; //insert before cmp
+        }
+        final Result x = new Result(Kind.REG);
+        parser.getCode().getControlFlowGraph().setCurrentBlock(targetNode);
+        final BasicBlock oldCurrent = parser.getCode().getControlFlowGraph().getCurrentBlock();
+        final Instruction addedInstruction = AuxiliaryFunctions.addInstruction(OperationCode.move, parser.getCode(), x,
+                interferingResult, parser.getSymbolTable(), target);
         parser.getCode().getControlFlowGraph().setCurrentBlock(oldCurrent);
         phiNode.addToMoveInstructions(addedInstruction);
+
     }
 
-    public Set<GraphNode> getNodes() {
-        return nodes;
-    }
 
     public Set<Instruction> getDeletedPhis() {
         return deletedPhis;

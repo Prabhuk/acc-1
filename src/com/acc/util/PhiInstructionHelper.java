@@ -12,10 +12,7 @@ import com.acc.structure.BasicBlock;
 import com.acc.structure.Symbol;
 import com.acc.structure.SymbolTable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by prabhuk on 2/18/2015.
@@ -124,7 +121,10 @@ public class PhiInstructionHelper {
                     phi = findPhi(symbol, join);
                 }
                 if (phi != null) {
-                    phi.setY(new Result(instruction.getSymbol()));
+                    final Result y = new Result(instruction.getSymbol());
+                    if(phi.getX() == null || !equals(phi.getX(), y)) {
+                        phi.setY(y);
+                    }
                 }
             }
         }
@@ -217,16 +217,54 @@ public class PhiInstructionHelper {
         BasicBlock right = null;
         final BasicBlock join = currentBlock.getJoinBlock();
         BasicBlock left = null;
-        for (BasicBlock child : children) {
-            if(left == null) {
-                left = child;
-            } else {
-                right = child;
+        if(children.size() < 2) {
+            left = join.getLeft();
+            right = join.getRight();
+        } else {
+            for (BasicBlock child : children) {
+                if (left == null) {
+                    left = child;
+                } else {
+                    right = child;
+                }
             }
         }
         handleLeft(left, join, symbolTable, code);
         handleRight(right, join, symbolTable, code);
-        fillIncomplete(code, join, symbolTable);
+        fillIncompleteForIf(code, join, symbolTable);
+    }
+
+    private static void fillIncompleteForIf(Code code, BasicBlock join, SymbolTable table) {
+        //Handle Phi Statements where right did not have assignments
+        final Collection<Instruction> allPhiInstructions = phis;
+        int locationOffset = 0;
+        for (Instruction phi : allPhiInstructions) {
+            if (!phi.isComplete()) {
+                final PhiOperandFinder operandFinder = new PhiOperandFinder(null, join, phi.getSymbol().getName());
+                new GraphHelper(operandFinder, code.getControlFlowGraph().getRootBlock());
+                final Result operand = operandFinder.getOperand();
+                if (phi.getX() == null) {
+                    if (!equals(operand, phi.getY())) {
+                        phi.setX(operand);
+                    }
+                } else if (phi.getY() == null) {
+                    if (!equals(operand, phi.getX())) {
+                        phi.setY(operand);
+                    }
+                }
+            }
+
+            if (phi.isComplete()) {
+                final Instruction instruction = join.addPhiInstruction(phi);
+                if (instruction != null) {
+                    code.addCode(phi, instruction);
+                    //this is make sure the order of instructions are maintained in the flat list of instructions within Code
+                } else {
+                    code.addCode(phi);
+                }
+                phi.getSymbol().setSuffix(phi.getLocation());
+            }
+        }
     }
 
 }

@@ -112,6 +112,12 @@ public class RegisterAllocator {
                 }
             }
         }
+
+        for (Instruction instruction : instructions) {
+            if(instruction.getOpcode() == OperationCode.noop) {
+                instruction.setDeleted(true, "noop");
+            }
+        }
 //        //This iteration of Delete will actually have added instructions for compensated moves
         final DeleteInstructions reorder = new DeleteInstructions(parser.getCode(), parser);
         new GraphHelper(reorder, rootNode);

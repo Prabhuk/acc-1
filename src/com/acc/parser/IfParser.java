@@ -75,6 +75,7 @@ public class IfParser extends Parser {
         }
 //        code.Fixlink(follow);
         currentBlock.addDominatedOverBlock(join);
+        PhiInstructionHelper.createPhiForIF(code, currentBlock, getSymbolTable());
 
         handleFiToken();
         if(join.getLeft() != null) {
@@ -83,7 +84,7 @@ public class IfParser extends Parser {
         if(join.getRight() != null) {
             join.getRight().addChild(join);
         }
-        PhiInstructionHelper.createPhiForIF(code, currentBlock, getSymbolTable());
+
         code.setCurrentBlock(join);
         return x;
     }

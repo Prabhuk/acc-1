@@ -73,11 +73,11 @@ public class CompileInputFile {
             final BasicBlock rootNode = CFG.getRootBlock();
             new GraphHelper(new DeleteInstructions(code, parser), rootNode); //$TO Reorder Phis into place
             createVCG(prefix, parser, rootNode);
+            printInstructions(parser, code);
             removeEmptyBlocks(parser, code, rootNode);
             copyPropagation(parser, code, rootNode);
             commonSubExpressionElimination(parser, code, rootNode);
             removeKills(parser, code, rootNode);
-            printInstructions(parser, code);
             constantFolding(parser, code, rootNode);
             printInstructions(parser, code);
 
@@ -93,6 +93,8 @@ public class CompileInputFile {
             printInstructions(parser, code);
             final RegisterAllocator registerAllocator = new RegisterAllocator(parser, graph);
             registerAllocator.processPhis();
+
+
             parser.setRegisterInfo(registerAllocator.getRegisterInfoAfterUpdate());
             printInstructions(parser, code);
             createVCG(prefix +"_ra", parser, rootNode);
@@ -158,7 +160,7 @@ public class CompileInputFile {
 
 
     private static void removeEmptyBlocks(Computation parser, Code code, BasicBlock rootNode) {
-        new GraphHelper(new EmptyBlockRemover(parser), rootNode);
+//        new GraphHelper(new EmptyBlockRemover(parser), rootNode);
     }
 
     private static void printInstructions(Computation parser, Code code) {

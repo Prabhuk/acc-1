@@ -1,8 +1,11 @@
 package com.acc.structure;
 
+import com.acc.constants.OperationCode;
 import com.acc.data.BlockType;
+import com.acc.data.Code;
 import com.acc.data.Instruction;
 import com.acc.data.Result;
+import com.acc.ui.OutputContents;
 
 import java.util.*;
 
@@ -18,7 +21,7 @@ public class BasicBlock {
 
     private final Map<String, Instruction> phiMap = new HashMap<String, Instruction>();
     private final List<BasicBlock> dominatesOver = new ArrayList<BasicBlock>();
-    private final Set<BasicBlock> children = new HashSet<BasicBlock>();
+    private final LinkedHashSet<BasicBlock> children = new LinkedHashSet<BasicBlock>();
     private Set<BasicBlock> parents = new HashSet<BasicBlock>();
     private Set<Integer> liveRanges = new HashSet<Integer>();
     private Map<String, Result> valueMap = new HashMap<String, Result>();
@@ -108,7 +111,7 @@ public class BasicBlock {
         return dominatesOver.remove(block);
     }
 
-    public Set<BasicBlock> getChildren() {
+    public LinkedHashSet<BasicBlock> getChildren() {
         return children;
     }
 

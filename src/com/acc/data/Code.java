@@ -1,5 +1,6 @@
 package com.acc.data;
 
+import com.acc.constants.OperationCode;
 import com.acc.structure.BasicBlock;
 import com.acc.structure.ControlFlowGraph;
 
@@ -42,6 +43,29 @@ public class Code {
     }
 
     public int addCode(Instruction instruction, int targetIndex) {
+        if(getCurrentBlock().getInstructions().isEmpty()) {
+            final int location = instruction.getLocation();
+            final Instruction noop = new Instruction(OperationCode.noop, null, null, location);
+            instructions.add(noop);
+            controlFlowGraph.addInstruction(noop);
+            instruction.setLocation(getPc());
+            if(instruction.getOpcode() == OperationCode.move || instruction.isPhi()) {
+                if(instruction.getX().isVariable()) {
+                    if(instruction.getX().getLocation() == location) {
+                        instruction.getX().setLocation(getPc());
+                        instruction.getSymbol().setSuffix(getPc());
+                    }
+                }
+                if(instruction.isPhi()) {
+                    if(instruction.getY().isVariable()) {
+                        if(instruction.getY().getLocation() == location) {
+                            instruction.getY().setLocation(getPc());
+                            instruction.getSymbol().setSuffix(getPc());
+                        }
+                    }
+                }
+            }
+        }
         if(instruction.isKill()) {
             final BasicBlock joinBlock = controlFlowGraph.getCurrentBlock().getJoinBlock();
             if (joinBlock != null) {

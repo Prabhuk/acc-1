@@ -65,6 +65,9 @@ public class Instruction {
     }
 
     public String getInstructionString() {
+        if(opcode == OperationCode.noop) {
+            return "";
+        }
 
         StringBuilder sb = new StringBuilder(OperationCode.getOperationName(opcode));
         final Integer operandCount = OperationCode.getOperandCount(opcode);
