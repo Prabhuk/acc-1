@@ -177,7 +177,10 @@ public class RegisterAllocator {
     }
 
     private Result updateIntermediates(Map<Integer, Integer> moveRegisters, Result parameter, Instruction instruction) {
-        final Integer integer = moveRegisters.get(instruction.getY().getIntermediateLoation());
+        if(!parameter.isIntermediate()) {
+            return parameter;
+        }
+        final Integer integer = moveRegisters.get(parameter.getIntermediateLoation());
         if(integer != null) {
             final Result x = new Result(Kind.REG);
             x.regNo(integer);

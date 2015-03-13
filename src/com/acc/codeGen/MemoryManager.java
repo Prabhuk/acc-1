@@ -1,4 +1,4 @@
-package com.acc;
+package com.acc.codeGen;
 
 import com.acc.codeGen.AuxilaryDLXFunctions;
 import com.acc.codeGen.MachineCode;
@@ -10,8 +10,11 @@ import com.acc.data.Result;
 import com.acc.exception.RegisterAllocationException;
 import com.acc.parser.Computation;
 import com.acc.structure.Register;
+import com.acc.structure.Symbol;
+import com.acc.util.Printer;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,6 +25,7 @@ public class MemoryManager {
     private Map<Integer,Integer> offsetLocations;
     private MachineCode machineCode;
     private int offsetcoutner;
+    Map<String,Integer> variableOffsets;
 
     public MemoryManager(Computation program, MachineCode machineCode)
     {
@@ -30,9 +34,21 @@ public class MemoryManager {
         this.machineCode=machineCode;
         int registercount=1;
         offsetcoutner = 0;
+        variableOffsets = new HashMap<String, Integer>();
+        int paramref = 0;
+        if(!program.getProgramName().equals("main")) {
+            if (program.getArgumentNamesForProcedure(program.getProgramName()) != null || !program.getArgumentNamesForProcedure(program.getProgramName()).isEmpty()) {
+                int paramsize = program.getArgumentNamesForProcedure(program.getProgramName()).size();
+                for (String procNames : program.getArgumentNamesForProcedure(program.getProgramName())) {
+                    variableOffsets.put(procNames, (paramsize+3) - paramref-2);
+                    paramref++;
+                }
+            }
+        }
         Map<Integer,Integer> regInfo = program.getRegisterInfo();
         for(Integer i:regInfo.keySet())
         {
+            Printer.debugMessage("regdetails:   "+Integer.toString(regInfo.get(i)));
             if(regInfo.get(i)<8)
             {
                 registerLocations.put(i,regInfo.get(i)+1);
@@ -48,6 +64,17 @@ public class MemoryManager {
         }
         if(offsetcoutner>0)
             AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.SUBI, 29, 0, offsetcoutner*4);
+//        if(program.getProgramName().equals("main"))
+//        {
+//            Integer globalOffsetcounter = 0;
+//            for (Symbol s : program.getSymbolTable().getSymbols()) {
+//                Printer.print(s.getName());
+//                GlobalMemoryTable.insertglobalvariables(s.getName(),globalOffsetcounter);
+//                AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, 0, 29, -4);
+//                globalOffsetcounter++;
+//            }
+          //  AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.ADDI, 30, 29, 0);
+//        }
     }
 
     public Result getInstructionRegister(Integer location) {
@@ -111,6 +138,29 @@ public class MemoryManager {
                 AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.LDW, 27, 29, (offset * 4));
                 return new Result(Kind.REG, 27, offset, null, null, null, null);
             }
+        }
+        else if(x.isVariable())
+        {
+            if(isB) {
+                if (variableOffsets.containsKey(x.getVariableName())) {
+                    AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.LDW, 26, 28, variableOffsets.get(x.getVariableName()) * 4);
+                    return new Result(Kind.REG, 26, variableOffsets.get(x.getVariableName()), null, null, null, null);
+                }
+                else
+                    //global table code here
+                    return new Result(Kind.REG, 26, variableOffsets.get(x.getVariableName()), null, null, null, null);
+            }
+            else
+            {
+                if (variableOffsets.containsKey(x.getVariableName())) {
+                    AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.LDW, 27, 28, variableOffsets.get(x.getVariableName()) * 4);
+                    return new Result(Kind.REG, 27, variableOffsets.get(x.getVariableName()), null, null, null, null);
+                }
+                else
+                    //global table code here
+                    return new Result(Kind.REG, 27, variableOffsets.get(x.getVariableName()), null, null, null, null);
+            }
+
         }
         else
             return new Result(Kind.REG, 27, null,null,null,null);

@@ -1,10 +1,8 @@
 package com.acc.codeGen;
 
-import com.acc.MemoryManager;
 import com.acc.constants.OperationCode;
 import com.acc.data.Instruction;
 import com.acc.data.Result;
-import com.acc.parser.Computation;
 
 /**
  * Created by Rumpy on 11-03-2015.

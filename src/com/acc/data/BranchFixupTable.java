@@ -43,7 +43,7 @@ public class BranchFixupTable {
         if(branchMap.containsKey(branchTo)) {
             List<MachineInstruction> fixupInstructions = branchMap.get(branchTo);
             for (MachineInstruction instruction : fixupInstructions) {
-                instruction.fixup(fixUpPoint);
+                instruction.fixup(fixUpPoint - instruction.getLocation());
             }
         }
     }

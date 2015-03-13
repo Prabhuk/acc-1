@@ -1,6 +1,5 @@
 package com.acc.codeGen;
 
-import com.acc.MemoryManager;
 import com.acc.constants.OperationCode;
 import com.acc.data.BranchFixupTable;
 import com.acc.data.Instruction;
@@ -24,7 +23,7 @@ public class BranchTranslator {
 
             if(instructionMap.containsKey(c.value()))
             {
-                AuxilaryDLXFunctions.putF1(machineCode, dlxOpCode, 0,0,(Integer)instructionMap.get(c.value()));
+                AuxilaryDLXFunctions.putF1(machineCode, dlxOpCode, 0,0,(Integer)instructionMap.get(c.value())-machineCode.getPc());
             }
             else
             {

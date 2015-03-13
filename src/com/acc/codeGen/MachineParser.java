@@ -1,6 +1,5 @@
 package com.acc.codeGen;
 
-import com.acc.MemoryManager;
 import com.acc.constants.Kind;
 import com.acc.constants.OperationCode;
 import com.acc.data.*;
@@ -31,11 +30,12 @@ public class MachineParser {
         functionMap = new HashMap<String, Integer>();
         functionMap.put("main", -1);
         AuxilaryDLXFunctions.putF2(machineCode, MachineOperationCode.ADD, 29, 0, 30);
-        //AuxilaryDLXFunctions.putF1(machineCode ,MachineOperationCode.ADD, 29,0,30);
+       // AuxilaryDLXFunctions.putF1(machineCode ,MachineOperationCode.ADD, 29,0,30);
     }
 
     public int[] begin() {
         parse(outputContents.getProgram("main"));
+        Printer.debugMessage("\n\n\nPROGRAM STRT:");
         for (MachineInstruction i : machineCode.getInstructions()) {
             Printer.debugMessage(Integer.toString(i.getLocation()) + " : " + MachineOperationCode.getOperationName(i.opcode) + " " + Integer.toString(i.a) + " " + Integer.toString(i.b) + " " + Integer.toString(i.c));
         }
@@ -46,17 +46,20 @@ public class MachineParser {
     public void parse(Computation program) {
         SymbolTable symboltable = program.getSymbolTable();
         Code programCode = program.getCode();
-
         List<Instruction> instructionSet = programCode.getInstructions();
         functionMap.put(program.getProgramName(), machineCode.getPc());   //Placing this function in the table of visited functions
+        int parameterSize = 0;
+
 
         if (!program.getProgramName().equals("main")) {
+            parameterSize = program.getFormalParams().size();
             procedureFixupTable.fix(program.getProgramName(), machineCode.getPc());  // Fixing all references to this function
-            //machineCode.addCode(DLX.assemble(MachineOperationCode.PSH, 31,29,-4));
-
-            //PROLOGUE
+            //PROLOGUE CONT.....
+            //pushing the return address
             AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, 31, 29, -4);
+            //pushing old FP
             AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, 28, 29, -4);
+            //making FP reg = SP reg
             AuxilaryDLXFunctions.putF2(machineCode, MachineOperationCode.ADD, 28, 0, 29);
         }
         //Copying local symbol table into memory
@@ -72,14 +75,14 @@ public class MachineParser {
 
 
         for (Instruction currentInstruction : instructionSet) {
-            //instantiateVairables(localSymbols, currentInstruction);
+            instantiateVairables(localSymbols, currentInstruction);
             //System.out.println(currentInstruction.getLocation());
             branchFixupTable.fix(currentInstruction.getLocation(), machineCode.getPc());
             instructionMap.put(currentInstruction.getLocation(), machineCode.getPc());
             Printer.debugMessage("MACHINE PARSER: " + currentInstruction.getInstructionString());
             Integer instructionOpCode = currentInstruction.getOpcode();
             if (instructionOpCode == OperationCode.call) {
-                procedureCallTranslator(currentInstruction);
+                 procedureCallTranslator(currentInstruction,memoryManager);
             } else if (instructionOpCode >= OperationCode.add && instructionOpCode <= OperationCode.cmp) {
                 ArithmeticTranslator.translate(machineCode, currentInstruction, memoryManager);
                 //Todo Have to deal with arrays!!
@@ -90,14 +93,22 @@ public class MachineParser {
             } else if (instructionOpCode == OperationCode.move) {
                 MoveTranslator.translate(currentInstruction, machineCode, memoryManager);
             }
+            else if(instructionOpCode == OperationCode.ret)
+            {
+                if(currentInstruction.getX().isRegister())
+                {
+                    Result c = memoryManager.getOperand(currentInstruction,currentInstruction.getX(),false);
+                    AuxilaryDLXFunctions.putF2(machineCode, MachineOperationCode.ADD, 25, 0, c.regNo());
+                }
+                else if(currentInstruction.getX().isConstant()) {
+                    AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.ADDI, 25, 0, currentInstruction.getX().value());
+                }
+            }
+            else if(instructionOpCode == OperationCode.end)
+            {
+                EndTranslator.translate(machineCode, program, parameterSize);
+            }
 
-        }
-        if (!program.getProgramName().equals("main")) {
-            //EPILOGUE
-            AuxilaryDLXFunctions.putF2(machineCode, MachineOperationCode.ADD, 29, 0, 28);
-            AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.POP, 28, 29, 4);
-          //  AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.POP, 31, 29, 4);  //todo This line is for handling parameters
-            AuxilaryDLXFunctions.putF2(machineCode, MachineOperationCode.RET, 0, 0, 31);
         }
 
         for (String functionName : functionMap.keySet()) {
@@ -105,25 +116,56 @@ public class MachineParser {
                 parse(outputContents.getProgram(functionName));
             }
         }
-        AuxilaryDLXFunctions.putF2(machineCode, MachineOperationCode.RET, 0, 0, 0);
+
     }
 
-    private void procedureCallTranslator(Instruction currentInstruction) {
+
+
+    private int procedureCallTranslator(Instruction currentInstruction,MemoryManager memoryManager) {
         Integer dlxOpCode = MachineOperationCode.BSR;
+        //PROLOGUE
+        //pushing registers first
+        AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, 1, 29, -4);
+        AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, 2, 29, -4);
+        AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, 3, 29, -4);
+        AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, 4, 29, -4);
+        AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, 5, 29, -4);
+        AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, 6, 29, -4);
+        AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, 7, 29, -4);
+        AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, 8, 29, -4);
+        //adding parameters as needed
+        List<Result> parameters = currentInstruction.getParameters();
+        if(parameters != null && !parameters.isEmpty()) {
+            //Todo: What do i do with parameter values?
+            for(Result parameter: parameters)
+            {
+               Result b = memoryManager.getOperand(currentInstruction, parameter, true);
+                if(b.isConstant())
+                {
+                    AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.ADDI, 27, 0, b.value());
+                    AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, 27, 29, -4);
+
+                }
+                else
+                    AuxilaryDLXFunctions.putF1(machineCode, MachineOperationCode.PSH, b.regNo(), 29, -4);
+                //no pop yet
+            }
+        }
         if (!functionMap.containsKey(currentInstruction.getX().getVariableName())) {
             MachineInstruction machineInstruction = AuxilaryDLXFunctions.putF1(machineCode, dlxOpCode, 0, 0, -1);
-            final List<Result> parameters = currentInstruction.getParameters();
-            if(parameters != null && !parameters.isEmpty()) {
-                //Todo: What do i do with parameter values?
-            }
             functionMap.put(currentInstruction.getX().getVariableName(), -1);
             procedureFixupTable.add(currentInstruction.getX().getVariableName(), machineInstruction);
         } else {
             Integer functionAddress = functionMap.get(currentInstruction.getX().getVariableName());
-            AuxilaryDLXFunctions.putF1(machineCode, dlxOpCode, 0, 0, functionAddress);
+            if(functionAddress > machineCode.getPc())
+                AuxilaryDLXFunctions.putF1(machineCode, dlxOpCode, 0, 0, functionAddress - machineCode.getPc());
         }
+        Result a = memoryManager.getInstructionRegister(currentInstruction.getLocation());
+        if(a.isRegister())
+            AuxilaryDLXFunctions.putF2(machineCode, MachineOperationCode.ADD, a.regNo(), 0,25 );
         //I need to add this instruction to a map which contains the procedure name and all the BSRs to it.
         //This will later be used for fix-up purposes
+        return parameters.size();
     }
 
 

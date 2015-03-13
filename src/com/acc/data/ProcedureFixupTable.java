@@ -44,7 +44,7 @@ public class ProcedureFixupTable {
         List<MachineInstruction> fixupInstructions = procedureMap.get(procedureName);
         for(MachineInstruction instruction: fixupInstructions)
         {
-            instruction.fixup(address);
+            instruction.fixup(address - instruction.getLocation());
         }
     }
 }

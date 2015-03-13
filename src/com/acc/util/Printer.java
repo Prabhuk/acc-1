@@ -15,7 +15,7 @@ public class Printer {
 
     public static void debugMessage(String message) {
 
-//        System.out.println(message);
+        System.out.println(message);
     }
 
     public static void debugMessage(Instruction instruction) {
