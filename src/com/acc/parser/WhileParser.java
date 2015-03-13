@@ -37,7 +37,7 @@ public class WhileParser extends Parser {
         final BasicBlock currentBlock = new BasicBlock();
         currentBlock.setType(BlockType.WHILE_HEAD);
         currentBlock.setJoinBlock(currentBlock);
-        previousBlock.addChild(currentBlock);
+        previousBlock.addChild(currentBlock, true);
         code.setCurrentBlock(currentBlock);
         BasicBlock loopBlock = code.getCurrentBlock();
         Result x = new Relation(code, tokenizer, symbolTable).parse();
@@ -65,27 +65,32 @@ public class WhileParser extends Parser {
         handleDoToken();
 
         final BasicBlock right = new BasicBlock();
+        currentBlock.addChild(right, true);
         right.setType(BlockType.WHILE_BODY);
         right.setJoinBlock(currentBlock);
-        currentBlock.addChild(right, true);
         join.setRight(right);
         code.setCurrentBlock(right);
 
         final Result rightTree = new StatSequence(code, tokenizer, symbolTable).parse();
-        if(rightTree.getJoin() != null) {
-            join.setRight(rightTree.getJoin());
-        }
 
-        if(rightTree.getFollow() != null) {
-            join.setRight(rightTree.getFollow());
-            rightTree.getFollow().addChild(loopBlock); //Does loop body dominate loop condition block?
-        } else {
-            right.addChild(loopBlock);
-        }
+//        if(rightTree.getJoin() != null) {
+        join.setRight(code.getCurrentBlock());
+        code.getCurrentBlock().addChild(join, false);
+//            rightTree.getJoin().addChild(loopBlock); //Does loop body dominate loop condition block?
+//        }
+
+//        if(rightTree.getFollow() != null) {
+//            join.setRight(rightTree.getFollow());
+//            rightTree.getFollow().addChild(loopBlock); //Does loop body dominate loop condition block?
+//        } else {
+//            right.addChild(loopBlock);
+//        }
 
         AuxiliaryFunctions.BJ(code, loop); //Backward Jump to the loop beginning.
-        PhiInstructionHelper.createPhiInstructions(getSymbolTable(), join, code);
+//        PhiInstructionHelper.createPhiInstructions(getSymbolTable(), join, code, currentBlock);
+        PhiInstructionHelper.createPhiInstructions(code, currentBlock, getSymbolTable());
         code.Fixup(x.fixupLoc());
+
         final BasicBlock followBlock = new BasicBlock();
         followBlock.setType(BlockType.WHILE_FOLLOW);
         join.addChild(followBlock, true);

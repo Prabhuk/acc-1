@@ -123,6 +123,9 @@ public class BasicBlock {
 
 
     public void addChild(BasicBlock child, boolean addDominatedOver) {
+        if(child.getParents().contains(this)) {
+            return;
+        }
         child.getParents().add(this);
         this.children.add(child);
         if(addDominatedOver) {

@@ -43,9 +43,7 @@ public class IfParser extends Parser {
         handleThenToken();
 
         final Result leftTree = new StatSequence(code, tokenizer, symbolTable).parse();//Ignoring the return type. Shouldn't mean anything at this context.
-        if (leftTree.getJoin() != null && !leftTree.getJoin().equals(join)) {
-            join.setLeft(leftTree.getJoin());
-        }
+        join.setLeft(code.getCurrentBlock());
 
 //        Result follow = new Result(Kind.FRAME_POINTER, 0, 0, 0, null, ZERO);
         Token incoming = tokenizer.next();
@@ -85,7 +83,7 @@ public class IfParser extends Parser {
         if(join.getRight() != null) {
             join.getRight().addChild(join);
         }
-        PhiInstructionHelper.createPhiInstructions(getSymbolTable(), join, code);
+        PhiInstructionHelper.createPhiForIF(code, currentBlock, getSymbolTable());
         code.setCurrentBlock(join);
         return x;
     }
