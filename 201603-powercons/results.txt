@@ -1,0 +1,18 @@
+\begin{tikzpicture}
+\begin{axis}[
+           symbolic x coords={omnetpp (VTV), astar (CFI), hello},
+           xtick=data,
+	%xticklabel={,,},
+	ylabel=Average Power Consumption (Watts),
+	%enlargelimits=0.05,
+	legend style={at={(0.5,-0.1)},
+	anchor=north, legend columns=0},
+	ybar interval=0.5,
+]
+\addplot 
+	coordinates { (omnetpp (VTV), 14.455)  (astar (CFI), 15.093) (hello, 15)};
+\addplot 
+	coordinates { (omnetpp (VTV), 14.888)  (astar (CFI), 15.577) (hello, 15)};
+\legend{OFF (Baseline), ON (Experiment) }
+\end{axis}
+\end{tikzpicture}

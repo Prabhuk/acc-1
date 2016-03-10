@@ -1,0 +1,186 @@
+% Copy and paste bibtex citations here, and give them a meaningful nickname.
+
+@inproceedings {tice,
+author = {Caroline Tice and Tom Roeder and Peter Collingbourne and Stephen Checkoway and {\'U}lfar Erlingsson and Luis Lozano and Geoff Pike},
+title = {Enforcing Forward-Edge Control-Flow Integrity in GCC \& LLVM},
+booktitle = {23rd USENIX Security Symposium (USENIX Security 14)},
+year = {2014},
+month = Aug,
+isbn = {978-1-931971-15-7},
+address = {San Diego, CA},
+pages = {941--955},
+url = {https://www.usenix.org/conference/usenixsecurity14/technical-sessions/presentation/tice},
+publisher = {USENIX Association},
+}
+@inproceedings{abadi,
+ author = {Abadi, Mart\'{\i}n and Budiu, Mihai and Erlingsson, \'{U}lfar and Ligatti, Jay},
+ title = {Control-flow Integrity},
+ booktitle = {Proceedings of the 12th ACM Conference on Computer and Communications Security},
+ series = {CCS '05},
+ year = {2005},
+ isbn = {1-59593-226-7},
+ location = {Alexandria, VA, USA},
+ pages = {340--353},
+ numpages = {14},
+ url = {http://doi.acm.org/10.1145/1102120.1102165},
+ doi = {10.1145/1102120.1102165},
+ acmid = {1102165},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {binary rewriting, control-flow graph, inlined reference monitors, vulnerabilities},
+} 
+
+@inproceedings{coop,
+  title={Counterfeit Object-oriented Programming: On the Difficulty of Preventing Code Reuse Attacks in C++ Applications},
+  author={Felix Schuster and Thomas Tendyck and Christopher Liebchen and Lucas Davi and Ahmad-Reza Sadeghi and Thorsten Holz},
+  booktitle={SP},
+  year={2015}
+}
+
+@inproceedings{zygote,
+ author = {Lee, Byoungyoung and Lu, Long and Wang, Tielei and Kim, Taesoo and Lee, Wenke},
+ title = {From Zygote to Morula: Fortifying Weakened ASLR on Android},
+ booktitle = {Proceedings of the 2014 IEEE Symposium on Security and Privacy},
+ series = {SP '14},
+ year = {2014},
+ isbn = {978-1-4799-4686-0},
+ pages = {424--439},
+ numpages = {16},
+ url = {http://dx.doi.org/10.1109/SP.2014.34},
+ doi = {10.1109/SP.2014.34},
+ acmid = {2650762},
+ publisher = {IEEE Computer Society},
+ address = {Washington, DC, USA},
+ keywords = {Android, ASLR, Security},
+} 
+
+@inproceedings {gadgets,
+author = {Lucas Davi and Ahmad-Reza Sadeghi and Daniel Lehmann and Fabian Monrose},
+title = {Stitching the Gadgets: On the Ineffectiveness of Coarse-Grained Control-Flow Integrity Protection},
+booktitle = {23rd USENIX Security Symposium (USENIX Security 14)},
+year = {2014},
+month = Aug,
+isbn = {978-1-931971-15-7},
+address = {San Diego, CA},
+pages = {401--416},
+url = {https://www.usenix.org/conference/usenixsecurity14/technical-sessions/presentation/davi},
+publisher = {USENIX Association},
+}
+
+@inproceedings {trop,
+author = {Vasilis Pappas and Michalis Polychronakis and Angelos D. Keromytis},
+title = {Transparent ROP Exploit Mitigation Using Indirect Branch Tracing},
+booktitle = {Presented as part of the 22nd USENIX Security Symposium (USENIX Security 13)},
+year = {2013},
+isbn = {978-1-931971-03-4},
+address = {Washington, D.C.},
+pages = {447--462},
+url = {https://www.usenix.org/conference/usenixsecurity13/technical-sessions/paper/pappas},
+publisher = {USENIX},
+}
+
+@inproceedings{turing,
+ author = {Homescu, Andrei and Stewart, Michael and Larsen, Per and Brunthaler, Stefan and Franz, Michael},
+ title = {Microgadgets: Size Does Matter in Turing-complete Return-oriented Programming},
+ booktitle = {Proceedings of the 6th USENIX Conference on Offensive Technologies},
+ series = {WOOT'12},
+ year = {2012},
+ location = {Bellevue, WA},
+ pages = {7--7},
+ numpages = {1},
+ url = {http://dl.acm.org/citation.cfm?id=2372399.2372409},
+ acmid = {2372409},
+ publisher = {USENIX Association},
+ address = {Berkeley, CA, USA},
+} 
+
+@inproceedings{safed,
+  author = {Jang, Dongseok and Tatlock, Zachary and Lerner, Sorin},
+  title = {Safe{D}ispatch: Securing {C++} Virtual Calls from Memory Corruption Attacks},
+  booktitle = {20th Annual Network and Distributed System Security Symposium},
+  series = {NDSS '14},
+  publisher = {The Internet Society},
+  year = {2014},
+  paper = {sd-jang-ndss14.pdf},
+  puburl = {http://www.internetsociety.org/doc/safedispatch-securing-c-virtual-calls-memory-corruption-attacks},
+  abstract = {Several defenses have increased the cost of traditional, low-level attacks that corrupt control data,
+                  e.g. return addresses saved on the stack, to compromise program execution.  In response, creative
+                  adversaries have begun circumventing these defenses by exploiting programming errors to manipulate
+                  pointers to virtual tables, or vtables, of C++ objects. These attacks can hijack program control flow
+                  whenever a virtual method of a corrupted object is called, potentially allowing the attacker to gain
+                  complete control of the underlying system.  In this paper we present SafeDispatch, a novel defense to
+                  prevent such vtable hijacking by statically analyzing C++ programs and inserting sufficient runtime
+                  checks to ensure that control flow at virtual method call sites cannot be arbitrarily influenced by an
+                  attacker.  We implemented SafeDispatch as a Clang++/LLVM extension, used our enhanced compiler to
+                  build a vtable-safe version of the Google Chromium browser, and measured the performance overhead of
+                  our approach on popular browser benchmark suites.  By carefully crafting a handful of optimizations,
+                  we were able to reduce average runtime overhead to just 2.1\%.}
+}
+
+@INPROCEEDINGS{mocfi,
+    author = {Lucas Davi and Ra Dmitrienko and Manuel Egele and Thomas Fischer and Thorsten Holz and Ralf Hund and Stefan Nürnberger and Ahmad-reza Sadeghi},
+    title = {MoCFI: A framework to mitigate control-flow attacks on smartphones},
+    booktitle = {In Proceedings of the Network and Distributed System Security Symposium (NDSS},
+    year = {2012}
+}
+
+@inproceedings{picfi,
+ author = {Niu, Ben and Tan, Gang},
+ title = {Per-Input Control-Flow Integrity},
+ booktitle = {Proceedings of the 22Nd ACM SIGSAC Conference on Computer and Communications Security},
+ series = {CCS '15},
+ year = {2015},
+ isbn = {978-1-4503-3832-5},
+ location = {Denver, Colorado, USA},
+ pages = {914--926},
+ numpages = {13},
+ url = {http://doi.acm.org/10.1145/2810103.2813644},
+ doi = {10.1145/2810103.2813644},
+ acmid = {2813644},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {control-flow integrity, dynamic CFI},
+} 
+
+@inproceedings{failaslr,
+ author = {Shacham, Hovav and Page, Matthew and Pfaff, Ben and Goh, Eu-Jin and Modadugu, Nagendra and Boneh, Dan},
+ title = {On the Effectiveness of Address-space Randomization},
+ booktitle = {Proceedings of the 11th ACM Conference on Computer and Communications Security},
+ series = {CCS '04},
+ year = {2004},
+ isbn = {1-58113-961-6},
+ location = {Washington DC, USA},
+ pages = {298--307},
+ numpages = {10},
+ url = {http://doi.acm.org/10.1145/1030083.1030124},
+ doi = {10.1145/1030083.1030124},
+ acmid = {1030124},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {address-space randomization, automated attacks, diversity},
+} 
+
+@inproceedings{vtrust,
+  title={VTrust: Regaining Trust on Virtual Calls},
+  author={Zhang, Chao and Carr, Scott and Li, Tongxin and Ding, Yu and Song, Chengyu and Payer, Mathias and Song, Dawn},
+  booktitle={The Network and Distributed System Security Symposium (NDSS'16)},
+  volume={2016},
+  year={2016}
+}
+
+@article{aslr,
+  title={PaX address space layout randomization (ASLR)},
+  author={Team, PaX},
+  year={2003}
+}
+
+@INPROCEEDINGS{powertutor, 
+author={L. Zhang and B. Tiwana and R. P. Dick and Z. Qian and Z. M. Mao and Z. Wang and L. Yang}, 
+booktitle={Hardware/Software Codesign and System Synthesis (CODES+ISSS), 2010 IEEE/ACM/IFIP International Conference on}, 
+title={Accurate online power estimation and automatic battery behavior based power model generation for smartphones}, 
+year={2010}, 
+pages={105-114}, 
+keywords={battery management systems;electric sensing devices;embedded systems;power consumption;power engineering computing;PowerBooter;automatic battery behavior;built-in battery voltage sensor;embedded system;online power estimation;power efficient software;power management;power model generation;smartphone variant;Batteries;Bluetooth;Brightness;Cameras;Global Positioning System;Ground penetrating radar;Monitoring;Power modeling;battery;mobile phones}, 
+month={Oct},}
+
+

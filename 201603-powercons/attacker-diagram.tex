@@ -1,0 +1,27 @@
+\begin{tikzpicture}
+[start chain=going below,]
+
+\node[smallbox, red] (vptr) {
+VPTR
+};
+
+\node[mediumbox, right of=vptr,node distance=150pt, blue] (Vtable) {
+Human Vtable \\
+$\rightarrow$ Human: speak() \\
+$\rightarrow$  Employee: speak() \\
+$\rightarrow$  Manager: speak() \\
+};
+
+\node[mediumbox, below right of=vptr, node distance = -16pt] (Henry) {
+Henry              
+};
+
+\node[mediumbox, above of=Vtable, node distance = 80pt, red] (Devil) {
+Attacker's code
+};
+
+%\draw [->] (vptr) -- (Vtable);
+
+\draw [->, red] (vptr) to [out=10,in=170] (Devil);
+
+  \end{tikzpicture}

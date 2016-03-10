@@ -1,0 +1,34 @@
+\begin{tikzpicture}
+%  [node distance=.8cm,
+[start chain=going below,]
+\node[box, join] (Human) {
+\begin{verbatim}
+class Human {
+     virtual void speak();
+};\end{verbatim}
+};
+\node[box, join] (Employee) {
+\begin{verbatim}
+class Employee : public Human {
+     virtual void speak();
+};
+\end{verbatim}
+};
+     
+\node[box, join] (Manager) {
+\begin{verbatim}
+class Manager : public Employee {
+     virtual void speak();
+};
+\end{verbatim}
+};
+
+\node[emptybox, below of=Manager,node distance =  15pt] (Code) {
+\begin{verbatim}
+Human* Henry = new Manager();
+Henry -> speak();
+\end{verbatim}
+};
+
+
+\end{tikzpicture}
